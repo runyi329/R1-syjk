@@ -1,0 +1,120 @@
+{
+  "mainBets": [
+    {
+      "name": "庄家 (Banker)",
+      "edge": 1.06,
+      "payout": "1:0.95",
+      "recommendation": "strongly_recommended",
+      "description": "需扣5%佣金，是百家乐中数学期望值最高的投注选项，长期策略的首选。",
+      "probability": "45.86%"
+    },
+    {
+      "name": "闲家 (Player)",
+      "edge": 1.24,
+      "payout": "1:1",
+      "recommendation": "recommended",
+      "description": "次佳选择，无需支付佣金，适合不喜欢计算佣金的玩家。",
+      "probability": "44.62%"
+    },
+    {
+      "name": "和局 (Tie)",
+      "edge": 14.36,
+      "payout": "1:8",
+      "recommendation": "not_recommended",
+      "description": "虽然赔率高，但庄家优势极高，是赌场最赚钱的投注之一，应避免。",
+      "probability": "9.52%"
+    }
+  ],
+  "pairBets": [
+    {
+      "name": "庄对子 (Banker Pair)",
+      "edge": 10.36,
+      "payout": "1:11",
+      "recommendation": "not_recommended",
+      "description": "庄家前两张牌为对子。中奖概率低，风险高。",
+      "probability": "7.47%"
+    },
+    {
+      "name": "闲对子 (Player Pair)",
+      "edge": 10.36,
+      "payout": "1:11",
+      "recommendation": "not_recommended",
+      "description": "闲家前两张牌为对子。与庄对子一样的劣势。",
+      "probability": "7.47%"
+    },
+    {
+      "name": "完美对子 (Perfect Pair)",
+      "edge": 13.03,
+      "payout": "1:25",
+      "recommendation": "not_recommended",
+      "description": "前两张牌花色和点数都相同。极难中奖。",
+      "probability": "~3.5%"
+    },
+    {
+      "name": "任意对子 (Either Pair)",
+      "edge": 13.71,
+      "payout": "1:5",
+      "recommendation": "not_recommended",
+      "description": "庄家或闲家任意一方出现对子。8副牌数据。",
+      "probability": "14.38%"
+    }
+  ],
+  "sideBets": [
+    {
+      "name": "幸运六 (Lucky 6)",
+      "edge": 1.46,
+      "payout": "12:1 / 20:1",
+      "recommendation": "recommended",
+      "description": "免佣百家乐玩法。庄家6点胜：2张牌赔12:1，3张牌赔20:1。",
+      "probability": "5.39%"
+    },
+    {
+      "name": "闲家龙宝 (Player Dragon)",
+      "edge": 2.65,
+      "payout": "最高 1:30",
+      "recommendation": "caution",
+      "description": "根据胜出点数差赔付。非天牌胜9点赔30倍。8副牌数据。",
+      "probability": "----"
+    },
+    {
+      "name": "大 (Big)",
+      "edge": 4.35,
+      "payout": "0.54:1",
+      "recommendation": "caution",
+      "description": "该局总共发出5或6张牌。",
+      "probability": "61.1%"
+    },
+    {
+      "name": "小 (Small)",
+      "edge": 5.27,
+      "payout": "1.5:1",
+      "recommendation": "not_recommended",
+      "description": "该局总共只发出4张牌。",
+      "probability": "37.9%"
+    },
+    {
+      "name": "龙7 (Dragon 7)",
+      "edge": 7.61,
+      "payout": "1:40",
+      "recommendation": "not_recommended",
+      "description": "EZ百家乐。庄家3张牌合计7点胜。",
+      "probability": "2.25%"
+    },
+    {
+      "name": "庄家龙宝 (Banker Dragon)",
+      "edge": 9.37,
+      "payout": "最高 1:30",
+      "recommendation": "not_recommended",
+      "description": "庄家优势远高于闲家龙宝，不建议投注。",
+      "probability": "----"
+    },
+    {
+      "name": "熊猫8 (Panda 8)",
+      "edge": 10.19,
+      "payout": "1:25",
+      "recommendation": "not_recommended",
+      "description": "EZ百家乐。闲家3张牌合计8点胜。",
+      "probability": "3.48%"
+    }
+  ]
+}
