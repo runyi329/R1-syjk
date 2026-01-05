@@ -1,0 +1,49 @@
+{
+  "startingHands": [
+    { "hand": "AA", "winRate": 85.2, "type": "pair", "description": "最强起手牌，俗称'火箭'，面对任意两张牌有极高胜率。" },
+    { "hand": "KK", "winRate": 82.4, "type": "pair", "description": "第二强起手牌，俗称'牛仔'，仅次于AA。" },
+    { "hand": "QQ", "winRate": 79.9, "type": "pair", "description": "强力对子，俗称'女士'，但在A或K出现时需谨慎。" },
+    { "hand": "JJ", "winRate": 77.5, "type": "pair", "description": "俗称'鱼钩'，强牌但容易被高牌压制。" },
+    { "hand": "TT", "winRate": 75.1, "type": "pair", "description": "中强对子，翻牌后需警惕高牌。" },
+    { "hand": "AKs", "winRate": 67.0, "type": "suited", "description": "最强非对子牌，同花AK，具有极高的成牌潜力。" },
+    { "hand": "AQs", "winRate": 66.1, "type": "suited", "description": "强力同花高牌，仅次于AKs。" },
+    { "hand": "AJs", "winRate": 65.4, "type": "suited", "description": "不错的同花高牌，但在被压制时需小心。" },
+    { "hand": "KQs", "winRate": 63.4, "type": "suited", "description": "两张强力高牌，同花潜力大。" },
+    { "hand": "AKo", "winRate": 65.4, "type": "offsuit", "description": "最强杂色高牌，俗称'大滑头'。" },
+    { "hand": "AQo", "winRate": 64.5, "type": "offsuit", "description": "强力杂色高牌，但在面对AK时处于劣势。" },
+    { "hand": "99", "winRate": 72.0, "type": "pair", "description": "中等对子，翻牌击中三条价值巨大。" },
+    { "hand": "88", "winRate": 69.0, "type": "pair", "description": "中等对子，适合埋伏。" },
+    { "hand": "77", "winRate": 66.0, "type": "pair", "description": "小对子，主要依赖击中三条。" },
+    { "hand": "JTs", "winRate": 57.5, "type": "suited", "description": "强力同花连张，听牌潜力巨大。" },
+    { "hand": "T9s", "winRate": 55.8, "type": "suited", "description": "中等同花连张，适合入池博取大牌。" }
+  ],
+  "probabilities": [
+    { "name": "皇家同花顺 (Royal Flush)", "prob": 0.0032, "odds": "1 : 30,939", "description": "同花色的A-K-Q-J-10，德州扑克中最大的牌型。" },
+    { "name": "同花顺 (Straight Flush)", "prob": 0.0279, "odds": "1 : 3,589", "description": "五张同花色的连续牌。" },
+    { "name": "四条 (Four of a Kind)", "prob": 0.168, "odds": "1 : 594", "description": "四张同点数的牌，俗称'炸弹'。" },
+    { "name": "葫芦 (Full House)", "prob": 2.60, "odds": "1 : 37.5", "description": "三张同点数加一对，俗称'福禄'。" },
+    { "name": "同花 (Flush)", "prob": 3.03, "odds": "1 : 32", "description": "五张同花色的牌，非连续。" },
+    { "name": "顺子 (Straight)", "prob": 4.62, "odds": "1 : 20.6", "description": "五张连续点数的牌，非同花。" },
+    { "name": "三条 (Three of a Kind)", "prob": 4.83, "odds": "1 : 19.7", "description": "三张同点数的牌。" },
+    { "name": "两对 (Two Pair)", "prob": 23.5, "odds": "1 : 3.26", "description": "两个对子。" },
+    { "name": "一对 (One Pair)", "prob": 43.8, "odds": "1 : 1.28", "description": "一个对子。" },
+    { "name": "高牌 (High Card)", "prob": 17.4, "odds": "1 : 4.74", "description": "没有任何成牌，只比单张大小。" }
+  ],
+  "insurance": [
+    { "outs": 1, "payout": 30, "prob": 2.27, "houseEdge": 29.5, "description": "极难中牌，庄家优势巨大。" },
+    { "outs": 2, "payout": 16, "prob": 4.55, "houseEdge": 22.7, "description": "常见于口袋对子博三条。" },
+    { "outs": 3, "payout": 10, "prob": 6.82, "houseEdge": 25.0, "description": "常见于高牌博对子。" },
+    { "outs": 4, "payout": 8, "prob": 9.09, "houseEdge": 18.2, "description": "常见于卡顺听牌。" },
+    { "outs": 5, "payout": 6, "prob": 11.36, "houseEdge": 20.5, "description": "常见于两对博葫芦。" },
+    { "outs": 6, "payout": 5, "prob": 13.64, "houseEdge": 18.2, "description": "常见于两高牌博对子。" },
+    { "outs": 7, "payout": 4, "prob": 15.91, "houseEdge": 20.5, "description": "较少见的听牌组合。" },
+    { "outs": 8, "payout": 3.5, "prob": 18.18, "houseEdge": 18.2, "description": "常见于两头顺听牌。" },
+    { "outs": 9, "payout": 3, "prob": 20.45, "houseEdge": 18.2, "description": "常见于同花听牌。" },
+    { "outs": 10, "payout": 2.5, "prob": 22.73, "houseEdge": 20.5, "description": "强力听牌组合。" },
+    { "outs": 11, "payout": 2.2, "prob": 25.00, "houseEdge": 20.0, "description": "同花加卡顺听牌。" },
+    { "outs": 12, "payout": 2, "prob": 27.27, "houseEdge": 18.2, "description": "同花加对子听牌。" },
+    { "outs": 13, "payout": 1.8, "prob": 29.55, "houseEdge": 17.3, "description": "极强听牌。" },
+    { "outs": 14, "payout": 1.6, "prob": 31.82, "houseEdge": 17.3, "description": "同花加两头顺听牌（部分）。" },
+    { "outs": 15, "payout": 1.4, "prob": 34.09, "houseEdge": 18.2, "description": "同花加两头顺听牌（完整）。" }
+  ]
+}

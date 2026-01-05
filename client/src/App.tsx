@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import BaccaratAnalysis from "./pages/BaccaratAnalysis";
 import RouletteAnalysis from "./pages/RouletteAnalysis";
 import FootballAnalysis from "./pages/FootballAnalysis";
+import PokerAnalysis from "./pages/PokerAnalysis";
 
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
        <Route path="/baccarat" component={BaccaratAnalysis} />
       <Route path="/roulette" component={RouletteAnalysis} />
       <Route path="/football" component={FootballAnalysis} />
+      <Route path="/poker" component={PokerAnalysis} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
