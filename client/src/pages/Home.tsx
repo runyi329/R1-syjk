@@ -68,14 +68,7 @@ export default function Home() {
                   ? 'Macau Runyi Investment Co., Ltd. covers the Asia-Pacific region, specializing in providing commercial big data analysis and investment risk management services for individual investors.'
                   : '澳門潤儀投資有限公司業務覆蓋亞太地區，專為個人投資者提供商業大數據分析與投資風險管理服務。'}
               </p>
-              <div className="flex flex-wrap justify-center gap-4 pt-4">
-                <Button size="lg" className="rounded-full px-8 shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-primary to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-primary-foreground border-0">
-                  {language === 'en' ? 'Start Investing' : '開始投資'}
-                </Button>
-                <Button size="lg" variant="outline" className="rounded-full px-8">
-                  {language === 'en' ? 'Contact Us' : '聯繫我們'}
-                </Button>
-              </div>
+
             </div>
           </div>
           
@@ -131,7 +124,7 @@ export default function Home() {
         </section>
 
         {/* 投资类别导航 */}
-        <section className="py-16 container mx-auto px-4">
+        <section className="py-8 md:py-16 container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               {language === 'en' ? 'Investment Sectors' : '投資領域'}
@@ -188,6 +181,18 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* 底部行动召唤 */}
+      <section className="py-12 container mx-auto px-4 text-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 shadow-[0_0_20px_rgba(var(--primary),0.3)] border border-primary/50 w-full sm:w-auto">
+            {language === 'en' ? 'Start Investing' : '開始投資'}
+          </Button>
+          <Button size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 text-lg px-8 w-full sm:w-auto">
+            {language === 'en' ? 'Contact Us' : '聯繫我們'}
+          </Button>
+        </div>
+      </section>
 
       <footer className="bg-card border-t border-border py-12 mt-auto">
         <div className="container mx-auto px-4 text-center">
