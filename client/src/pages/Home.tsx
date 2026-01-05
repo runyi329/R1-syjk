@@ -63,14 +63,24 @@ export default function Home() {
                 </Button>
               </Link>
             ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2"
-                onClick={() => window.location.href = '/api/oauth/login'}
-              >
-                {language === 'en' ? 'Login' : '登录'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2"
+                  onClick={() => window.location.href = '/api/oauth/login'}
+                >
+                  {language === 'en' ? 'Login' : '登录'}
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="bg-primary/80 hover:bg-primary text-primary-foreground transition-colors text-xs px-2"
+                  onClick={() => window.location.href = '/api/test-login'}
+                >
+                  {language === 'en' ? 'Test Login' : '测试登录'}
+                </Button>
+              </div>
             )}
           </div>
         </div>
