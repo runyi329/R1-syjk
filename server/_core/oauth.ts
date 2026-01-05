@@ -10,6 +10,19 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
+  // Login route - redirects to OAuth provider
+  app.get("/api/oauth/login", (req: Request, res: Response) => {
+    const oauthPortalUrl = process.env.VITE_OAUTH_PORTAL_URL || "https://manus.im";
+    const appId = process.env.VITE_APP_ID || "";
+    const currentUrl = `${req.protocol}://${req.get("host")}`;
+    const redirectUri = `${currentUrl}/api/oauth/callback`;
+    const state = Buffer.from(redirectUri).toString("base64");
+    
+    const authUrl = `${oauthPortalUrl}/oauth/authorize?client_id=${appId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+    
+    res.redirect(302, authUrl);
+  });
+
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
