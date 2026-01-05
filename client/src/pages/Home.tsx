@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users } from "lucide-react";
+import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices } from "lucide-react";
 import { Link } from "wouter";
 import contentData from "../data/investment-portal-content.json";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -87,39 +87,38 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 核心优势 - 紧凑单行布局 */}
-        <section className="py-8 bg-secondary/10 border-y border-border/30">
+        {/* 核心优势 - 横向三列带详情布局 */}
+        <section className="py-12 bg-secondary/10 border-y border-border/30">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
-                  <TrendingUp className="w-5 h-5" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20">
+                  <TrendingUp className="w-6 h-6" />
                 </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-lg text-primary">{language === 'en' ? 'Market Analysis' : '市場分析'}</h3>
-                </div>
+                <h3 className="font-bold text-lg text-primary mb-2">{language === 'en' ? 'Market Analysis' : '市場分析'}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {content.advantages[1].split('：')[1] || content.advantages[1].split(':')[1]}
+                </p>
               </div>
               
-              <div className="hidden md:block w-px h-10 bg-border/50"></div>
-              
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
-                  <ShieldCheck className="w-5 h-5" />
+              <div className="flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20">
+                  <ShieldCheck className="w-6 h-6" />
                 </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-lg text-primary">{language === 'en' ? 'Risk Control' : '風控建議'}</h3>
-                </div>
+                <h3 className="font-bold text-lg text-primary mb-2">{language === 'en' ? 'Risk Control' : '風控建議'}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {content.advantages[2].split('：')[1] || content.advantages[2].split(':')[1]}
+                </p>
               </div>
               
-              <div className="hidden md:block w-px h-10 bg-border/50"></div>
-              
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
-                  <Users className="w-5 h-5" />
+              <div className="flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20">
+                  <Users className="w-6 h-6" />
                 </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-lg text-primary">{language === 'en' ? 'Client Focus' : '客戶至上'}</h3>
-                </div>
+                <h3 className="font-bold text-lg text-primary mb-2">{language === 'en' ? 'Client Focus' : '客戶至上'}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {content.advantages[3].split('：')[1] || content.advantages[3].split(':')[1]}
+                </p>
               </div>
             </div>
           </div>
@@ -137,13 +136,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => {
+            {categories.map((category, index) => {
               const catData = category[language as keyof typeof category] as any;
+              // 动态分配图标
+              const icons = [BarChart3, Coins, Gem, Layers, PieChart, Dices];
+              const IconComponent = icons[index % icons.length];
+              
               return (
                 <Card key={category.id} className="group hover:shadow-lg transition-all duration-300 border-border/60 hover:border-primary/50 overflow-hidden bg-card/80 backdrop-blur-sm">
                   <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between space-y-0">
                     <div className="flex items-center gap-3">
-                      <div className="text-2xl text-primary filter drop-shadow-[0_0_5px_rgba(var(--primary),0.5)]">{catData.icon}</div>
+                      <div className="text-primary filter drop-shadow-[0_0_5px_rgba(var(--primary),0.5)]">
+                        <IconComponent className="w-6 h-6" />
+                      </div>
                       <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
                         {catData.name}
                       </CardTitle>
