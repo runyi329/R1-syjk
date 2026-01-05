@@ -66,7 +66,9 @@ export default function BaccaratAnalysis() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-bold text-lg">B</div>
+            <div className="w-8 h-8 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm">
+              <span className="italic tracking-tighter">R1</span>
+            </div>
             <h1 className="text-xl font-bold tracking-tight">百家乐数据透视</h1>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
@@ -227,6 +229,9 @@ export default function BaccaratAnalysis() {
         </section>
 
         <footer className="border-t border-border pt-8 pb-12 text-center text-sm text-muted-foreground">
+          <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-4">
+            <span className="italic tracking-tighter">R1</span>
+          </div>
           <p className="font-medium">© 2026 澳门潤儀投资有限公司 | 专业百家乐数据分析</p>
           <p className="mt-2 text-xs">赌博有风险，请理性娱乐。本站仅供数据分析参考。</p>
         </footer>

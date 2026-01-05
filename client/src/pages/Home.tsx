@@ -196,8 +196,8 @@ export default function Home() {
 
       <footer className="bg-card border-t border-border py-12 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg mx-auto mb-6">
-            R
+          <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-6">
+            <span className="italic tracking-tighter">R1</span>
           </div>
           <h3 className="font-bold text-lg mb-2">{content.name}</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto mb-8">
