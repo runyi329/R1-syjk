@@ -44,11 +44,11 @@ export default function BaccaratAnalysis() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-popover border border-border p-3 rounded-lg shadow-lg">
+        <div className="bg-popover border border-border p-3 rounded-lg shadow-lg min-w-[200px] z-50 relative">
           <p className="font-bold text-popover-foreground mb-1">{data.name}</p>
           <p className="text-sm text-muted-foreground">庄家优势: <span className="font-mono font-bold text-foreground">{data.edge}%</span></p>
           <p className="text-sm text-muted-foreground">赔率: {data.payout}</p>
-          <p className="text-xs mt-2 max-w-[200px] text-muted-foreground">{data.description}</p>
+          <p className="text-xs mt-2 text-muted-foreground whitespace-normal break-words">{data.description}</p>
         </div>
       );
     }
@@ -92,11 +92,11 @@ export default function BaccaratAnalysis() {
             <CardContent>
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={baccaratData.mainBets} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                  <BarChart data={baccaratData.mainBets} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                     <XAxis type="number" domain={[0, 15]} hide />
-                    <YAxis type="category" dataKey="name" width={100} tick={{fontSize: 12}} />
-                    <RechartsTooltip content={<CustomTooltip />} cursor={{fill: 'transparent'}} />
-                    <Bar dataKey="edge" radius={[0, 4, 4, 0]} barSize={40}>
+                    <YAxis type="category" dataKey="name" width={80} tick={{fontSize: 11}} />
+                    <RechartsTooltip content={<CustomTooltip />} cursor={{fill: 'transparent'}} wrapperStyle={{ zIndex: 100 }} />
+                    <Bar dataKey="edge" radius={[0, 4, 4, 0]} barSize={40} label={{ position: 'insideLeft', fill: '#fff', fontSize: 11, formatter: (val: any) => `${val}%` }}>
                       {baccaratData.mainBets.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.edge < 2 ? "var(--success)" : "var(--danger)"} />
                       ))}
@@ -165,12 +165,12 @@ export default function BaccaratAnalysis() {
                           activeTab === 'pair' ? baccaratData.pairBets : 
                           activeTab === 'side' ? baccaratData.sideBets : allData}
                     layout="vertical"
-                    margin={{ top: 20, right: 50, left: 60, bottom: 20 }}
+                    margin={{ top: 20, right: 10, left: 0, bottom: 20 }}
                   >
                     <XAxis type="number" domain={[0, 'auto']} tickFormatter={(val) => `${val}%`} />
-                    <YAxis type="category" dataKey="name" width={140} tick={{fontSize: 12, fontWeight: 500}} />
-                    <RechartsTooltip content={<CustomTooltip />} cursor={{fill: 'var(--muted)', opacity: 0.2}} />
-                    <Bar dataKey="edge" radius={[0, 4, 4, 0]} barSize={30} animationDuration={1000}>
+                    <YAxis type="category" dataKey="name" width={90} tick={{fontSize: 11, fontWeight: 500}} />
+                    <RechartsTooltip content={<CustomTooltip />} cursor={{fill: 'var(--muted)', opacity: 0.2}} wrapperStyle={{ zIndex: 100 }} />
+                    <Bar dataKey="edge" radius={[0, 4, 4, 0]} barSize={30} animationDuration={1000} label={{ position: 'insideLeft', fill: '#fff', fontSize: 10, formatter: (val: any) => `${val}%` }}>
                       {(activeTab === 'main' ? baccaratData.mainBets : 
                         activeTab === 'pair' ? baccaratData.pairBets : 
                         activeTab === 'side' ? baccaratData.sideBets : allData).map((entry, index) => {
