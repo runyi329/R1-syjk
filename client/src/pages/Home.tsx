@@ -2,13 +2,11 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices, AlertCircle } from "lucide-react";
+import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices } from "lucide-react";
 import { Link } from "wouter";
 import contentData from "../data/investment-portal-content.json";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MarketTicker } from "@/components/MarketTicker";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "sonner";
 
 export default function Home() {
   const { data: authData } = trpc.auth.me.useQuery();
@@ -65,55 +63,14 @@ export default function Home() {
                 </Button>
               </Link>
             ) : (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2"
-                  >
-                    {language === 'en' ? 'Login' : '登录'}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-card border-border">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-foreground">
-                      <AlertCircle className="h-5 w-5 text-yellow-500" />
-                      {language === 'en' ? 'Login Notice' : '登录说明'}
-                    </DialogTitle>
-                    <DialogDescription className="text-muted-foreground space-y-3 pt-2">
-                      <p>
-                        {language === 'en' 
-                          ? 'OAuth login is currently unavailable in the development environment.' 
-                          : '开发环境中暂时无法使用OAuth登录。'}
-                      </p>
-                      <p>
-                        {language === 'en'
-                          ? 'After publishing the website, OAuth login will work automatically with the official domain.'
-                          : '发布网站后，OAuth登录将自动在正式域名上生效。'}
-                      </p>
-                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mt-3">
-                        <p className="text-sm font-medium text-foreground">
-                          {language === 'en' ? 'How to publish:' : '如何发布：'}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {language === 'en'
-                            ? 'Click the "Publish" button in the top right corner of the management interface to publish your website.'
-                            : '点击管理界面右上角的“发布”按钮即可发布网站。'}
-                        </p>
-                      </div>
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Button 
-                    onClick={() => {
-                      toast.info(language === 'en' ? 'Please publish the website first' : '请先发布网站');
-                    }}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    {language === 'en' ? 'I Understand' : '我知道了'}
-                  </Button>
-                </DialogContent>
-              </Dialog>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2"
+                onClick={() => window.location.href = '/api/oauth/login'}
+              >
+                {language === 'en' ? 'Login' : '登录'}
+              </Button>
             )}
           </div>
         </div>
