@@ -40,3 +40,7 @@
 - [x] 测试登录功能：添加测试登录按钮，无需OAuth即可快速登录
 - [x] 测试登录API：创建/api/test-login端点，自动创建或登录测试账号
 - [x] 首页测试登录按钮：在登录按钮旁边添加“测试登录”选项
+
+## 紧急问题
+- [x] 开发环境网站显示Not Found错误 - 已解决，开发环境正常
+- [x] 正式域名(runyi.manus.space)显示Not Found - 修复测试登录session错误，使用SDK创建session token

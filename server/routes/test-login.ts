@@ -1,5 +1,8 @@
 import { Router } from "express";
 import { getUserByOpenId, upsertUser } from "../db.js";
+import { sdk } from "../_core/sdk.js";
+import { getSessionCookieOptions } from "../_core/cookies.js";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 const router = Router();
 
@@ -27,9 +30,15 @@ router.get("/test-login", async (req: any, res: any) => {
       throw new Error("创建测试用户失败");
     }
     
-    // 设置session
-    req.session.userId = user.id;
-    req.session.openId = user.openId;
+    // 创建session token
+    const sessionToken = await sdk.createSessionToken(user.openId, {
+      name: user.name || "测试用户",
+      expiresInMs: ONE_YEAR_MS,
+    });
+    
+    // 设置cookie
+    const cookieOptions = getSessionCookieOptions(req);
+    res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
     
     // 重定向到首页
     res.redirect("/");
