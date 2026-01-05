@@ -1,0 +1,178 @@
+{
+  "company": {
+    "zh_TW": {
+      "name": "澳門潤儀投資有限公司",
+      "tagline": "全面的投資諮詢 · 前沿的市場分析 · 專業的風控建議",
+      "description": "澳門潤儀投資有限公司成立於澳門，是一家專注於全球投資分析與風險管理的專業機構。我們致力於為客戶提供全面、前沿的投資諮詢和風控建議，幫助投資者在複雜多變的金融市場中做出明智決策。",
+      "advantages": [
+        "全面的投資覆蓋：涵蓋股票、期貨、外匯、商品、數字資產、固定收益等多個投資領域",
+        "前沿的市場分析：基於大數據和專業研究，提供實時、準確的市場洞察",
+        "專業的風控建議：幫助客戶識別風險、優化投資組合、實現穩健增長",
+        "以客戶為中心：深入理解中國大陸投資者的需求，提供本地化的投資解決方案"
+      ],
+      "cta": "無論您是初入投資市場的新手，還是經驗豐富的投資者，澳門潤儀投資都能為您提供專業、可靠的投資指導。"
+    },
+    "zh_CN": {
+      "name": "澳门润仪投资有限公司",
+      "tagline": "全面的投资咨询 · 前沿的市场分析 · 专业的风控建议",
+      "description": "澳门润仪投资有限公司成立于澳门，是一家专注于全球投资分析与风险管理的专业机构。我们致力于为客户提供全面、前沿的投资咨询和风控建议，帮助投资者在复杂多变的金融市场中做出明智决策。",
+      "advantages": [
+        "全面的投资覆盖：涵盖股票、期货、外汇、商品、数字资产、固定收益等多个投资领域",
+        "前沿的市场分析：基于大数据和专业研究，提供实时、准确的市场洞察",
+        "专业的风控建议：帮助客户识别风险、优化投资组合、实现稳健增长",
+        "以客户为中心：深入理解中国大陆投资者的需求，提供本地化的投资解决方案"
+      ],
+      "cta": "无论您是初入投资市场的新手，还是经验丰富的投资者，澳门润仪投资都能为您提供专业、可靠的投资指导。"
+    },
+    "en": {
+      "name": "Macau Runyi Investment Co., Ltd.",
+      "tagline": "Comprehensive Investment Consulting · Cutting-edge Market Analysis · Professional Risk Management",
+      "description": "Macau Runyi Investment Co., Ltd. is a professional institution established in Macau, specializing in global investment analysis and risk management. We are committed to providing comprehensive, cutting-edge investment consulting and risk control advice to help investors make informed decisions in complex and ever-changing financial markets.",
+      "advantages": [
+        "Comprehensive Investment Coverage: Covering stocks, futures, forex, commodities, digital assets, and fixed income across multiple investment sectors",
+        "Cutting-edge Market Analysis: Providing real-time, accurate market insights based on big data and professional research",
+        "Professional Risk Management: Helping clients identify risks, optimize investment portfolios, and achieve steady growth",
+        "Client-Centric Approach: Understanding the needs of mainland Chinese investors and providing localized investment solutions"
+      ],
+      "cta": "Whether you are a newcomer to the investment market or an experienced investor, Macau Runyi Investment can provide you with professional and reliable investment guidance."
+    }
+  },
+  "categories": [
+    {
+      "id": "stocks",
+      "zh_TW": {
+        "name": "股票指數類",
+        "description": "涵蓋A股、港股、美股等全球主要股票市場分析",
+        "icon": "📈"
+      },
+      "zh_CN": {
+        "name": "股票指数类",
+        "description": "涵盖A股、港股、美股等全球主要股票市场分析",
+        "icon": "📈"
+      },
+      "en": {
+        "name": "Stocks & Indices",
+        "description": "Analysis of major global stock markets including A-shares, Hong Kong stocks, and US stocks",
+        "icon": "📈"
+      },
+      "projects": [
+        { "id": "a-stocks", "name_key": "A股分析" },
+        { "id": "hk-stocks", "name_key": "港股分析" },
+        { "id": "us-stocks", "name_key": "美股分析" }
+      ]
+    },
+    {
+      "id": "forex",
+      "zh_TW": {
+        "name": "外匯貨幣類",
+        "description": "外匯交易與數字貨幣市場深度分析",
+        "icon": "💱"
+      },
+      "zh_CN": {
+        "name": "外汇货币类",
+        "description": "外汇交易与数字货币市场深度分析",
+        "icon": "💱"
+      },
+      "en": {
+        "name": "Forex & Digital Currency",
+        "description": "In-depth analysis of forex trading and digital currency markets",
+        "icon": "💱"
+      },
+      "projects": [
+        { "id": "forex-analysis", "name_key": "外匯交易分析" },
+        { "id": "crypto-analysis", "name_key": "數字貨幣分析" }
+      ]
+    },
+    {
+      "id": "commodities",
+      "zh_TW": {
+        "name": "商品能源類",
+        "description": "黃金、原油、農產品等大宗商品市場分析",
+        "icon": "⛽"
+      },
+      "zh_CN": {
+        "name": "商品能源类",
+        "description": "黄金、原油、农产品等大宗商品市场分析",
+        "icon": "⛽"
+      },
+      "en": {
+        "name": "Commodities & Energy",
+        "description": "Analysis of commodities and energy markets including gold, crude oil, and agricultural products",
+        "icon": "⛽"
+      },
+      "projects": [
+        { "id": "gold-silver", "name_key": "黃金白銀分析" },
+        { "id": "crude-oil", "name_key": "原油分析" },
+        { "id": "agricultural", "name_key": "農產品分析" }
+      ]
+    },
+    {
+      "id": "derivatives",
+      "zh_TW": {
+        "name": "衍生品類",
+        "description": "期貨與期權市場專業分析與交易策略",
+        "icon": "📊"
+      },
+      "zh_CN": {
+        "name": "衍生品类",
+        "description": "期货与期权市场专业分析与交易策略",
+        "icon": "📊"
+      },
+      "en": {
+        "name": "Derivatives",
+        "description": "Professional analysis and trading strategies for futures and options markets",
+        "icon": "📊"
+      },
+      "projects": [
+        { "id": "futures-analysis", "name_key": "期貨分析" },
+        { "id": "options-analysis", "name_key": "期權分析" }
+      ]
+    },
+    {
+      "id": "fixed-income",
+      "zh_TW": {
+        "name": "固定收益類",
+        "description": "債券、公募基金、私募基金等固定收益產品分析",
+        "icon": "💰"
+      },
+      "zh_CN": {
+        "name": "固定收益类",
+        "description": "债券、公募基金、私募基金等固定收益产品分析",
+        "icon": "💰"
+      },
+      "en": {
+        "name": "Fixed Income",
+        "description": "Analysis of fixed income products including bonds, public funds, and private funds",
+        "icon": "💰"
+      },
+      "projects": [
+        { "id": "bonds", "name_key": "債券分析" },
+        { "id": "public-funds", "name_key": "公募基金分析" },
+        { "id": "private-funds", "name_key": "私募基金分析" }
+      ]
+    },
+    {
+      "id": "gaming",
+      "zh_TW": {
+        "name": "博彩娛樂類",
+        "description": "百家樂、輪盤等博彩遊戲數據分析與策略",
+        "icon": "🎰"
+      },
+      "zh_CN": {
+        "name": "博彩娱乐类",
+        "description": "百家乐、轮盘等博彩游戏数据分析与策略",
+        "icon": "🎰"
+      },
+      "en": {
+        "name": "Gaming & Entertainment",
+        "description": "Data analysis and strategies for gaming including baccarat and roulette",
+        "icon": "🎰"
+      },
+      "projects": [
+        { "id": "baccarat", "name_key": "百家樂分析", "url": "/baccarat" },
+        { "id": "roulette", "name_key": "輪盤分析" },
+        { "id": "sports-betting", "name_key": "體育博彩分析" }
+      ]
+    }
+  ]
+}
