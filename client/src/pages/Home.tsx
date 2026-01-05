@@ -1,3 +1,4 @@
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -8,6 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MarketTicker } from "@/components/MarketTicker";
 
 export default function Home() {
+  const { data: authData } = trpc.auth.me.useQuery();
+
   const { language, setLanguage } = useLanguage();
   const content = contentData.company[language];
   const categories = contentData.categories;
@@ -46,9 +49,29 @@ export default function Home() {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <Button variant="outline" size="sm" className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-              {language === 'en' ? 'Login / Register' : '登錄 / 註冊'}
-            </Button>
+            {authData && authData.role === 'admin' && (
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors mr-2">
+                  {language === 'en' ? 'Admin' : '管理后台'}
+                </Button>
+              </Link>
+            )}
+            {authData ? (
+              <Link href="/user-center">
+                <Button variant="outline" size="sm" className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                  {language === 'en' ? 'User Center' : '個人中心'}
+                </Button>
+              </Link>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                onClick={() => window.location.href = '/api/oauth/login'}
+              >
+                {language === 'en' ? 'Login / Register' : '登錄 / 註冊'}
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -185,9 +208,11 @@ export default function Home() {
       {/* 底部行动召唤 */}
       <section className="py-12 container mx-auto px-4 text-center">
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 shadow-[0_0_20px_rgba(var(--primary),0.3)] border border-primary/50 w-full sm:w-auto">
-            {language === 'en' ? 'Start Investing' : '開始投資'}
-          </Button>
+          <Link href="/shop">
+            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 shadow-[0_0_20px_rgba(var(--primary),0.3)] border border-primary/50 w-full sm:w-auto">
+              {language === 'en' ? 'Redeem Products' : '兑换商城'}
+            </Button>
+          </Link>
           <Button size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 text-lg px-8 w-full sm:w-auto">
             {language === 'en' ? 'Contact Us' : '聯繫我們'}
           </Button>
