@@ -66,15 +66,15 @@ export default function Shop() {
             </div>
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {authData && userData && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/30">
-                <Coins className="h-5 w-5 text-[#D4AF37]" />
-                <span className="text-[#D4AF37] font-bold">{parseFloat(userData.usdtBalance).toFixed(2)} USDT</span>
+              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/30">
+                <Coins className="h-4 w-4 sm:h-5 sm:w-5 text-[#D4AF37]" />
+                <span className="text-[#D4AF37] font-bold text-xs sm:text-base">{parseFloat(userData.usdtBalance).toFixed(2)} USDT</span>
               </div>
             )}
             {authData ? (
-              <Button onClick={() => setLocation("/user-center")} variant="outline" className="border-[#D4AF37] text-[#D4AF37]">
+              <Button onClick={() => setLocation("/user-center")} variant="outline" className="border-[#D4AF37] text-[#D4AF37] text-xs sm:text-sm px-2 sm:px-4">
                 个人中心
               </Button>
             ) : (
@@ -88,9 +88,9 @@ export default function Shop() {
 
       <div className="container mx-auto py-8 px-4">
         {/* Page Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#D4AF37] mb-4">兑换商城</h1>
-          <p className="text-white/60 text-lg">使用 USDT 积分兑换精选商品</p>
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#D4AF37] mb-3 sm:mb-4">兑换商城</h1>
+          <p className="text-white/60 text-base sm:text-lg">使用 USDT 积分兑换精选商品</p>
         </div>
 
         {/* Products Grid */}
@@ -104,25 +104,25 @@ export default function Shop() {
             <p className="text-white/60 text-lg">暂无可兑换商品</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {products.map((product) => (
               <Card key={product.id} className="bg-black/50 border-white/10 hover:border-[#D4AF37]/50 transition-all">
-                <CardHeader>
+                <CardHeader className="p-3 sm:p-6">
                   {product.imageUrl && (
-                    <div className="w-full h-48 rounded-lg overflow-hidden mb-4">
+                    <div className="w-full h-40 sm:h-48 rounded-lg overflow-hidden mb-3 sm:mb-4">
                       <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                     </div>
                   )}
-                  <CardTitle className="text-white">{product.name}</CardTitle>
-                  <CardDescription className="text-white/60">{product.description || "暂无描述"}</CardDescription>
+                  <CardTitle className="text-white text-base sm:text-lg">{product.name}</CardTitle>
+                  <CardDescription className="text-white/60 text-xs sm:text-sm line-clamp-2">{product.description || "暂无描述"}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-2xl font-bold text-[#D4AF37]">
+                <CardContent className="p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <div className="text-xl sm:text-2xl font-bold text-[#D4AF37]">
                       {parseFloat(product.price).toFixed(2)} USDT
                     </div>
                     {product.stock !== -1 && (
-                      <Badge variant="outline" className="text-white/60 border-white/30">
+                      <Badge variant="outline" className="text-white/60 border-white/30 text-xs">
                         库存：{product.stock}
                       </Badge>
                     )}
@@ -134,16 +134,16 @@ export default function Shop() {
                       max={product.stock === -1 ? undefined : product.stock}
                       value={quantities[product.id] || 1}
                       onChange={(e) => setQuantities({ ...quantities, [product.id]: parseInt(e.target.value) || 1 })}
-                      className="bg-white/5 border-white/10 text-white"
+                      className="bg-white/5 border-white/10 text-white text-sm"
                     />
-                    <span className="text-white/60 text-sm">数量</span>
+                    <span className="text-white/60 text-xs sm:text-sm">数量</span>
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="p-3 sm:p-6">
                   <Button
                     onClick={() => handleRedeem(product.id, product.price)}
                     disabled={redeemMutation.isPending || (product.stock !== -1 && product.stock === 0)}
-                    className="w-full bg-[#D4AF37] text-black hover:bg-[#B8941F]"
+                    className="w-full bg-[#D4AF37] text-black hover:bg-[#B8941F] text-sm sm:text-base"
                   >
                     {redeemMutation.isPending ? (
                       <>

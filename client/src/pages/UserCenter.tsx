@@ -85,19 +85,19 @@ export default function UserCenter() {
         </div>
       </header>
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
         {/* Account Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <Card className="bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/30">
             <CardHeader>
               <CardTitle className="text-white">USDT 积分余额</CardTitle>
               <CardDescription className="text-white/60">当前可用余额</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-[#D4AF37]">
+              <div className="text-3xl sm:text-4xl font-bold text-[#D4AF37]">
                 {parseFloat(userData.usdtBalance).toFixed(2)}
               </div>
-              <div className="text-sm text-white/60 mt-2">USDT</div>
+              <div className="text-xs sm:text-sm text-white/60 mt-2">USDT</div>
             </CardContent>
           </Card>
 
@@ -126,14 +126,14 @@ export default function UserCenter() {
               <CardDescription className="text-white/60">基本信息</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between">
                   <span className="text-white/60">用户名：</span>
                   <span className="text-white">{userData.name || "未设置"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/60">角色：</span>
-                  <Badge variant="outline" className="text-[#D4AF37] border-[#D4AF37]/50">
+                  <Badge variant="outline" className="text-[#D4AF37] border-[#D4AF37]/50 text-xs">
                     {userData.role === "admin" ? "管理员" : "普通用户"}
                   </Badge>
                 </div>
@@ -144,11 +144,11 @@ export default function UserCenter() {
 
         {/* Tabs */}
         <Tabs defaultValue="transactions" className="w-full">
-          <TabsList className="bg-black/50 border border-white/10">
-            <TabsTrigger value="transactions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-2 w-full">
+            <TabsTrigger value="transactions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               积分流水
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+            <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               我的订单
             </TabsTrigger>
           </TabsList>
@@ -171,28 +171,28 @@ export default function UserCenter() {
                     {transactions.map((tx) => (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 gap-2"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           {getTransactionIcon(tx.type)}
-                          <div>
-                            <div className="text-white font-medium">{getTransactionLabel(tx.type)}</div>
-                            <div className="text-sm text-white/60">{tx.notes || "无备注"}</div>
+                          <div className="flex-1">
+                            <div className="text-white font-medium text-sm sm:text-base">{getTransactionLabel(tx.type)}</div>
+                            <div className="text-xs sm:text-sm text-white/60 line-clamp-1">{tx.notes || "无备注"}</div>
                             <div className="text-xs text-white/40">
                               {new Date(tx.createdAt).toLocaleString("zh-CN")}
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right sm:text-right ml-auto">
                           <div
-                            className={`text-lg font-bold ${
+                            className={`text-base sm:text-lg font-bold ${
                               parseFloat(tx.amount) >= 0 ? "text-green-400" : "text-red-400"
                             }`}
                           >
                             {parseFloat(tx.amount) >= 0 ? "+" : ""}
                             {parseFloat(tx.amount).toFixed(2)} USDT
                           </div>
-                          <div className="text-sm text-white/60">
+                          <div className="text-xs sm:text-sm text-white/60">
                             余额：{parseFloat(tx.balanceAfter).toFixed(2)}
                           </div>
                         </div>

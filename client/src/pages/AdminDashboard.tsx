@@ -176,17 +176,17 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="bg-black/50 border border-white/10">
-            <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
-              用户管理
+          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-3 w-full">
+            <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              用户
             </TabsTrigger>
-            <TabsTrigger value="products" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
-              商品管理
+            <TabsTrigger value="products" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              商品
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
-              订单管理
+            <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              订单
             </TabsTrigger>
           </TabsList>
 
@@ -203,23 +203,23 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {users.map((user) => (
-                      <div key={user.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
-                        <div className="flex items-center justify-between mb-4">
+                      <div key={user.id} className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
                           <div>
-                            <div className="text-white font-medium">{user.name || "未设置昵称"}</div>
-                            <div className="text-sm text-white/60">ID: {user.id}</div>
+                            <div className="text-white font-medium text-sm sm:text-base">{user.name || "未设置昵称"}</div>
+                            <div className="text-xs sm:text-sm text-white/60">ID: {user.id}</div>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2 sm:gap-4">
                             <div className="text-right">
-                              <div className="text-[#D4AF37] font-bold text-lg">
+                              <div className="text-[#D4AF37] font-bold text-base sm:text-lg">
                                 {parseFloat(user.usdtBalance).toFixed(2)} USDT
                               </div>
                               <Badge
                                 variant={user.accountStatus === "active" ? "default" : "destructive"}
                                 className={
                                   user.accountStatus === "active"
-                                    ? "bg-green-500/20 text-green-400 border-green-500/50"
-                                    : "bg-red-500/20 text-red-400 border-red-500/50"
+                                    ? "bg-green-500/20 text-green-400 border-green-500/50 text-xs"
+                                    : "bg-red-500/20 text-red-400 border-red-500/50 text-xs"
                                 }
                               >
                                 {user.accountStatus === "active" ? "正常" : "已冻结"}
@@ -227,17 +227,18 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-2 sm:flex gap-2">
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-green-500/50 text-green-400"
+                                className="border-green-500/50 text-green-400 text-xs"
                                 onClick={() => setSelectedUserId(user.id)}
                               >
-                                <UserPlus className="h-4 w-4 mr-1" />
-                                添加积分
+                                <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                <span className="hidden sm:inline">添加积分</span>
+                                <span className="sm:hidden">添加</span>
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="bg-black border-white/10">
@@ -292,11 +293,12 @@ export default function AdminDashboard() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-red-500/50 text-red-400"
+                                className="border-red-500/50 text-red-400 text-xs"
                                 onClick={() => setSelectedUserId(user.id)}
                               >
-                                <UserMinus className="h-4 w-4 mr-1" />
-                                扣除积分
+                                <UserMinus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                <span className="hidden sm:inline">扣除积分</span>
+                                <span className="sm:hidden">扣除</span>
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="bg-black border-white/10">
@@ -350,21 +352,23 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-orange-500/50 text-orange-400"
+                              className="border-orange-500/50 text-orange-400 text-xs"
                               onClick={() => freezeAccountMutation.mutate({ userId: user.id })}
                             >
-                              <Lock className="h-4 w-4 mr-1" />
-                              冻结账户
+                              <Lock className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                              <span className="hidden sm:inline">冻结账户</span>
+                              <span className="sm:hidden">冻结</span>
                             </Button>
                           ) : (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-blue-500/50 text-blue-400"
+                              className="border-blue-500/50 text-blue-400 text-xs"
                               onClick={() => unfreezeAccountMutation.mutate({ userId: user.id })}
                             >
-                              <Unlock className="h-4 w-4 mr-1" />
-                              解冻账户
+                              <Unlock className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                              <span className="hidden sm:inline">解冻账户</span>
+                              <span className="sm:hidden">解冻</span>
                             </Button>
                           )}
                         </div>
@@ -387,12 +391,13 @@ export default function AdminDashboard() {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="bg-[#D4AF37] text-black hover:bg-[#B8941F]">
-                        <Plus className="h-4 w-4 mr-1" />
-                        添加商品
+                      <Button className="bg-[#D4AF37] text-black hover:bg-[#B8941F] text-xs sm:text-sm px-2 sm:px-4">
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">添加商品</span>
+                        <span className="sm:hidden">添加</span>
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-black border-white/10 max-w-2xl">
+                    <DialogContent className="bg-black border-white/10 max-w-2xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle className="text-white">
                           {productForm.id ? "编辑商品" : "添加商品"}
@@ -467,32 +472,32 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {products.map((product) => (
-                      <div key={product.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
+                      <div key={product.id} className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10">
                         {product.imageUrl && (
                           <div className="w-full h-32 rounded-lg overflow-hidden mb-3">
                             <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                           </div>
                         )}
                         <div className="mb-3">
-                          <div className="text-white font-medium mb-1">{product.name}</div>
-                          <div className="text-sm text-white/60 mb-2">{product.description || "暂无描述"}</div>
+                          <div className="text-white font-medium mb-1 text-sm sm:text-base">{product.name}</div>
+                          <div className="text-xs sm:text-sm text-white/60 mb-2 line-clamp-2">{product.description || "暂无描述"}</div>
                           <div className="flex items-center justify-between">
-                            <div className="text-[#D4AF37] font-bold">
+                            <div className="text-[#D4AF37] font-bold text-sm sm:text-base">
                               {parseFloat(product.price).toFixed(2)} USDT
                             </div>
                             <Badge
                               variant={product.status === "active" ? "default" : "secondary"}
                               className={
                                 product.status === "active"
-                                  ? "bg-green-500/20 text-green-400 border-green-500/50"
-                                  : "bg-gray-500/20 text-gray-400 border-gray-500/50"
+                                  ? "bg-green-500/20 text-green-400 border-green-500/50 text-xs"
+                                  : "bg-gray-500/20 text-gray-400 border-gray-500/50 text-xs"
                               }
                             >
                               {product.status === "active" ? "上架" : "下架"}
                             </Badge>
                           </div>
                           {product.stock !== -1 && (
-                            <div className="text-sm text-white/60 mt-1">库存：{product.stock}</div>
+                            <div className="text-xs sm:text-sm text-white/60 mt-1">库存：{product.stock}</div>
                           )}
                         </div>
                         <div className="flex gap-2">
@@ -501,7 +506,7 @@ export default function AdminDashboard() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="flex-1 border-[#D4AF37]/50 text-[#D4AF37]"
+                                className="flex-1 border-[#D4AF37]/50 text-[#D4AF37] text-xs"
                                 onClick={() =>
                                   setProductForm({
                                     id: product.id,
@@ -514,11 +519,11 @@ export default function AdminDashboard() {
                                   })
                                 }
                               >
-                                <Edit className="h-4 w-4 mr-1" />
-                                编辑
+                                <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                <span className="hidden sm:inline">编辑</span>
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="bg-black border-white/10 max-w-2xl">
+                            <DialogContent className="bg-black border-white/10 max-w-2xl max-h-[90vh] overflow-y-auto">
                               <DialogHeader>
                                 <DialogTitle className="text-white">编辑商品</DialogTitle>
                               </DialogHeader>
@@ -599,14 +604,14 @@ export default function AdminDashboard() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="border-red-500/50 text-red-400"
+                            className="border-red-500/50 text-red-400 px-2 sm:px-3"
                             onClick={() => {
               if (confirm("确定要删除这个商品吗？")) {
                                 deleteProductMutation.mutate({ productId: product.id });
                               }
                             }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </div>
@@ -630,11 +635,11 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {orders.map((order) => (
-                      <div key={order.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
-                        <div className="flex items-center justify-between mb-2">
+                      <div key={order.id} className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
                           <div>
-                            <div className="text-white font-medium">订单 #{order.id}</div>
-                            <div className="text-sm text-white/60">
+                            <div className="text-white font-medium text-sm sm:text-base">订单 #{order.id}</div>
+                            <div className="text-xs sm:text-sm text-white/60">
                               用户ID: {order.userId} | 商品ID: {order.productId}
                             </div>
                           </div>
@@ -642,10 +647,10 @@ export default function AdminDashboard() {
                             variant={order.status === "completed" ? "default" : "secondary"}
                             className={
                               order.status === "completed"
-                                ? "bg-green-500/20 text-green-400 border-green-500/50"
+                                ? "bg-green-500/20 text-green-400 border-green-500/50 text-xs w-fit"
                                 : order.status === "pending"
-                                ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/50"
-                                : "bg-red-500/20 text-red-400 border-red-500/50"
+                                ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/50 text-xs w-fit"
+                                : "bg-red-500/20 text-red-400 border-red-500/50 text-xs w-fit"
                             }
                           >
                             {order.status === "completed"
@@ -655,7 +660,7 @@ export default function AdminDashboard() {
                               : "已取消"}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
                           <div>
                             <span className="text-white/60">数量：</span>
                             <span className="text-white">{order.quantity}</span>
@@ -666,7 +671,7 @@ export default function AdminDashboard() {
                               {parseFloat(order.totalPrice).toFixed(2)} USDT
                             </span>
                           </div>
-                          <div>
+                          <div className="col-span-1 sm:col-span-2">
                             <span className="text-white/60">创建时间：</span>
                             <span className="text-white">{new Date(order.createdAt).toLocaleString("zh-CN")}</span>
                           </div>

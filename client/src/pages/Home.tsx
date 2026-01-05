@@ -51,25 +51,25 @@ export default function Home() {
             
             {authData && authData.role === 'admin' && (
               <Link href="/admin">
-                <Button variant="outline" size="sm" className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors mr-2">
-                  {language === 'en' ? 'Admin' : '管理后台'}
+                <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
+                  {language === 'en' ? 'Admin' : '后台'}
                 </Button>
               </Link>
             )}
             {authData ? (
               <Link href="/user-center">
-                <Button variant="outline" size="sm" className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-                  {language === 'en' ? 'User Center' : '個人中心'}
+                <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
+                  {language === 'en' ? 'User' : '个人'}
                 </Button>
               </Link>
             ) : (
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="hidden sm:flex border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2"
                 onClick={() => window.location.href = '/api/oauth/login'}
               >
-                {language === 'en' ? 'Login / Register' : '登錄 / 註冊'}
+                {language === 'en' ? 'Login' : '登录'}
               </Button>
             )}
           </div>
