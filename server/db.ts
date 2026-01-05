@@ -116,6 +116,12 @@ export async function updateUserStatus(userId: number, status: "active" | "froze
   await db.update(users).set({ accountStatus: status }).where(eq(users.id, userId));
 }
 
+export async function updateUserName(userId: number, name: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ name }).where(eq(users.id, userId));
+}
+
 // ========== 积分流水 ==========
 
 export async function createPointTransaction(transaction: InsertPointTransaction) {

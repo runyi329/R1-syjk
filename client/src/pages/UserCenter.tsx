@@ -24,7 +24,11 @@ export default function UserCenter() {
     if (!authLoading && !user) {
       setLocation("/");
     }
-  }, [user, authLoading, setLocation]);
+    // 如果用户已登录但未设置用户名，跳转到注册页面
+    if (userData && !userData.name) {
+      setLocation("/register");
+    }
+  }, [user, authLoading, userData, setLocation]);
 
   if (authLoading || userLoading) {
     return (

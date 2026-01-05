@@ -15,6 +15,9 @@ import { toast } from "sonner";
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { data: authData, isLoading: authLoading } = trpc.auth.me.useQuery();
+  const { data: userData } = trpc.users.getMe.useQuery(undefined, {
+    enabled: !!authData,
+  });
   const { data: users, refetch: refetchUsers } = trpc.users.getAllUsers.useQuery(undefined, {
     enabled: authData?.role === "admin",
   });
@@ -108,7 +111,11 @@ export default function AdminDashboard() {
       toast.error("您没有权限访问此页面");
       setLocation("/");
     }
-  }, [authData, authLoading, setLocation]);
+    // 如果用户已登录但未设置用户名，跳转到注册页面
+    if (userData && !userData.name) {
+      setLocation("/register");
+    }
+  }, [authData, authLoading, userData, setLocation]);
 
   const resetProductForm = () => {
     setProductForm({

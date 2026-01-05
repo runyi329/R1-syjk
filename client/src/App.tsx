@@ -13,6 +13,7 @@ import PokerAnalysis from "./pages/PokerAnalysis";
 import UserCenter from "./pages/UserCenter";
 import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
+import Register from "./pages/Register";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/roulette" component={RouletteAnalysis} />
       <Route path="/football" component={FootballAnalysis} />
       <Route path="/poker" component={PokerAnalysis} />
+      <Route path="/register" component={Register} />
       <Route path="/user-center" component={UserCenter} />
       <Route path="/shop" component={Shop} />
       <Route path="/admin" component={AdminDashboard} />

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, ShoppingCart, Coins } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,6 +17,13 @@ export default function Shop() {
   const { data: userData } = trpc.users.getMe.useQuery(undefined, {
     enabled: !!authData,
   });
+
+  useEffect(() => {
+    // 如果用户已登录但未设置用户名，跳转到注册页面
+    if (authData && userData && !userData.name) {
+      setLocation("/register");
+    }
+  }, [authData, userData, setLocation]);
 
   const redeemMutation = trpc.orders.redeemProduct.useMutation({
     onSuccess: (data) => {

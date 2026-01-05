@@ -8,6 +8,14 @@ export const usersRouter = router({
     return ctx.user;
   }),
 
+  // 用户：更新自己的用户名
+  updateMyName: protectedProcedure
+    .input(z.object({ name: z.string().min(2).max(20) }))
+    .mutation(async ({ ctx, input }) => {
+      await db.updateUserName(ctx.user.id, input.name);
+      return { success: true };
+    }),
+
   // 管理员：获取所有用户
   getAllUsers: adminProcedure.query(async () => {
     return await db.getAllUsers();

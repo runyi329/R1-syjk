@@ -14,12 +14,16 @@ export function registerOAuthRoutes(app: Express) {
   app.get("/api/oauth/login", (req: Request, res: Response) => {
     const oauthPortalUrl = process.env.VITE_OAUTH_PORTAL_URL || "https://manus.im";
     const appId = process.env.VITE_APP_ID || "";
-    const currentUrl = `${req.protocol}://${req.get("host")}`;
-    const redirectUri = `${currentUrl}/api/oauth/callback`;
+    
+    // Always use HTTPS for redirect_uri
+    const protocol = "https";
+    const host = req.get("host");
+    const redirectUri = `${protocol}://${host}/api/oauth/callback`;
     const state = Buffer.from(redirectUri).toString("base64");
     
     const authUrl = `${oauthPortalUrl}/oauth/authorize?client_id=${appId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
     
+    console.log("[OAuth] Login redirect to:", authUrl);
     res.redirect(302, authUrl);
   });
 
