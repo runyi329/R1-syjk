@@ -5,6 +5,7 @@ import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users } from "lucide-react"
 import { Link } from "wouter";
 import contentData from "../data/investment-portal-content.json";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MarketTicker } from "@/components/MarketTicker";
 
 export default function Home() {
   const { language, setLanguage } = useLanguage();
@@ -66,6 +67,13 @@ export default function Home() {
                   {language === 'en' ? 'Contact Us' : '聯繫我們'}
                 </Button>
               </div>
+            </div>
+          </div>
+          
+          {/* 实时行情栏 */}
+          <div className="container mx-auto px-4 mt-8 md:mt-12">
+            <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-2 shadow-sm">
+              <MarketTicker />
             </div>
           </div>
         </section>
