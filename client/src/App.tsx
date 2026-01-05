@@ -10,6 +10,7 @@ import BaccaratAnalysis from "./pages/BaccaratAnalysis";
 import RouletteAnalysis from "./pages/RouletteAnalysis";
 import FootballAnalysis from "./pages/FootballAnalysis";
 import PokerAnalysis from "./pages/PokerAnalysis";
+import Lottery from "./pages/Lottery";
 import UserCenter from "./pages/UserCenter";
 import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/roulette" component={RouletteAnalysis} />
       <Route path="/football" component={FootballAnalysis} />
       <Route path="/poker" component={PokerAnalysis} />
+      <Route path="/lottery" component={Lottery} />
       <Route path="/register" component={Register} />
       <Route path="/user-center" component={UserCenter} />
       <Route path="/shop" component={Shop} />

@@ -172,7 +172,8 @@
         { "id": "baccarat", "name_key": "百家樂分析", "url": "/baccarat" },
         { "id": "roulette", "name_key": "輪盤分析", "url": "/roulette" },
         { "id": "sports-betting", "name_key": "體育博彩分析", "url": "/football" },
-        { "id": "poker", "name_key": "德州撲克分析", "url": "/poker" }
+        { "id": "poker", "name_key": "德州撲克分析", "url": "/poker" },
+        { "id": "lottery", "name_key": "彩票分析", "url": "/lottery" }
       ]
     }
   ]
