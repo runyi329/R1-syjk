@@ -1,13 +1,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info, AlertTriangle, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell } from "recharts";
 import baccaratData from "../data/baccaratData.json";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 // 颜色常量
 const COLORS = {
@@ -40,8 +49,19 @@ export default function BaccaratAnalysis() {
     ...baccaratData.sideBets
   ].sort((a, b) => a.edge - b.edge);
 
+  const [selectedData, setSelectedData] = useState<any>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const handleBarClick = (data: any) => {
+    if (!isDesktop) {
+      setSelectedData(data);
+      setIsDrawerOpen(true);
+    }
+  };
+
   const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+    if (isDesktop && active && payload && payload.length) {
       const data = payload[0].payload;
       return (
         <div className="bg-popover border border-border p-3 rounded-lg shadow-lg min-w-[200px] z-50 relative">
@@ -57,6 +77,33 @@ export default function BaccaratAnalysis() {
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle className="text-xl font-bold">{selectedData?.name}</DrawerTitle>
+            <DrawerDescription>
+              <div className="mt-4 space-y-4">
+                <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                  <span className="text-muted-foreground">庄家优势</span>
+                  <span className="font-mono font-bold text-xl text-foreground">{selectedData?.edge}%</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                  <span className="text-muted-foreground">赔率</span>
+                  <span className="font-mono font-medium text-foreground">{selectedData?.payout}</span>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-foreground leading-relaxed">{selectedData?.description}</p>
+                </div>
+              </div>
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="outline">关闭</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
       {/* 头部区域 */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto py-4 flex justify-between items-center">
@@ -96,9 +143,16 @@ export default function BaccaratAnalysis() {
                     <XAxis type="number" domain={[0, 15]} hide />
                     <YAxis type="category" dataKey="name" width={80} tick={{fontSize: 11}} />
                     <RechartsTooltip content={<CustomTooltip />} cursor={{fill: 'transparent'}} wrapperStyle={{ zIndex: 100 }} />
-                    <Bar dataKey="edge" radius={[0, 4, 4, 0]} barSize={40} label={{ position: 'insideLeft', fill: '#fff', fontSize: 11, formatter: (val: any) => `${val}%` }}>
+                    <Bar 
+                      dataKey="edge" 
+                      radius={[0, 4, 4, 0]} 
+                      barSize={40} 
+                      label={{ position: 'insideLeft', fill: '#fff', fontSize: 11, formatter: (val: any) => `${val}%` }}
+                      onClick={(data) => handleBarClick(data)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       {baccaratData.mainBets.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.edge < 2 ? "var(--success)" : "var(--danger)"} />
+                        <Cell key={`cell-${index}`} fill={entry.edge < 2 ? "var(--success)" : entry.edge < 5 ? "var(--warning)" : "var(--danger)"} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -170,7 +224,15 @@ export default function BaccaratAnalysis() {
                     <XAxis type="number" domain={[0, 'auto']} tickFormatter={(val) => `${val}%`} />
                     <YAxis type="category" dataKey="name" width={90} tick={{fontSize: 11, fontWeight: 500}} />
                     <RechartsTooltip content={<CustomTooltip />} cursor={{fill: 'var(--muted)', opacity: 0.2}} wrapperStyle={{ zIndex: 100 }} />
-                    <Bar dataKey="edge" radius={[0, 4, 4, 0]} barSize={30} animationDuration={1000} label={{ position: 'insideLeft', fill: '#fff', fontSize: 10, formatter: (val: any) => `${val}%` }}>
+                    <Bar 
+                      dataKey="edge" 
+                      radius={[0, 4, 4, 0]} 
+                      barSize={30} 
+                      animationDuration={1000} 
+                      label={{ position: 'insideLeft', fill: '#fff', fontSize: 10, formatter: (val: any) => `${val}%` }}
+                      onClick={(data) => handleBarClick(data)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       {(activeTab === 'main' ? baccaratData.mainBets : 
                         activeTab === 'pair' ? baccaratData.pairBets : 
                         activeTab === 'side' ? baccaratData.sideBets : allData).map((entry, index) => {
