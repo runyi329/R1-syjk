@@ -166,10 +166,10 @@ export default function Home() {
                           <span className="w-1 h-1 rounded-full bg-primary mr-1.5 shadow-[0_0_5px_var(--primary)]" />
                           {project.url ? (
                             <Link href={project.url} className="truncate hover:underline cursor-pointer">
-                              {project.name_key}
+                              {catData.projects.find((p: any) => p.id === project.id)?.name || project.name_key}
                             </Link>
                           ) : (
-                            <span className="truncate">{project.name_key}</span>
+                            <span className="truncate">{catData.projects.find((p: any) => p.id === project.id)?.name || project.name_key}</span>
                           )}
                         </div>
                       ))}

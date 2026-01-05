@@ -170,8 +170,8 @@
       },
       "projects": [
         { "id": "baccarat", "name_key": "百家樂分析", "url": "/baccarat" },
-        { "id": "roulette", "name_key": "輪盤分析" },
-        { "id": "sports-betting", "name_key": "體育博彩分析" }
+        { "id": "roulette", "name_key": "輪盤分析", "url": "/roulette" },
+        { "id": "sports-betting", "name_key": "體育博彩分析", "url": "/football" }
       ]
     }
   ]

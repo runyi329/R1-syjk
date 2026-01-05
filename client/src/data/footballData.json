@@ -1,0 +1,44 @@
+{
+  "markets": [
+    {
+      "name": "亚盘 (Asian Handicap)",
+      "edge": 2.5,
+      "payout": "0.95-1.05",
+      "probability": "50%",
+      "description": "通过让球平衡双方实力，通常只有两个选项。水位最低，对玩家最有利。",
+      "recommendation": "strongly_recommended"
+    },
+    {
+      "name": "大小球 (Over/Under)",
+      "edge": 4.5,
+      "payout": "0.90-1.00",
+      "probability": "50%",
+      "description": "预测总进球数。庄家优势适中。",
+      "recommendation": "recommended"
+    },
+    {
+      "name": "胜平负 (1X2)",
+      "edge": 6.5,
+      "payout": "VARIES",
+      "probability": "33%*",
+      "description": "传统的胜、平、负投注。由于有三个选项，庄家抽水通常较高。",
+      "recommendation": "caution"
+    },
+    {
+      "name": "波胆 (Correct Score)",
+      "edge": 22.5,
+      "payout": "HIGH",
+      "probability": "LOW",
+      "description": "预测准确比分。庄家优势极高，属于高风险投注。",
+      "recommendation": "not_recommended"
+    },
+    {
+      "name": "混合过关 (Parlay/Accumulator)",
+      "edge": 15.0,
+      "payout": "VERY HIGH",
+      "probability": "VERY LOW",
+      "description": "串联多场比赛。庄家优势会随场次叠加，长期极难盈利。",
+      "recommendation": "not_recommended"
+    }
+  ]
+}

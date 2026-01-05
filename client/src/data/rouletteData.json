@@ -1,0 +1,80 @@
+{
+  "european": [
+    {
+      "name": "红/黑 (Red/Black)",
+      "edge": 2.70,
+      "payout": "1:1",
+      "probability": "48.65%",
+      "description": "投注红色或黑色号码。最受欢迎的投注之一。",
+      "recommendation": "recommended"
+    },
+    {
+      "name": "单/双 (Odd/Even)",
+      "edge": 2.70,
+      "payout": "1:1",
+      "probability": "48.65%",
+      "description": "投注奇数或偶数号码。",
+      "recommendation": "recommended"
+    },
+    {
+      "name": "大/小 (High/Low)",
+      "edge": 2.70,
+      "payout": "1:1",
+      "probability": "48.65%",
+      "description": "投注1-18(小)或19-36(大)。",
+      "recommendation": "recommended"
+    },
+    {
+      "name": "单号 (Straight Up)",
+      "edge": 2.70,
+      "payout": "35:1",
+      "probability": "2.70%",
+      "description": "投注任意一个特定号码。高风险高回报。",
+      "recommendation": "recommended"
+    }
+  ],
+  "american": [
+    {
+      "name": "红/黑 (Red/Black)",
+      "edge": 5.26,
+      "payout": "1:1",
+      "probability": "47.37%",
+      "description": "由于增加了00，胜率低于欧式轮盘。",
+      "recommendation": "not_recommended"
+    },
+    {
+      "name": "单号 (Straight Up)",
+      "edge": 5.26,
+      "payout": "35:1",
+      "probability": "2.63%",
+      "description": "投注单一号码。庄家优势显著高于欧式。",
+      "recommendation": "not_recommended"
+    },
+    {
+      "name": "五数注 (Five Number)",
+      "edge": 7.89,
+      "payout": "6:1",
+      "probability": "13.16%",
+      "description": "投注0, 00, 1, 2, 3。轮盘中最差的投注。",
+      "recommendation": "not_recommended"
+    }
+  ],
+  "french": [
+    {
+      "name": "红/黑 (La Partage)",
+      "edge": 1.35,
+      "payout": "1:1",
+      "probability": "48.65%*",
+      "description": "若开出0，退还一半赌注。对玩家最有利的规则。",
+      "recommendation": "strongly_recommended"
+    },
+    {
+      "name": "其他投注",
+      "edge": 2.70,
+      "payout": "VARIES",
+      "probability": "VARIES",
+      "description": "除等额注外，其他投注优势与欧式相同。",
+      "recommendation": "recommended"
+    }
+  ]
+}

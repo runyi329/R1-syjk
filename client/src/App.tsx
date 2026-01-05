@@ -7,13 +7,17 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
 import BaccaratAnalysis from "./pages/BaccaratAnalysis";
+import RouletteAnalysis from "./pages/RouletteAnalysis";
+import FootballAnalysis from "./pages/FootballAnalysis";
 
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/baccarat"} component={BaccaratAnalysis} />
+       <Route path="/baccarat" component={BaccaratAnalysis} />
+      <Route path="/roulette" component={RouletteAnalysis} />
+      <Route path="/football" component={FootballAnalysis} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
