@@ -50,17 +50,18 @@ export default function Home() {
       <main className="flex-1">
         {/* 英雄区域 */}
         <section className="relative py-16 md:py-24 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent -z-10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background -z-10" />
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=2832&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-overlay -z-20" />
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-yellow-200 to-primary">
                 {content.tagline}
               </h2>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 {content.description}
               </p>
               <div className="flex flex-wrap justify-center gap-4 pt-4">
-                <Button size="lg" className="rounded-full px-8 shadow-lg hover:shadow-xl transition-all">
+                <Button size="lg" className="rounded-full px-8 shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-primary to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-primary-foreground border-0">
                   {language === 'en' ? 'Start Investing' : '開始投資'}
                 </Button>
                 <Button size="lg" variant="outline" className="rounded-full px-8">
@@ -79,7 +80,7 @@ export default function Home() {
         </section>
 
         {/* 核心优势 */}
-        <section className="py-12 bg-secondary/30">
+        <section className="py-12 bg-secondary/10 border-y border-border/30">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center space-y-3 p-6 bg-card rounded-xl shadow-sm border border-border/50">
