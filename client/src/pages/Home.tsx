@@ -87,12 +87,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 核心优势 - 横向三列带详情布局 */}
-        <section className="py-12 bg-secondary/10 border-y border-border/30">
+        {/* 核心优势 - 移动端横向滑动，桌面端三列布局 */}
+        <section className="py-12 bg-secondary/10 border-y border-border/30 overflow-hidden">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20">
+            <div className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
+              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
                   <TrendingUp className="w-6 h-6" />
                 </div>
                 <h3 className="font-bold text-lg text-primary mb-2">{language === 'en' ? 'Market Analysis' : '市場分析'}</h3>
@@ -101,8 +101,8 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20">
+              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <h3 className="font-bold text-lg text-primary mb-2">{language === 'en' ? 'Risk Control' : '風控建議'}</h3>
@@ -111,8 +111,8 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20">
+              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
                   <Users className="w-6 h-6" />
                 </div>
                 <h3 className="font-bold text-lg text-primary mb-2">{language === 'en' ? 'Client Focus' : '客戶至上'}</h3>
@@ -120,6 +120,12 @@ export default function Home() {
                   {content.advantages[3].split('：')[1] || content.advantages[3].split(':')[1]}
                 </p>
               </div>
+            </div>
+            {/* 移动端滑动提示 */}
+            <div className="flex justify-center gap-1 mt-2 md:hidden">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/30"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/30"></div>
             </div>
           </div>
         </section>
@@ -146,8 +152,8 @@ export default function Home() {
                 <Card key={category.id} className="group hover:shadow-lg transition-all duration-300 border-border/60 hover:border-primary/50 overflow-hidden bg-card/80 backdrop-blur-sm">
                   <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between space-y-0">
                     <div className="flex items-center gap-3">
-                      <div className="text-primary filter drop-shadow-[0_0_5px_rgba(var(--primary),0.5)]">
-                        <IconComponent className="w-6 h-6" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)] group-hover:scale-110 transition-transform duration-300">
+                        <IconComponent className="w-5 h-5" />
                       </div>
                       <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
                         {catData.name}
