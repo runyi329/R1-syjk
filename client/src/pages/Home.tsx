@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Crown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices, LogOut, LogIn } from "lucide-react";
@@ -16,6 +18,9 @@ import { PuzzleCaptcha } from "@/components/PuzzleCaptcha";
 
 export default function Home() {
   const { data: authData } = trpc.auth.me.useQuery();
+  const { data: userData } = trpc.users.getMe.useQuery(undefined, {
+    enabled: !!authData,
+  });
   const [location, setLocation] = useLocation();
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -120,6 +125,18 @@ export default function Home() {
     }
   };
 
+  // 计算VIP等级
+  const calculateVIPLevel = (balance: number): { level: number; label: string } => {
+    if (balance >= 5000000) return { level: 5, label: "VIP 5" };
+    if (balance >= 2000000) return { level: 4, label: "VIP 4" };
+    if (balance >= 1000000) return { level: 3, label: "VIP 3" };
+    if (balance >= 500000) return { level: 2, label: "VIP 2" };
+    if (balance >= 100000) return { level: 1, label: "VIP 1" };
+    return { level: 0, label: "普通用户" };
+  };
+
+  const vipInfo = userData ? calculateVIPLevel(parseFloat(userData.usdtBalance)) : { level: 0, label: "普通用户" };
+
   return (
     <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground flex flex-col">
       {/* 头部导航 */}
@@ -161,6 +178,24 @@ export default function Home() {
             )}
             {authData ? (
               <div className="flex gap-2 items-center">
+                {/* 用户信息显示 */}
+                {userData && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground hidden sm:flex">
+                    <span className="font-medium text-foreground">{userData.name}</span>
+                    <span>│</span>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs font-semibold ${
+                        vipInfo.level > 0 
+                          ? "bg-primary/20 text-primary border-primary/50" 
+                          : "text-muted-foreground border-border"
+                      }`}
+                    >
+                      {vipInfo.level > 0 && <Crown className="h-3 w-3 mr-0.5 inline" />}
+                      {vipInfo.label}
+                    </Badge>
+                  </div>
+                )}
                 <Link href="/user-center">
                   <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
                     {language === 'en' ? 'User Center' : '个人中心'}
