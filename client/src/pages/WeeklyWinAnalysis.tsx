@@ -478,16 +478,19 @@ export default function WeeklyWinAnalysis() {
                     </div>
                     <button
                       onClick={() => setIsCompoundInterest(!isCompoundInterest)}
-                      className={`ml-2 px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded transition-colors ${
+                      className={`ml-2 relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         isCompoundInterest 
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-gray-400 text-white'
+                          ? 'bg-green-500' 
+                          : 'bg-gray-400'
                       }`}
                     >
-                      复利{isCompoundInterest ? '2' : '1'}
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                          isCompoundInterest ? 'translate-x-5' : 'translate-x-0.5'
+                        }`}
+                      />
                     </button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{compoundInterestText}</p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>

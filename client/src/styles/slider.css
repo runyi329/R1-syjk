@@ -7,20 +7,22 @@
   -webkit-appearance: none;
   appearance: none;
   background: linear-gradient(to right, #3b82f6 0%, #3b82f6 50%, #e5e7eb 50%, #e5e7eb 100%);
+  margin: 12px 0;
 }
 
 /* Chrome/Safari 滑块样式 */
 .investment-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
   border: 2px solid #fbbf24;
   transition: all 0.2s ease;
+  margin-top: -14px;
 }
 
 .investment-slider::-webkit-slider-thumb:hover {
@@ -29,14 +31,15 @@
 
 /* Firefox 滑块样式 */
 .investment-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
   border: 2px solid #fbbf24;
   transition: all 0.2s ease;
+  margin-top: -14px;
 }
 
 .investment-slider::-moz-range-thumb:hover {
