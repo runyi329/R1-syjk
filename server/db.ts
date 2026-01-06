@@ -132,6 +132,12 @@ export async function updateUserName(userId: number, name: string) {
   await db.update(users).set({ name }).where(eq(users.id, userId));
 }
 
+export async function updateUserPassword(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
+}
+
 // ========== 用户名+密码注册 ==========
 
 export async function getUserByUsername(username: string) {

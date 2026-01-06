@@ -297,4 +297,39 @@ export const usersRouter = router({
 
       return { success: true };
     }),
+
+  // 用户：修改密码
+  changePassword: protectedProcedure
+    .input(z.object({
+      currentPassword: z.string(),
+      newPassword: z.string().min(6).max(50),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // 验证当前密码
+      const user = ctx.user;
+      const isPasswordValid = db.verifyPassword(input.currentPassword, user.passwordHash || '');
+      
+      if (!isPasswordValid) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: '当前密码错误',
+        });
+      }
+
+      // 检查新密码是否与当前密码相同
+      if (input.currentPassword === input.newPassword) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: '新密码不能与当前密码相同',
+        });
+      }
+
+      // 哈希新密码
+      const newPasswordHash = db.hashPassword(input.newPassword);
+
+      // 更新密码
+      await db.updateUserPassword(user.id, newPasswordHash);
+
+      return { success: true };
+    }),
 });

@@ -169,13 +169,7 @@ export default function Home() {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            {authData && authData.role === 'admin' && (
-              <Link href="/admin">
-                <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
-                  {language === 'en' ? 'Admin' : '后台'}
-                </Button>
-              </Link>
-            )}
+
             {authData ? (
               <div className="flex gap-2 items-center">
                 {/* 用户信息显示 */}
@@ -465,9 +459,17 @@ export default function Home() {
 
       <footer className="bg-card border-t border-border py-12 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-6">
-            <img src="/logo.png" alt="Logo" className="w-full h-full rounded-md" />
-          </div>
+          {authData && authData.role === 'admin' ? (
+            <Link href="/admin" className="inline-block mb-6 group">
+              <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm group-hover:shadow-[0_0_25px_rgba(var(--primary),0.5)] transition-all duration-300 cursor-pointer">
+                <img src="/logo.png" alt="Logo" className="w-full h-full rounded-md" />
+              </div>
+            </Link>
+          ) : (
+            <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-6">
+              <img src="/logo.png" alt="Logo" className="w-full h-full rounded-md" />
+            </div>
+          )}
           <h3 className="font-bold text-lg mb-2">{content.name}</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto mb-8">
             {content.tagline}

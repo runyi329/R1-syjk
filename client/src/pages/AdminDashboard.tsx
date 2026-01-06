@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock, Key } from "lucide-react";
 import { toast } from "sonner";
 import DepositsManagement from "@/components/admin/DepositsManagement";
 import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
@@ -36,6 +36,13 @@ export default function AdminDashboard() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [pointsAmount, setPointsAmount] = useState("");
   const [pointsNotes, setPointsNotes] = useState("");
+
+  // Password management state
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Product management state
   const [productForm, setProductForm] = useState({
@@ -93,6 +100,41 @@ export default function AdminDashboard() {
     },
     onError: (error: any) => toast.error(`操作失败：${error.message}`),
   });
+
+  const changePasswordMutation = trpc.users.changePassword.useMutation({
+    onSuccess: () => {
+      toast.success("密码修改成功");
+      setIsChangePasswordOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    },
+    onError: (error: any) => toast.error(`修改失败：${error.message}`),
+  });
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("请填写所有字段");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("新密码和确认密码不一致");
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error("新密码至少需要6个字符");
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      await changePasswordMutation.mutateAsync({
+        currentPassword,
+        newPassword,
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
 
   const createProductMutation = trpc.products.createProduct.useMutation({
     onSuccess: () => {
@@ -215,6 +257,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               订单
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              设置
             </TabsTrigger>
           </TabsList>
 
@@ -723,6 +768,95 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="mt-6">
+            <Card className="bg-black/50 border-white/10 max-w-md">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  修改密码
+                </CardTitle>
+                <CardDescription className="text-white/60">修改您的管理员账户密码</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-[#D4AF37] text-black hover:bg-[#E5C158]">
+                      修改密码
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-black/90 border-white/10">
+                    <DialogHeader>
+                      <DialogTitle className="text-white">修改密码</DialogTitle>
+                      <DialogDescription className="text-white/60">
+                        请输入当前密码和新密码
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label className="text-white">当前密码</Label>
+                        <Input
+                          type="password"
+                          placeholder="输入当前密码"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                          disabled={isChangingPassword}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-white">新密码</Label>
+                        <Input
+                          type="password"
+                          placeholder="输入新密码（至少6个字符）"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                          disabled={isChangingPassword}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-white">确认新密码</Label>
+                        <Input
+                          type="password"
+                          placeholder="再次输入新密码"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                          disabled={isChangingPassword}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsChangePasswordOpen(false)}
+                        className="border-white/20 text-white hover:bg-white/10"
+                        disabled={isChangingPassword}
+                      >
+                        取消
+                      </Button>
+                      <Button
+                        onClick={handleChangePassword}
+                        className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
+                        disabled={isChangingPassword}
+                      >
+                        {isChangingPassword ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            修改中...
+                          </>
+                        ) : (
+                          "确认修改"
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </TabsContent>
