@@ -575,7 +575,7 @@ export default function BaccaratAnalysis() {
                             const colors = ['#f97316', '#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444'];
                             const color = colors[idx % colors.length];
                             return (
-                              <linearGradient key={`gradient-${idx}`} id={`areaGradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                              <linearGradient key={`gradient-${idx}`} id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0%" stopColor={color} stopOpacity={0.3} />
                                 <stop offset="100%" stopColor={color} stopOpacity={0} />
                               </linearGradient>
@@ -599,33 +599,15 @@ export default function BaccaratAnalysis() {
                           labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
                           itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
                         />
-                        {simulationRounds.map((round, idx) => {
-                          const colors = ['#f97316', '#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444'];
-                          const color = colors[idx % colors.length];
-                          const startIndex = idx === 0 ? 0 : simulationRounds.slice(0, idx).reduce((sum, r) => sum + r.stats.balanceHistory.length, 0);
-                          const endIndex = startIndex + round.stats.balanceHistory.length;
-                          const segmentData = simulationResult.balanceHistory.slice(startIndex, endIndex).map((balance, i) => ({ round: startIndex + i, balance }));
-                          
-                          return (
-                            <>
-                              <defs>
-                                <linearGradient id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor={color} stopOpacity={0.3} />
-                                  <stop offset="100%" stopColor={color} stopOpacity={0} />
-                                </linearGradient>
-                              </defs>
-                              <Line 
-                                type="monotone" 
-                                dataKey="balance" 
-                                data={segmentData}
-                                stroke={color} 
-                                strokeWidth={3} 
-                                dot={false}
-                                fill={`url(#gradient-${idx})`}
-                              />
-                            </>
-                          );
-                        })}
+                        <Line 
+                          type="monotone" 
+                          dataKey="balance" 
+                          stroke="#f97316" 
+                          strokeWidth={3} 
+                          dot={false}
+                          fill="url(#gradient-0)"
+                          fillOpacity={1}
+                        />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
