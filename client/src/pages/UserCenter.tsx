@@ -110,12 +110,12 @@ export default function UserCenter() {
                 {isBalanceVisible ? (
                   <>
                     {parseFloat(userData.usdtBalance).toFixed(2)}{" "}
-                    <span className="text-xl sm:text-2xl">USDT</span>
+                    <span className="text-xs sm:text-sm text-white/60">USDT</span>
                   </>
                 ) : (
                   <>
                     ****{" "}
-                    <span className="text-xl sm:text-2xl">USDT</span>
+                    <span className="text-xs sm:text-sm text-white/60">USDT</span>
                   </>
                 )}
               </div>
