@@ -105,6 +105,36 @@ export default function UserCenter() {
 
   const vipInfo = calculateVIPLevel(parseFloat(userData.usdtBalance));
 
+  // 计算VIP升级进度
+  const calculateVIPProgress = (balance: number) => {
+    const vipThresholds = [
+      { level: 0, min: 0, max: 100000, label: "普通用户" },
+      { level: 1, min: 100000, max: 500000, label: "VIP 1" },
+      { level: 2, min: 500000, max: 1000000, label: "VIP 2" },
+      { level: 3, min: 1000000, max: 2000000, label: "VIP 3" },
+      { level: 4, min: 2000000, max: 5000000, label: "VIP 4" },
+      { level: 5, min: 5000000, max: Infinity, label: "VIP 5" },
+    ];
+
+    const current = vipThresholds.find(t => balance >= t.min && balance < t.max);
+    if (!current) return { current: "VIP 5", next: null, needed: 0, progress: 100 };
+
+    const nextThreshold = vipThresholds.find(t => t.level === current.level + 1);
+    if (!nextThreshold) return { current: current.label, next: null, needed: 0, progress: 100 };
+
+    const needed = nextThreshold.min - balance;
+    const progress = ((balance - current.min) / (nextThreshold.min - current.min)) * 100;
+
+    return {
+      current: current.label,
+      next: nextThreshold.label,
+      needed: Math.max(0, needed),
+      progress: Math.min(100, Math.max(0, progress)),
+    };
+  };
+
+  const vipProgress = calculateVIPProgress(parseFloat(userData.usdtBalance));
+
 
 
   return (
@@ -209,6 +239,33 @@ export default function UserCenter() {
                     </Badge>
                   </div>
                 </div>
+                
+                {/* VIP升级进度条 */}
+                {vipProgress.next && (
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-white/60">升级进度：</span>
+                      <span className="text-[#D4AF37] font-semibold">
+                        {vipProgress.next} 还需 {vipProgress.needed.toFixed(0)} USDT
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden border border-white/20">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F0E68C] transition-all duration-300"
+                        style={{ width: `${vipProgress.progress}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-white/40">
+                      <span>{vipProgress.current}</span>
+                      <span>{vipProgress.next}</span>
+                    </div>
+                  </div>
+                )}
+                {vipInfo.level === 5 && (
+                  <div className="text-center text-xs text-[#D4AF37] pt-2 border-t border-white/10">
+                    🎉 已达到最高VIP等级
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
