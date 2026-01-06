@@ -53,6 +53,7 @@ export default function BaccaratAnalysis() {
   const [simulationProgress, setSimulationProgress] = useState(0);
   const [simulationResult, setSimulationResult] = useState<SimulationStats | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
+  const [simulationRounds, setSimulationRounds] = useState<Array<{roundNumber: number, stats: SimulationStats}>>([]); // 存储多轮投注数据
 
   // 合并所有数据用于综合图表
   const allData = [
@@ -372,7 +373,7 @@ export default function BaccaratAnalysis() {
               </div>
 
               <Button
-                onClick={handleSimulate}
+                onClick={() => handleSimulate(false)}
                 disabled={isSimulating || !initialCapital || parseInt(initialCapital) < 1000 || parseInt(initialCapital) > 10000000}
                 className="w-full"
                 size="lg"
@@ -421,7 +422,26 @@ export default function BaccaratAnalysis() {
             {simulationResult && (
               <div className="space-y-6 mt-8">
                 <div className="border-t border-border pt-6">
-                  <h3 className="text-xl font-bold text-card-foreground mb-4">模拟结果</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-card-foreground">模拟结果</h3>
+                    {simulationResult.finalBalance > 0 && (
+                      <Button
+                        onClick={() => handleSimulate(true)}
+                        disabled={isSimulating}
+                        variant="outline"
+                        size="sm"
+                      >
+                        {isSimulating ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            模拟中...
+                          </>
+                        ) : (
+                          `继续投注 ${selectedRounds}局`
+                        )}
+                      </Button>
+                    )}
+                  </div>
                   
                   {/* 基本统计 */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
@@ -550,6 +570,18 @@ export default function BaccaratAnalysis() {
                     <h4 className="font-semibold text-card-foreground mb-4">资金变化趋势</h4>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }))}>
+                        <defs>
+                          {simulationRounds.map((round, idx) => {
+                            const colors = ['#f97316', '#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444'];
+                            const color = colors[idx % colors.length];
+                            return (
+                              <linearGradient key={`gradient-${idx}`} id={`areaGradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+                                <stop offset="100%" stopColor={color} stopOpacity={0} />
+                              </linearGradient>
+                            );
+                          })}
+                        </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#444444" />
                         <XAxis 
                           dataKey="round" 
@@ -567,7 +599,33 @@ export default function BaccaratAnalysis() {
                           labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
                           itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
                         />
-                        <Line type="monotone" dataKey="balance" stroke="#f59e0b" strokeWidth={3} dot={false} />
+                        {simulationRounds.map((round, idx) => {
+                          const colors = ['#f97316', '#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444'];
+                          const color = colors[idx % colors.length];
+                          const startIndex = idx === 0 ? 0 : simulationRounds.slice(0, idx).reduce((sum, r) => sum + r.stats.balanceHistory.length, 0);
+                          const endIndex = startIndex + round.stats.balanceHistory.length;
+                          const segmentData = simulationResult.balanceHistory.slice(startIndex, endIndex).map((balance, i) => ({ round: startIndex + i, balance }));
+                          
+                          return (
+                            <>
+                              <defs>
+                                <linearGradient id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+                                  <stop offset="100%" stopColor={color} stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
+                              <Line 
+                                type="monotone" 
+                                dataKey="balance" 
+                                data={segmentData}
+                                stroke={color} 
+                                strokeWidth={3} 
+                                dot={false}
+                                fill={`url(#gradient-${idx})`}
+                              />
+                            </>
+                          );
+                        })}
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -645,14 +703,17 @@ export default function BaccaratAnalysis() {
     </div>
   );
 
-  function handleSimulate() {
+  function handleSimulate(isContinue: boolean = false) {
     const capital = parseInt(initialCapital);
-    if (capital < 1000 || capital > 10000000) {
+    if (!isContinue && (capital < 1000 || capital > 10000000)) {
       return;
     }
 
     setIsSimulating(true);
-    setSimulationResult(null);
+    if (!isContinue) {
+      setSimulationResult(null);
+      setSimulationRounds([]);
+    }
     setSimulationProgress(0);
 
     // 模拟进度条，平均等待2-3秒
@@ -673,15 +734,53 @@ export default function BaccaratAnalysis() {
 
     // 在进度条完成后执行模拟
     setTimeout(() => {
+      const startingCapital = isContinue && simulationResult ? simulationResult.finalBalance : capital;
       const result = runSimulation({
         rounds: selectedRounds,
-        initialCapital: capital,
+        initialCapital: startingCapital,
         basebet: 500,
         maxBet: 2000000,
       });
+      
       setSimulationProgress(100);
       setTimeout(() => {
-        setSimulationResult(result);
+        if (isContinue && simulationResult) {
+          // 继续投注：合并数据
+          const roundNumber = simulationRounds.length + 1;
+          setSimulationRounds(prev => [...prev, { roundNumber, stats: result }]);
+          
+          // 合并统计数据
+          const mergedResult: SimulationStats = {
+            ...result,
+            initialCapital: parseInt(initialCapital),
+            totalRounds: simulationResult.totalRounds + result.totalRounds,
+            bankerCount: simulationResult.bankerCount + result.bankerCount,
+            playerCount: simulationResult.playerCount + result.playerCount,
+            tieCount: simulationResult.tieCount + result.tieCount,
+            bankerRate: ((simulationResult.bankerCount + result.bankerCount) / (simulationResult.totalRounds + result.totalRounds)) * 100,
+            playerRate: ((simulationResult.playerCount + result.playerCount) / (simulationResult.totalRounds + result.totalRounds)) * 100,
+            tieRate: ((simulationResult.tieCount + result.tieCount) / (simulationResult.totalRounds + result.totalRounds)) * 100,
+            balanceHistory: [...simulationResult.balanceHistory, ...result.balanceHistory],
+            history: [...simulationResult.history, ...result.history].slice(-100),
+            minBet: Math.min(simulationResult.minBet, result.minBet),
+            maxBetAmount: Math.max(simulationResult.maxBetAmount, result.maxBetAmount),
+            avgBet: ((simulationResult.avgBet * simulationResult.totalRounds + result.avgBet * result.totalRounds) / (simulationResult.totalRounds + result.totalRounds)),
+            totalBetAmount: simulationResult.totalBetAmount + result.totalBetAmount,
+            turnoverMultiple: (simulationResult.totalBetAmount + result.totalBetAmount) / parseInt(initialCapital),
+            avgProfitPerRound: (result.finalBalance - parseInt(initialCapital)) / (simulationResult.totalRounds + result.totalRounds),
+            minBalance: Math.min(simulationResult.minBalance, result.minBalance),
+            maxBalance: Math.max(simulationResult.maxBalance, result.maxBalance),
+            bankerMaxWinStreak: Math.max(simulationResult.bankerMaxWinStreak, result.bankerMaxWinStreak),
+            bankerMaxLoseStreak: Math.max(simulationResult.bankerMaxLoseStreak, result.bankerMaxLoseStreak),
+            playerMaxWinStreak: Math.max(simulationResult.playerMaxWinStreak, result.playerMaxWinStreak),
+            playerMaxLoseStreak: Math.max(simulationResult.playerMaxLoseStreak, result.playerMaxLoseStreak),
+          };
+          setSimulationResult(mergedResult);
+        } else {
+          // 首次模拟
+          setSimulationRounds([{ roundNumber: 1, stats: result }]);
+          setSimulationResult(result);
+        }
         setIsSimulating(false);
         setSimulationProgress(0);
       }, 200);
