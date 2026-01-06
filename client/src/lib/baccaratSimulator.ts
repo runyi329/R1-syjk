@@ -176,17 +176,15 @@ export function runSimulation(config: SimulationConfig): SimulationStats {
     // 更新余额
     balance += winAmount;
 
-    // 记录历史（只保留前100局）
-    if (history.length < 100) {
-      history.push({
-        round,
-        outcome,
-        betOn,
-        betAmount,
-        winAmount,
-        balance,
-      });
-    }
+    // 记录历史
+    history.push({
+      round,
+      outcome,
+      betOn,
+      betAmount,
+      winAmount,
+      balance,
+    });
 
     // 记录资金曲线
     balanceHistory.push(balance);
