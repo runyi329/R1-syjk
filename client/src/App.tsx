@@ -18,6 +18,7 @@ import UserCenter from "./pages/UserCenter";
 import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import MobileBottomNav from "./components/MobileBottomNav";
 
 function Router() {
@@ -35,6 +36,7 @@ function Router() {
           <Route path="/withdraw" component={Withdraw} />
           <Route path="/wallet-addresses" component={WalletAddresses} />
         <Route path="/register" component={Register} />
+        <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/user-center" component={UserCenter} />
         <Route path="/shop" component={Shop} />
         <Route path="/admin" component={AdminDashboard} />

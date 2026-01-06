@@ -264,6 +264,19 @@ export default function Home() {
                         >
                           {isLoggingIn ? (language === 'en' ? 'Logging in...' : '登录中...') : (language === 'en' ? 'Login' : '登录')}
                         </Button>
+
+                        <div className="text-center text-sm text-muted-foreground">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsLoginDialogOpen(false);
+                              window.location.href = '/forgot-password';
+                            }}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {language === 'en' ? 'Forgot password?' : '忘记密码?'}
+                          </button>
+                        </div>
                       </form>
                     )}
                   </DialogContent>
