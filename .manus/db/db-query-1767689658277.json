@@ -1,0 +1,58 @@
+{
+  "query": "SELECT id, amount, network, adminNotes FROM deposits ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, amount, network, adminNotes FROM deposits ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "amount": "50.00000000",
+      "network": "Admin",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "2",
+      "amount": "100.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "3",
+      "amount": "50.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "4",
+      "amount": "80.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "5",
+      "amount": "15.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "6",
+      "amount": "70.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "7",
+      "amount": "200.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    },
+    {
+      "id": "8",
+      "amount": "50.00000000",
+      "network": "Migration",
+      "adminNotes": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tamount\tnetwork\tadminNotes\n1\t50.00000000\tAdmin\tNULL\n2\t100.00000000\tMigration\tNULL\n3\t50.00000000\tMigration\tNULL\n4\t80.00000000\tMigration\tNULL\n5\t15.00000000\tMigration\tNULL\n6\t70.00000000\tMigration\tNULL\n7\t200.00000000\tMigration\tNULL\n8\t50.00000000\tMigration\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 405
+}

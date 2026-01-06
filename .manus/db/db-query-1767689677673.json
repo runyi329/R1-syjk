@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, amount, network FROM deposits WHERE network LIKE '%Admin%' OR network LIKE '%Migration%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, amount, network FROM deposits WHERE network LIKE '%Admin%' OR network LIKE '%Migration%';",
+  "rows": [
+    {
+      "id": "1",
+      "amount": "50.00000000",
+      "network": "Admin"
+    },
+    {
+      "id": "2",
+      "amount": "100.00000000",
+      "network": "Migration"
+    },
+    {
+      "id": "3",
+      "amount": "50.00000000",
+      "network": "Migration"
+    },
+    {
+      "id": "4",
+      "amount": "80.00000000",
+      "network": "Migration"
+    },
+    {
+      "id": "5",
+      "amount": "15.00000000",
+      "network": "Migration"
+    },
+    {
+      "id": "6",
+      "amount": "70.00000000",
+      "network": "Migration"
+    },
+    {
+      "id": "7",
+      "amount": "200.00000000",
+      "network": "Migration"
+    },
+    {
+      "id": "8",
+      "amount": "50.00000000",
+      "network": "Migration"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tamount\tnetwork\n1\t50.00000000\tAdmin\n2\t100.00000000\tMigration\n3\t50.00000000\tMigration\n4\t80.00000000\tMigration\n5\t15.00000000\tMigration\n6\t70.00000000\tMigration\n7\t200.00000000\tMigration\n8\t50.00000000\tMigration\n",
+  "stderr": "",
+  "execution_time_ms": 408
+}

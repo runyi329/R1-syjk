@@ -304,3 +304,8 @@
 - [x] 在UserCenter提现历史中添加adminNotes显示（只在有内容时显示）
 - [x] 验证Deposit.tsx和Withdraw.tsx中的备注显示逻辑已正确
 - [x] 确保所有地方的备注显示逻辑一致
+
+## 清空充值历史中的标签
+- [x] 清空deposits表中network字段中的"Admin 岗位"和"Migration 岗位"
+- [x] 将这些记录的network字段设置为"Sui"
+- [x] 验证修改成功
