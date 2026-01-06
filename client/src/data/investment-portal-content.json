@@ -56,9 +56,9 @@
         "icon": "📈"
       },
       "projects": [
-        { "id": "a-stocks", "name_key": "A股分析" },
-        { "id": "hk-stocks", "name_key": "港股分析" },
-        { "id": "us-stocks", "name_key": "美股分析" }
+        { "id": "a-stocks", "name_key": "A股分析", "url": "/stocks-a" },
+        { "id": "hk-stocks", "name_key": "港股分析", "url": "/stocks-hk" },
+        { "id": "us-stocks", "name_key": "美股分析", "url": "/stocks-us" }
       ]
     },
     {
@@ -79,7 +79,7 @@
         "icon": "💱"
       },
       "projects": [
-        { "id": "forex-analysis", "name_key": "外匯交易分析" },
+        { "id": "forex-analysis", "name_key": "外匯交易分析", "url": "/forex" },
         { "id": "crypto-analysis", "name_key": "數字貨幣分析", "url": "/crypto" }
       ]
     },
@@ -101,9 +101,9 @@
         "icon": "⛽"
       },
       "projects": [
-        { "id": "gold-silver", "name_key": "黃金白銀分析" },
-        { "id": "crude-oil", "name_key": "原油分析" },
-        { "id": "agricultural", "name_key": "農產品分析" }
+        { "id": "gold-silver", "name_key": "黃金白銀分析", "url": "/commodities-gold" },
+        { "id": "crude-oil", "name_key": "原油分析", "url": "/commodities-oil" },
+        { "id": "agricultural", "name_key": "農產品分析", "url": "/commodities-ag" }
       ]
     },
     {
@@ -124,8 +124,8 @@
         "icon": "📊"
       },
       "projects": [
-        { "id": "futures-analysis", "name_key": "期貨分析" },
-        { "id": "options-analysis", "name_key": "期權分析" }
+        { "id": "futures-analysis", "name_key": "期貨分析", "url": "/derivatives-futures" },
+        { "id": "options-analysis", "name_key": "期權分析", "url": "/derivatives-options" }
       ]
     },
     {
@@ -146,9 +146,9 @@
         "icon": "💰"
       },
       "projects": [
-        { "id": "bonds", "name_key": "債券分析" },
-        { "id": "public-funds", "name_key": "公募基金分析" },
-        { "id": "private-funds", "name_key": "私募基金分析" }
+        { "id": "bonds", "name_key": "債券分析", "url": "/fixed-income-bonds" },
+        { "id": "public-funds", "name_key": "公募基金分析", "url": "/fixed-income-public" },
+        { "id": "private-funds", "name_key": "私募基金分析", "url": "/fixed-income-private" }
       ]
     },
     {

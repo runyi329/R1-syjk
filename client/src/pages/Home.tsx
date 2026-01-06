@@ -403,8 +403,11 @@ export default function Home() {
               const icons = [BarChart3, Coins, Gem, Layers, PieChart, Dices];
               const IconComponent = icons[index % icons.length];
               
+              // 获取该分类的第一个项目的URL作为导航目标
+              const firstProjectUrl = category.projects && category.projects.length > 0 ? category.projects[0].url : null;
+              
               return (
-                <Card key={category.id} className="group hover:shadow-lg transition-all duration-300 border-border/60 hover:border-primary/50 overflow-hidden bg-card/80 backdrop-blur-sm">
+                <Card key={category.id} className="group hover:shadow-lg transition-all duration-300 border-border/60 hover:border-primary/50 overflow-hidden bg-card/80 backdrop-blur-sm cursor-pointer">
                   <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between space-y-0">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)] group-hover:scale-110 transition-transform duration-300">
@@ -414,9 +417,13 @@ export default function Home() {
                         {catData.name}
                       </CardTitle>
                     </div>
-                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <button 
+                      onClick={() => firstProjectUrl && setLocation(firstProjectUrl)}
+                      className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors hover:scale-110"
+                      title={language === 'en' ? 'Learn more' : '了解详情'}
+                    >
                       <ArrowRight className="w-3 h-3" />
-                    </div>
+                    </button>
                   </CardHeader>
                   <CardContent className="px-5 pb-4 pt-2">
                     <CardDescription className="line-clamp-1 text-xs mb-3 text-muted-foreground/80">
