@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, TrendingDown, Zap } from "lucide-react";
 import { Link } from "wouter";
-import { useState, useEffect } from "react";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from "recharts";
+import { useState, useEffect, useRef } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 
 interface CryptoData {
   symbol: string;
@@ -22,13 +22,8 @@ export default function CryptoAnalysis() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUsingMockData, setIsUsingMockData] = useState(false);
-
-  useEffect(() => {
-    fetchCryptoData();
-    // 每30秒更新一次数据
-    const interval = setInterval(fetchCryptoData, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const isMountedRef = useRef(true);
+  const hasInitialLoadRef = useRef(false);
 
   // 生成模拟历史数据
   const generateMockHistory = (basePrice: number, variance: number) => {
@@ -71,6 +66,9 @@ export default function CryptoAnalysis() {
   };
 
   const fetchCryptoData = async () => {
+    // 防止组件卸载后更新状态
+    if (!isMountedRef.current) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -78,7 +76,8 @@ export default function CryptoAnalysis() {
 
       // 使用 CoinGecko API（免费，无需认证）
       const response = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true'
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true',
+        { signal: AbortSignal.timeout(8000) }
       );
 
       if (!response.ok) throw new Error('Failed to fetch crypto data');
@@ -87,7 +86,8 @@ export default function CryptoAnalysis() {
 
       // 获取历史数据用于图表
       const historyResponse = await fetch(
-        'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7'
+        'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7',
+        { signal: AbortSignal.timeout(8000) }
       );
 
       if (!historyResponse.ok) throw new Error('Failed to fetch history data');
@@ -102,7 +102,8 @@ export default function CryptoAnalysis() {
 
       // 获取 ETH 历史数据
       const ethHistoryResponse = await fetch(
-        'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7'
+        'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7',
+        { signal: AbortSignal.timeout(8000) }
       );
 
       if (!ethHistoryResponse.ok) throw new Error('Failed to fetch ETH history');
@@ -114,36 +115,60 @@ export default function CryptoAnalysis() {
         price: Math.round(item[1])
       }));
 
-      setCryptoData({
-        BTC: {
-          symbol: 'BTC',
-          name: 'Bitcoin',
-          price: data.bitcoin.usd,
-          change24h: data.bitcoin.usd_24h_change,
-          marketCap: data.bitcoin.usd_market_cap,
-          volume24h: data.bitcoin.usd_24h_vol,
-          priceHistory: btcHistory
-        },
-        ETH: {
-          symbol: 'ETH',
-          name: 'Ethereum',
-          price: data.ethereum.usd,
-          change24h: data.ethereum.usd_24h_change,
-          marketCap: data.ethereum.usd_market_cap,
-          volume24h: data.ethereum.usd_24h_vol,
-          priceHistory: ethHistory
-        }
-      });
+      if (isMountedRef.current) {
+        setCryptoData({
+          BTC: {
+            symbol: 'BTC',
+            name: 'Bitcoin',
+            price: data.bitcoin.usd,
+            change24h: data.bitcoin.usd_24h_change,
+            marketCap: data.bitcoin.usd_market_cap,
+            volume24h: data.bitcoin.usd_24h_vol,
+            priceHistory: btcHistory
+          },
+          ETH: {
+            symbol: 'ETH',
+            name: 'Ethereum',
+            price: data.ethereum.usd,
+            change24h: data.ethereum.usd_24h_change,
+            marketCap: data.ethereum.usd_market_cap,
+            volume24h: data.ethereum.usd_24h_vol,
+            priceHistory: ethHistory
+          }
+        });
+        setError(null);
+        setIsUsingMockData(false);
+        setLoading(false);
+      }
     } catch (err) {
       console.error('Crypto data fetch error:', err);
       // 使用模拟数据作为备用
-      setCryptoData(getMockData());
-      setIsUsingMockData(true);
-      setError('无法连接到实时数据源，显示示例数据');
-    } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setCryptoData(getMockData());
+        setIsUsingMockData(true);
+        setError('无法连接到实时数据源，显示示例数据');
+        setLoading(false);
+      }
     }
   };
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    // 只在首次加载时调用一次
+    if (!hasInitialLoadRef.current) {
+      hasInitialLoadRef.current = true;
+      fetchCryptoData();
+    }
+
+    // 每30秒更新一次数据
+    const interval = setInterval(fetchCryptoData, 30000);
+
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -197,7 +222,7 @@ export default function CryptoAnalysis() {
         )}
 
         {/* 错误提示 */}
-        {error && (
+        {error && !loading && (
           <Card className="border-l-4 border-l-yellow-500 bg-yellow-500/5">
             <CardHeader>
               <CardTitle className="text-yellow-600">⚠️ 数据提示</CardTitle>
@@ -212,7 +237,7 @@ export default function CryptoAnalysis() {
         )}
 
         {/* 总览区域 */}
-        {!loading && (
+        {!loading && Object.keys(cryptoData).length > 0 && (
           <>
             <section id="overview" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
