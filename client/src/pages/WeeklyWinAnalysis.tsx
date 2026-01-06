@@ -10,8 +10,7 @@ import AssetAllocationSection from "@/components/AssetAllocationSection";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function WeeklyWinAnalysis() {
-  const [investmentAmount, setInvestmentAmount] = useState(10000);
-  const [weeklyProfit, setWeeklyProfit] = useState(500);
+  const [investmentAmount, setInvestmentAmount] = useState(100000);
 
   // 资金配置数据
   const fundAllocation = [
@@ -22,19 +21,12 @@ export default function WeeklyWinAnalysis() {
   // 收益演示数据（基于投资金额）
   const userFund = ((investmentAmount * 0.8) as number).toFixed(2);
   const companyFund = ((investmentAmount * 0.2) as number).toFixed(2);
-  const weeklyWithdrawalNum = weeklyProfit * 0.01;
+  const weeklyWithdrawalNum = investmentAmount * 0.01;
   const weeklyWithdrawal = weeklyWithdrawalNum.toFixed(2);
-  const annualWithdrawalNum = weeklyWithdrawalNum * 52;
-  const annualWithdrawal = annualWithdrawalNum.toFixed(2);
-  const annualYield = ((annualWithdrawalNum / investmentAmount) * 100).toFixed(2);
+  const monthlyWithdrawalNum = (weeklyWithdrawalNum / 28) * 30;
+  const monthlyWithdrawal = monthlyWithdrawalNum.toFixed(2);
 
-  // 收益分成演示
-  const profitDistribution = [
-    { week: "第1周", profit: weeklyProfit, withdrawal: weeklyProfit * 0.01, remaining: weeklyProfit * 0.99 },
-    { week: "第2周", profit: weeklyProfit * 1.05, withdrawal: weeklyProfit * 1.05 * 0.01, remaining: weeklyProfit * 1.05 * 0.99 },
-    { week: "第3周", profit: weeklyProfit * 1.1, withdrawal: weeklyProfit * 1.1 * 0.01, remaining: weeklyProfit * 1.1 * 0.99 },
-    { week: "第4周", profit: weeklyProfit * 1.08, withdrawal: weeklyProfit * 1.08 * 0.01, remaining: weeklyProfit * 1.08 * 0.99 }
-  ];
+
 
   // 历史收益案例数据
   const successCases = [
@@ -424,33 +416,19 @@ export default function WeeklyWinAnalysis() {
                   <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
                   <input
                     type="range"
-                    min="1000"
-                    max="100000"
-                    step="1000"
+                    min="10000"
+                    max="1000000"
+                    step="10000"
                     value={investmentAmount}
                     onChange={(e) => setInvestmentAmount(Number(e.target.value))}
                     className="w-full"
                   />
                   <div className="mt-2 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                 </div>
-
-                <div>
-                  <label className="text-sm font-semibold mb-3 block">周均利润 (USDT)</label>
-                  <input
-                    type="range"
-                    min="100"
-                    max="5000"
-                    step="100"
-                    value={weeklyProfit}
-                    onChange={(e) => setWeeklyProfit(Number(e.target.value))}
-                    className="w-full"
-                  />
-                  <div className="mt-2 text-2xl font-bold text-green-500">${weeklyProfit.toLocaleString()}</div>
-                </div>
               </div>
 
               {/* 计算结果 */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-muted rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-6 bg-muted rounded-lg">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">客户账户资金</p>
                   <p className="text-xl font-bold text-primary">${userFund}</p>
@@ -463,61 +441,15 @@ export default function WeeklyWinAnalysis() {
                   <p className="text-xs text-muted-foreground mb-1">每周提现额</p>
                   <p className="text-xl font-bold text-green-500">${weeklyWithdrawal}</p>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">年化收益率</p>
-                  <p className="text-xl font-bold text-yellow-500">{annualYield}%</p>
-                </div>
-              </div>
-
-              {/* 年度收益 */}
-              <div className="p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">年度提现总额</p>
-                    <p className="text-3xl font-bold text-primary">${annualWithdrawal}</p>
-                  </div>
-                  <Zap className="w-12 h-12 text-primary opacity-20" />
+                <div className="md:col-span-3">
+                  <p className="text-xs text-muted-foreground mb-1">每月提现额</p>
+                  <p className="text-2xl font-bold text-primary">${monthlyWithdrawal}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* 收益分成演示 */}
-          <Card className="border-none shadow-md">
-            <CardHeader>
-              <CardTitle>4周收益分成演示</CardTitle>
-              <CardDescription>基于周均利润 ${weeklyProfit.toLocaleString()} 的示例</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={profitDistribution}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="week" stroke="var(--muted-foreground)" />
-                    <YAxis stroke="var(--muted-foreground)" />
-                    <RechartsTooltip 
-                      contentStyle={{
-                        backgroundColor: 'var(--card)',
-                        border: '1px solid var(--border)',
-                        borderRadius: '8px'
-                      }}
-                      formatter={(value: any) => `$${value.toFixed(2)}`}
-                    />
-                    <Legend />
-                    <Bar dataKey="withdrawal" name="每周提现" fill="var(--primary)" />
-                    <Bar dataKey="remaining" name="账户保留" fill="var(--muted-foreground)" opacity={0.5} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
 
-              {/* 说明 */}
-              <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                <p className="text-sm text-blue-900">
-                  <strong>说明：</strong> 每周您可以提现利润的1%，剩余99%的利润继续在账户中增长。这样既能获得稳定的周收入，又能让账户资金通过复利不断增长。
-                </p>
-              </div>
-            </CardContent>
-          </Card>
         </section>
 
         {/* 历史收益案例 */}
