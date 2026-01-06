@@ -289,9 +289,11 @@ export default function Deposit() {
                         <CardTitle className="text-white text-base">
                           充值 {parseFloat(deposit.amount).toFixed(2)} USDT
                         </CardTitle>
-                        <CardDescription className="text-white/60 text-xs mt-1">
-                          {deposit.network} 网络
-                        </CardDescription>
+                        {deposit.adminNotes && (
+                          <CardDescription className="text-white/60 text-xs mt-1">
+                            {deposit.adminNotes}
+                          </CardDescription>
+                        )}
                       </div>
                       {getStatusBadge(deposit.status)}
                     </div>

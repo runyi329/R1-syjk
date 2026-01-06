@@ -315,3 +315,9 @@
 - [x] 将`(deposit) => () => (`改为`(deposit) => (`
 - [x] 验证TypeScript编译通过（0 errors）
 - [x] 优化充值历史的渲染性能
+
+## 修改充值历史的显示逻辑
+- [x] 隐藏Deposit.tsx中的network字段显示
+- [x] 修改CardDescription只显示adminNotes（当有备注时）
+- [x] 完全隐藏没有备注的充值记录的描述部分
+- [x] 与资金流水记录的显示逻辑保持一致
