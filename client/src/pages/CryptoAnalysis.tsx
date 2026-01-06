@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, TrendingDown, Zap } from "lucide-react";
 import { Link } from "wouter";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 
 interface CryptoData {
@@ -20,10 +20,6 @@ interface CryptoData {
 export default function CryptoAnalysis() {
   const [cryptoData, setCryptoData] = useState<{ [key: string]: CryptoData }>({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isUsingMockData, setIsUsingMockData] = useState(false);
-  const isMountedRef = useRef(true);
-  const hasInitialLoadRef = useRef(false);
 
   // 生成模拟历史数据
   const generateMockHistory = (basePrice: number, variance: number) => {
@@ -65,120 +61,14 @@ export default function CryptoAnalysis() {
     };
   };
 
-  const fetchCryptoData = async () => {
-    // 防止组件卸载后更新状态
-    if (!isMountedRef.current) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-      setIsUsingMockData(false);
-
-      // 创建超时控制器
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-      try {
-        // 使用 CoinGecko API（免费，无需认证）
-        const response = await fetch(
-          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true',
-          { signal: controller.signal }
-        );
-
-        if (!response.ok) throw new Error('Failed to fetch crypto data');
-
-        const data = await response.json();
-
-        // 获取历史数据用于图表
-        const historyResponse = await fetch(
-          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7',
-          { signal: controller.signal }
-        );
-
-        if (!historyResponse.ok) throw new Error('Failed to fetch history data');
-
-        const historyData = await historyResponse.json();
-
-        // 处理 BTC 数据
-        const btcHistory = historyData.prices.map((item: [number, number]) => ({
-          time: new Date(item[0]).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
-          price: Math.round(item[1])
-        }));
-
-        // 获取 ETH 历史数据
-        const ethHistoryResponse = await fetch(
-          'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7',
-          { signal: controller.signal }
-        );
-
-        if (!ethHistoryResponse.ok) throw new Error('Failed to fetch ETH history');
-
-        const ethHistoryData = await ethHistoryResponse.json();
-
-        const ethHistory = ethHistoryData.prices.map((item: [number, number]) => ({
-          time: new Date(item[0]).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
-          price: Math.round(item[1])
-        }));
-
-        clearTimeout(timeoutId);
-
-        if (isMountedRef.current) {
-          setCryptoData({
-            BTC: {
-              symbol: 'BTC',
-              name: 'Bitcoin',
-              price: data.bitcoin.usd,
-              change24h: data.bitcoin.usd_24h_change,
-              marketCap: data.bitcoin.usd_market_cap,
-              volume24h: data.bitcoin.usd_24h_vol,
-              priceHistory: btcHistory
-            },
-            ETH: {
-              symbol: 'ETH',
-              name: 'Ethereum',
-              price: data.ethereum.usd,
-              change24h: data.ethereum.usd_24h_change,
-              marketCap: data.ethereum.usd_market_cap,
-              volume24h: data.ethereum.usd_24h_vol,
-              priceHistory: ethHistory
-            }
-          });
-          setError(null);
-          setIsUsingMockData(false);
-          setLoading(false);
-        }
-      } catch (fetchErr) {
-        clearTimeout(timeoutId);
-        throw fetchErr;
-      }
-    } catch (err) {
-      console.error('Crypto data fetch error:', err);
-      // 使用模拟数据作为备用
-      if (isMountedRef.current) {
-        setCryptoData(getMockData());
-        setIsUsingMockData(true);
-        setError('无法连接到实时数据源，显示示例数据');
-        setLoading(false);
-      }
-    }
-  };
-
   useEffect(() => {
-    isMountedRef.current = true;
+    // 模拟加载延迟
+    const timer = setTimeout(() => {
+      setCryptoData(getMockData());
+      setLoading(false);
+    }, 500);
 
-    // 只在首次加载时调用一次
-    if (!hasInitialLoadRef.current) {
-      hasInitialLoadRef.current = true;
-      fetchCryptoData();
-    }
-
-    // 每30秒更新一次数据
-    const interval = setInterval(fetchCryptoData, 30000);
-
-    return () => {
-      isMountedRef.current = false;
-      clearInterval(interval);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   const formatPrice = (price: number) => {
@@ -230,21 +120,6 @@ export default function CryptoAnalysis() {
               <p className="text-muted-foreground">正在加载数据...</p>
             </div>
           </div>
-        )}
-
-        {/* 错误提示 */}
-        {error && !loading && (
-          <Card className="border-l-4 border-l-yellow-500 bg-yellow-500/5">
-            <CardHeader>
-              <CardTitle className="text-yellow-600">⚠️ 数据提示</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">{error}</p>
-              <Button onClick={fetchCryptoData} variant="outline" size="sm">
-                重新加载实时数据
-              </Button>
-            </CardContent>
-          </Card>
         )}
 
         {/* 总览区域 */}
