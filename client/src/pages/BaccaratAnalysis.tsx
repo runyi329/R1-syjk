@@ -50,6 +50,7 @@ export default function BaccaratAnalysis() {
   const [selectedRounds, setSelectedRounds] = useState<number>(1000);
   const [initialCapital, setInitialCapital] = useState<string>("10000");
   const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationProgress, setSimulationProgress] = useState(0);
   const [simulationResult, setSimulationResult] = useState<SimulationStats | null>(null);
 
   // 合并所有数据用于综合图表
@@ -340,6 +341,19 @@ export default function BaccaratAnalysis() {
                   placeholder="输入1000-10000000"
                   className="mt-2 bg-background border-border text-foreground"
                 />
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2">
+                  {[10000, 50000, 100000, 200000, 500000, 1000000].map((amount) => (
+                    <Button
+                      key={amount}
+                      variant={parseInt(initialCapital) === amount ? "default" : "outline"}
+                      onClick={() => setInitialCapital(amount.toString())}
+                      className="text-xs sm:text-sm"
+                      size="sm"
+                    >
+                      {amount >= 10000 ? `${amount / 10000}万` : amount}
+                    </Button>
+                  ))}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   最小1000元，最大1000万元
                 </p>
@@ -371,6 +385,35 @@ export default function BaccaratAnalysis() {
                   "开始模拟"
                 )}
               </Button>
+
+              {/* 进度条 */}
+              {isSimulating && (
+                <div className="space-y-2">
+                  <div className="relative w-full h-12 bg-muted rounded-full overflow-hidden border-2 border-primary/30">
+                    {/* 进度条背景 */}
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-primary/50 to-primary transition-all duration-300 ease-out"
+                      style={{ width: `${simulationProgress}%` }}
+                    />
+                    
+                    {/* 筹码图标 */}
+                    <div 
+                      className="absolute top-1/2 -translate-y-1/2 transition-all duration-300 ease-out"
+                      style={{ left: `calc(${simulationProgress}% - 20px)` }}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary border-4 border-background shadow-lg flex items-center justify-center">
+                        <span className="text-lg font-bold text-primary-foreground">¥</span>
+                      </div>
+                    </div>
+                    
+                    {/* 百分比文字 */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-foreground z-10">{Math.round(simulationProgress)}%</span>
+                    </div>
+                  </div>
+                  <p className="text-center text-xs text-muted-foreground">正在模拟投注，请稍候...</p>
+                </div>
+              )}
             </div>
 
             {/* 统计结果 */}
@@ -391,15 +434,23 @@ export default function BaccaratAnalysis() {
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">盈亏金额</div>
-                      <div className={`text-lg font-bold ${simulationResult.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className={`text-lg font-bold ${simulationResult.profitLoss >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {simulationResult.profitLoss >= 0 ? '+' : ''}¥{simulationResult.profitLoss.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
                       </div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">盈亏率</div>
-                      <div className={`text-lg font-bold ${simulationResult.profitLossRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className={`text-lg font-bold ${simulationResult.profitLossRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {simulationResult.profitLossRate >= 0 ? '+' : ''}{simulationResult.profitLossRate.toFixed(2)}%
                       </div>
+                    </div>
+                  </div>
+
+                  {/* 总投注局数 */}
+                  <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-2 border-primary/30 mb-6">
+                    <div className="text-center">
+                      <div className="text-sm text-muted-foreground mb-1">此次共投注</div>
+                      <div className="text-4xl font-bold text-primary">{simulationResult.totalRounds}局</div>
                     </div>
                   </div>
 
@@ -408,17 +459,20 @@ export default function BaccaratAnalysis() {
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-sm text-muted-foreground mb-2">开庄统计</div>
                       <div className="text-2xl font-bold text-card-foreground mb-1">{simulationResult.bankerCount}局</div>
-                      <div className="text-xs text-muted-foreground">占比 {simulationResult.bankerRate.toFixed(2)}%</div>
+                      <div className="text-xs text-muted-foreground mb-1">实际占比 {simulationResult.bankerRate.toFixed(2)}%</div>
+                      <div className="text-xs text-primary">期望值 45.86% (偏差 {(simulationResult.bankerRate - 45.86).toFixed(2)}%)</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-sm text-muted-foreground mb-2">开闲统计</div>
                       <div className="text-2xl font-bold text-card-foreground mb-1">{simulationResult.playerCount}局</div>
-                      <div className="text-xs text-muted-foreground">占比 {simulationResult.playerRate.toFixed(2)}%</div>
+                      <div className="text-xs text-muted-foreground mb-1">实际占比 {simulationResult.playerRate.toFixed(2)}%</div>
+                      <div className="text-xs text-primary">期望值 44.62% (偏差 {(simulationResult.playerRate - 44.62).toFixed(2)}%)</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-sm text-muted-foreground mb-2">开和统计</div>
                       <div className="text-2xl font-bold text-card-foreground mb-1">{simulationResult.tieCount}局</div>
-                      <div className="text-xs text-muted-foreground">占比 {simulationResult.tieRate.toFixed(2)}%</div>
+                      <div className="text-xs text-muted-foreground mb-1">实际占比 {simulationResult.tieRate.toFixed(2)}%</div>
+                      <div className="text-xs text-primary">期望值 9.52% (偏差 {(simulationResult.tieRate - 9.52).toFixed(2)}%)</div>
                     </div>
                   </div>
 
@@ -462,7 +516,7 @@ export default function BaccaratAnalysis() {
                           labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
                           itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
                         />
-                        <Line type="monotone" dataKey="balance" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="balance" stroke="#f59e0b" strokeWidth={3} dot={false} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -535,8 +589,25 @@ export default function BaccaratAnalysis() {
 
     setIsSimulating(true);
     setSimulationResult(null);
+    setSimulationProgress(0);
 
-    // 使用setTimeout模拟异步计算，避免阻塞UI
+    // 模拟进度条，平均等待2-3秒
+    const totalDuration = 2000 + Math.random() * 1000; // 2-3秒
+    const updateInterval = 50; // 每50ms更新一次
+    const steps = totalDuration / updateInterval;
+    let currentStep = 0;
+
+    const progressInterval = setInterval(() => {
+      currentStep++;
+      const progress = Math.min((currentStep / steps) * 100, 99);
+      setSimulationProgress(progress);
+
+      if (currentStep >= steps) {
+        clearInterval(progressInterval);
+      }
+    }, updateInterval);
+
+    // 在进度条完成后执行模拟
     setTimeout(() => {
       const result = runSimulation({
         rounds: selectedRounds,
@@ -544,8 +615,12 @@ export default function BaccaratAnalysis() {
         basebet: 500,
         maxBet: 2000000,
       });
-      setSimulationResult(result);
-      setIsSimulating(false);
-    }, 100);
+      setSimulationProgress(100);
+      setTimeout(() => {
+        setSimulationResult(result);
+        setIsSimulating(false);
+        setSimulationProgress(0);
+      }, 200);
+    }, totalDuration);
   }
 }
