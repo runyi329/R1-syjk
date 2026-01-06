@@ -321,12 +321,15 @@ export default function UserCenter() {
                         key={deposit.id}
                         className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
                       >
-                        <div>
+                        <div className="flex-1">
                           <div className="text-white font-medium">充值 {parseFloat(deposit.amount).toFixed(2)} USDT</div>
                           <div className="text-sm text-white/60">{deposit.network} 网络</div>
                           <div className="text-xs text-white/40">
                             {new Date(deposit.createdAt).toLocaleString("zh-CN")}
                           </div>
+                          {deposit.adminNotes && (
+                            <div className="text-xs text-white/60 mt-2">{deposit.adminNotes}</div>
+                          )}
                         </div>
                         <div className="text-right">
                           <Badge
@@ -413,12 +416,15 @@ export default function UserCenter() {
                         key={withdrawal.id}
                         className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
                       >
-                        <div>
+                        <div className="flex-1">
                           <div className="text-white font-medium">提现 {parseFloat(withdrawal.amount).toFixed(2)} USDT</div>
                           <div className="text-sm text-white/60">{withdrawal.network} 网络</div>
                           <div className="text-xs text-white/40">
                             {new Date(withdrawal.createdAt).toLocaleString("zh-CN")}
                           </div>
+                          {withdrawal.adminNotes && (
+                            <div className="text-xs text-white/60 mt-2">{withdrawal.adminNotes}</div>
+                          )}
                         </div>
                         <div className="text-right">
                           <Badge

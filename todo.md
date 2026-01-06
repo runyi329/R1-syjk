@@ -298,3 +298,9 @@
 - [x] 修改UserCenter.tsx，移除"无备注"文本显示
 - [x] 当notes为空时完全不显示任何内容
 - [x] 验证资金流水记录显示效果
+
+## 在充值/提现历史中添加备注显示
+- [x] 在UserCenter充值历史中添加adminNotes显示（只在有内容时显示）
+- [x] 在UserCenter提现历史中添加adminNotes显示（只在有内容时显示）
+- [x] 验证Deposit.tsx和Withdraw.tsx中的备注显示逻辑已正确
+- [x] 确保所有地方的备注显示逻辑一致
