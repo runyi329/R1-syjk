@@ -2,7 +2,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUp, TrendingDown, Zap } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
@@ -15,10 +15,18 @@ interface CryptoData {
   marketCap: number;
   volume24h: number;
   priceHistory: Array<{ time: string; price: number }>;
+  marketRank?: number;
+}
+
+interface FearGreedData {
+  value: string;
+  value_classification: string;
+  timestamp: string;
 }
 
 export default function CryptoAnalysis() {
   const [cryptoData, setCryptoData] = useState<{ [key: string]: CryptoData }>({});
+  const [fearGreedData, setFearGreedData] = useState<FearGreedData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // 生成模拟历史数据
@@ -47,7 +55,8 @@ export default function CryptoAnalysis() {
         change24h: -0.28,
         marketCap: 1.87e12,
         volume24h: 50.14e9,
-        priceHistory: generateMockHistory(93669, 5000)
+        priceHistory: generateMockHistory(93669, 5000),
+        marketRank: 1
       },
       ETH: {
         symbol: 'ETH',
@@ -56,19 +65,67 @@ export default function CryptoAnalysis() {
         change24h: 2.56,
         marketCap: 395.27e9,
         volume24h: 27.37e9,
-        priceHistory: generateMockHistory(3274.98, 200)
+        priceHistory: generateMockHistory(3274.98, 200),
+        marketRank: 2
       }
     };
   };
 
-  useEffect(() => {
-    // 模拟加载延迟
-    const timer = setTimeout(() => {
-      setCryptoData(getMockData());
-      setLoading(false);
-    }, 500);
+  // 获取Fear & Greed指数
+  const fetchFearGreedIndex = async () => {
+    try {
+      const response = await fetch('https://api.alternative.me/fng/?limit=1');
+      const data = await response.json();
+      if (data.data && data.data.length > 0) {
+        setFearGreedData(data.data[0]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Fear & Greed Index:', error);
+    }
+  };
 
-    return () => clearTimeout(timer);
+  // 获取CoinGecko市场排名数据
+  const fetchMarketRankings = async () => {
+    try {
+      const response = await fetch(
+        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false'
+      );
+      const data = await response.json();
+      
+      // 创建排名映射
+      const rankMap: { [key: string]: number } = {};
+      data.forEach((coin: any, index: number) => {
+        if (coin.symbol.toUpperCase() === 'BTC') rankMap['BTC'] = index + 1;
+        if (coin.symbol.toUpperCase() === 'ETH') rankMap['ETH'] = index + 1;
+      });
+      
+      // 更新cryptoData中的排名
+      setCryptoData(prev => ({
+        ...prev,
+        BTC: { ...prev.BTC, marketRank: rankMap['BTC'] },
+        ETH: { ...prev.ETH, marketRank: rankMap['ETH'] }
+      }));
+    } catch (error) {
+      console.error('Failed to fetch market rankings:', error);
+    }
+  };
+
+  useEffect(() => {
+    // 初始化数据加载
+    const loadData = async () => {
+      // 先加载模拟数据
+      setCryptoData(getMockData());
+      
+      // 然后异步获取Fear & Greed指数和排名
+      await Promise.all([
+        fetchFearGreedIndex(),
+        fetchMarketRankings()
+      ]);
+      
+      setLoading(false);
+    };
+    
+    loadData();
   }, []);
 
   const formatPrice = (price: number) => {
@@ -85,6 +142,26 @@ export default function CryptoAnalysis() {
     if (cap >= 1e9) return `$${(cap / 1e9).toFixed(2)}B`;
     if (cap >= 1e6) return `$${(cap / 1e6).toFixed(2)}M`;
     return `$${cap.toFixed(0)}`;
+  };
+
+  // 获取恐惧贪婪指数的颜色
+  const getFearGreedColor = (value: string) => {
+    const numValue = parseInt(value);
+    if (numValue <= 25) return 'text-red-600';
+    if (numValue <= 45) return 'text-orange-500';
+    if (numValue <= 55) return 'text-yellow-500';
+    if (numValue <= 75) return 'text-lime-500';
+    return 'text-green-600';
+  };
+
+  // 获取恐惧贪婪指数的背景色
+  const getFearGreedBgColor = (value: string) => {
+    const numValue = parseInt(value);
+    if (numValue <= 25) return 'bg-red-500/10';
+    if (numValue <= 45) return 'bg-orange-500/10';
+    if (numValue <= 55) return 'bg-yellow-500/10';
+    if (numValue <= 75) return 'bg-lime-500/10';
+    return 'bg-green-500/10';
   };
 
   return (
@@ -105,6 +182,7 @@ export default function CryptoAnalysis() {
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
             <a href="#overview" className="hover:text-foreground transition-colors">总览</a>
+            <a href="#sentiment" className="hover:text-foreground transition-colors">市场情绪</a>
             <a href="#analysis" className="hover:text-foreground transition-colors">详细分析</a>
             <a href="#products" className="hover:text-foreground transition-colors">产品</a>
           </nav>
@@ -122,10 +200,75 @@ export default function CryptoAnalysis() {
           </div>
         )}
 
+        {/* 市场情绪区域 */}
+        {!loading && fearGreedData && (
+          <section id="sentiment" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight mb-2">市场情绪指数</h2>
+              <p className="text-muted-foreground mb-6">实时市场恐惧贪婪指数分析</p>
+            </div>
+
+            <Card className={`border-l-4 border-l-primary shadow-md ${getFearGreedBgColor(fearGreedData.value)}`}>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle className="text-lg">加密货币恐惧贪婪指数</CardTitle>
+                    <CardDescription>基于多个市场指标的实时情绪分析</CardDescription>
+                  </div>
+                  <AlertCircle className="w-6 h-6 text-muted-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">当前指数</p>
+                    <p className={`text-4xl font-bold ${getFearGreedColor(fearGreedData.value)}`}>
+                      {fearGreedData.value}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">市场情绪</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {fearGreedData.value_classification}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">指数范围</p>
+                    <p className="text-sm text-foreground">
+                      0 = 极度恐惧 | 50 = 中立 | 100 = 极度贪婪
+                    </p>
+                  </div>
+                </div>
+
+                {/* 指数说明 */}
+                <div className="p-4 bg-secondary/30 rounded-lg border border-border">
+                  <p className="text-sm text-foreground mb-2">
+                    {parseInt(fearGreedData.value) <= 25 
+                      ? '🔴 极度恐惧：市场情绪极度悲观，可能存在投资机会，但需谨慎。'
+                      : parseInt(fearGreedData.value) <= 45
+                      ? '🟠 恐惧：市场情绪悲观，投资者谨慎，可能是逢低布局的机会。'
+                      : parseInt(fearGreedData.value) <= 55
+                      ? '🟡 中立：市场情绪平衡，投资者保持观望，等待明确信号。'
+                      : parseInt(fearGreedData.value) <= 75
+                      ? '🟢 贪婪：市场情绪乐观，投资者积极，需注意风险。'
+                      : '🟢 极度贪婪：市场情绪极度乐观，可能存在泡沫风险，需要谨慎。'
+                    }
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
         {/* 总览区域 */}
         {!loading && Object.keys(cryptoData).length > 0 && (
           <>
             <section id="overview" className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight mb-2">市场总览</h2>
+                <p className="text-muted-foreground mb-6">主流币种实时行情</p>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {Object.entries(cryptoData).map(([key, crypto]) => (
                   <Card key={key} className="border-none shadow-md overflow-hidden">
@@ -133,7 +276,10 @@ export default function CryptoAnalysis() {
                       <div className="flex justify-between items-start">
                         <div>
                           <CardTitle className="text-2xl font-bold">{crypto.name}</CardTitle>
-                          <CardDescription className="text-xs mt-1">{crypto.symbol}</CardDescription>
+                          <CardDescription className="text-xs mt-1">
+                            {crypto.symbol}
+                            {crypto.marketRank && ` • 排名 #${crypto.marketRank}`}
+                          </CardDescription>
                         </div>
                         <Badge variant="outline" className="text-lg font-bold">
                           {crypto.symbol}
@@ -328,7 +474,7 @@ export default function CryptoAnalysis() {
                             {volumeToMarketCapRatioNum > 5 
                               ? `${crypto.symbol}市场热度高，交易活跃，投资者兴趣高涨。`
                               : volumeToMarketCapRatioNum > 2
-                              ? `${crypto.symbol}市场较为活跃，交易量适中，投资機会不錄。`
+                              ? `${crypto.symbol}市场较为活跃，交易量适中，投资机会不错。`
                               : `${crypto.symbol}市场交易量较低，投资者兴趣有限。`
                             }
                           </p>
