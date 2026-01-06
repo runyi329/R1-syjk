@@ -419,6 +419,7 @@ export default function WeeklyWinAnalysis() {
                 <div>
                   <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
                   <div className="flex flex-col items-center">
+                    <div className="mb-3 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                     <input
                       type="range"
                       min="10000"
@@ -431,7 +432,6 @@ export default function WeeklyWinAnalysis() {
                         background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb 100%)`
                       }}
                     />
-                    <div className="mt-3 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                   </div>
                   
                   {/* 快捷预设按钮 */}
@@ -470,27 +470,9 @@ export default function WeeklyWinAnalysis() {
                   <p className="text-xs sm:text-sm text-muted-foreground">客户账户资金</p>
                   <p className="text-lg sm:text-xl font-bold text-green-500">${userFund}</p>
                 </div>
-                <div className="relative space-y-1">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
-                      <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
-                    </div>
-                    <button
-                      onClick={() => setIsCompoundInterest(!isCompoundInterest)}
-                      className={`ml-2 relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        isCompoundInterest 
-                          ? 'bg-green-500' 
-                          : 'bg-gray-400'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                          isCompoundInterest ? 'translate-x-5' : 'translate-x-0.5'
-                        }`}
-                      />
-                    </button>
-                  </div>
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
+                  <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>
