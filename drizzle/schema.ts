@@ -1,4 +1,4 @@
-import { decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -206,3 +206,46 @@ export const withdrawals = mysqlTable("withdrawals", {
 
 export type Withdrawal = typeof withdrawals.$inferSelect;
 export type InsertWithdrawal = typeof withdrawals.$inferInsert;
+
+
+/**
+ * 登录尝试表 - 记录登录失败尝试，用于防暴力破解
+ */
+export const loginAttempts = mysqlTable("loginAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 用户名 */
+  username: varchar("username", { length: 64 }).notNull(),
+  /** 登录IP地址 */
+  ipAddress: varchar("ipAddress", { length: 45 }).notNull(),
+  /** 是否成功：true-成功，false-失败 */
+  success: boolean("success").notNull().default(false),
+  /** 失败原因（如果失败） */
+  failureReason: varchar("failureReason", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
+
+/**
+ * 验证码表 - 存储滑动拼图验证码信息
+ */
+export const captchas = mysqlTable("captchas", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 验证码token，用于标识一个验证码实例 */
+  token: varchar("token", { length: 128 }).notNull().unique(),
+  /** 验证码答案（4位数字，加密存储） */
+  answerHash: varchar("answerHash", { length: 255 }).notNull(),
+  /** 验证码类型：puzzle-滑动拼图 */
+  type: mysqlEnum("type", ["puzzle"]).default("puzzle").notNull(),
+  /** 是否已验证 */
+  verified: boolean("verified").notNull().default(false),
+  /** 验证失败次数 */
+  failureCount: int("failureCount").default(0).notNull(),
+  /** 过期时间（15分钟后过期） */
+  expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Captcha = typeof captchas.$inferSelect;
+export type InsertCaptcha = typeof captchas.$inferInsert;

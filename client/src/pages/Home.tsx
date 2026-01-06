@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { PuzzleCaptcha } from "@/components/PuzzleCaptcha";
 
 export default function Home() {
   const { data: authData } = trpc.auth.me.useQuery();
@@ -20,6 +21,9 @@ export default function Home() {
   const [loginPassword, setLoginPassword] = useState("");
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [requiresCaptcha, setRequiresCaptcha] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [remainingAttempts, setRemainingAttempts] = useState(10);
 
   const { language, setLanguage } = useLanguage();
   const content = contentData.company[language];
@@ -27,21 +31,46 @@ export default function Home() {
 
   const loginMutation = trpc.users.loginWithPassword.useMutation({
     onSuccess: () => {
-      toast.success("登录成功！");
+      toast.success(language === 'en' ? "Login successful!" : "登录成功！");
       setIsLoginDialogOpen(false);
       setLoginUsername("");
       setLoginPassword("");
+      setRequiresCaptcha(false);
+      setCaptchaToken(null);
       window.location.href = "/";
     },
-    onError: (error) => {
-      toast.error(error.message || "登录失败");
+    onError: (error: any) => {
+      const cause = error.cause;
+      if (cause?.requiresCaptcha) {
+        setRemainingAttempts(cause.remainingAttempts || 0);
+        if (!captchaToken) {
+          // 生成新的验证码
+          generateNewCaptcha();
+        }
+        setRequiresCaptcha(true);
+      }
+      toast.error(error.message || (language === 'en' ? "Login failed" : "登录失败"));
     },
   });
+
+  const generateCaptchaMutation = trpc.users.generateCaptcha.useMutation({
+    onSuccess: (data) => {
+      setCaptchaToken(data.token);
+      setRequiresCaptcha(true);
+    },
+    onError: () => {
+      toast.error(language === 'en' ? "Failed to generate captcha" : "生成验证码失败");
+    },
+  });
+
+  const generateNewCaptcha = () => {
+    generateCaptchaMutation.mutate();
+  };
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginUsername || !loginPassword) {
-      toast.error("请输入用户名和密码");
+      toast.error(language === 'en' ? "Please enter username and password" : "请输入用户名和密码");
       return;
     }
     setIsLoggingIn(true);
@@ -49,6 +78,22 @@ export default function Home() {
       await loginMutation.mutateAsync({
         username: loginUsername,
         password: loginPassword,
+        captchaToken: captchaToken || undefined,
+        captchaAnswer: undefined,
+      });
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleCaptchaVerified = async (answer: string) => {
+    setIsLoggingIn(true);
+    try {
+      await loginMutation.mutateAsync({
+        username: loginUsername,
+        password: loginPassword,
+        captchaToken: captchaToken || "",
+        captchaAnswer: answer,
       });
     } finally {
       setIsLoggingIn(false);
@@ -153,41 +198,65 @@ export default function Home() {
                         {language === 'en' ? 'Enter your username and password' : '输入用户名和密码登录'}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handlePasswordLogin} className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {language === 'en' ? 'Username' : '用户名'}
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder={language === 'en' ? 'Enter username' : '输入用户名'}
-                          value={loginUsername}
-                          onChange={(e) => setLoginUsername(e.target.value)}
-                          disabled={isLoggingIn}
-                          className="border-primary/20 focus:border-primary"
+
+                    {requiresCaptcha && captchaToken ? (
+                      <div className="space-y-4">
+                        <PuzzleCaptcha
+                          token={captchaToken}
+                          onVerified={handleCaptchaVerified}
+                          onClose={() => {
+                            setRequiresCaptcha(false);
+                            setCaptchaToken(null);
+                          }}
                         />
+                        <div className="text-center text-sm text-muted-foreground">
+                          {language === 'en' ? `Remaining attempts: ${remainingAttempts}` : `剩余尝试次数: ${remainingAttempts}`}
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {language === 'en' ? 'Password' : '密码'}
-                        </label>
-                        <Input
-                          type="password"
-                          placeholder={language === 'en' ? 'Enter password' : '输入密码'}
-                          value={loginPassword}
-                          onChange={(e) => setLoginPassword(e.target.value)}
-                          disabled={isLoggingIn}
-                          className="border-primary/20 focus:border-primary"
-                        />
-                      </div>
-                      <Button
-                        type="submit"
-                        disabled={isLoggingIn || !loginUsername || !loginPassword}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                      >
-                        {isLoggingIn ? (language === 'en' ? 'Logging in...' : '登录中...') : (language === 'en' ? 'Login' : '登录')}
-                      </Button>
-                    </form>
+                    ) : (
+                      <form onSubmit={handlePasswordLogin} className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            {language === 'en' ? 'Username' : '用户名'}
+                          </label>
+                          <Input
+                            type="text"
+                            placeholder={language === 'en' ? 'Enter username' : '输入用户名'}
+                            value={loginUsername}
+                            onChange={(e) => setLoginUsername(e.target.value)}
+                            disabled={isLoggingIn}
+                            className="border-primary/20 focus:border-primary"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            {language === 'en' ? 'Password' : '密码'}
+                          </label>
+                          <Input
+                            type="password"
+                            placeholder={language === 'en' ? 'Enter password' : '输入密码'}
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            disabled={isLoggingIn}
+                            className="border-primary/20 focus:border-primary"
+                          />
+                        </div>
+                        {remainingAttempts < 10 && (
+                          <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                            {language === 'en' 
+                              ? `Remaining attempts: ${remainingAttempts}` 
+                              : `剩余尝试次数: ${remainingAttempts}`}
+                          </div>
+                        )}
+                        <Button
+                          type="submit"
+                          disabled={isLoggingIn || !loginUsername || !loginPassword}
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                        >
+                          {isLoggingIn ? (language === 'en' ? 'Logging in...' : '登录中...') : (language === 'en' ? 'Login' : '登录')}
+                        </Button>
+                      </form>
+                    )}
                   </DialogContent>
                 </Dialog>
 

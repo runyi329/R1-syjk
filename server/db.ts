@@ -240,3 +240,212 @@ export async function updateOrderStatus(orderId: number, status: "pending" | "co
   if (!db) throw new Error("Database not available");
   await db.update(orders).set({ status }).where(eq(orders.id, orderId));
 }
+
+
+// ========== 登录安全防护 ==========
+
+/**
+ * 记录登录尝试
+ */
+export async function recordLoginAttempt(username: string, ipAddress: string, success: boolean, failureReason?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { loginAttempts } = await import("../drizzle/schema");
+  await db.insert(loginAttempts).values({
+    username,
+    ipAddress,
+    success,
+    failureReason: failureReason || null,
+  });
+}
+
+/**
+ * 获取用户在指定IP地址上的登录失败次数（最近24小时）
+ */
+export async function getLoginFailureCount(username: string, ipAddress: string): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { loginAttempts } = await import("../drizzle/schema");
+  const { eq, and, gt, desc } = await import("drizzle-orm");
+  
+  // 获取24小时内的失败尝试
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  
+  const attempts = await db
+    .select()
+    .from(loginAttempts)
+    .where(
+      and(
+        eq(loginAttempts.username, username),
+        eq(loginAttempts.ipAddress, ipAddress),
+        eq(loginAttempts.success, false),
+        gt(loginAttempts.createdAt, twentyFourHoursAgo)
+      )
+    );
+  
+  return attempts.length;
+}
+
+/**
+ * 检查账户是否被锁定
+ */
+export async function isAccountLocked(username: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const user = await getUserByUsername(username);
+  if (!user) return false;
+  
+  // 检查用户是否被标记为锁定
+  return user.accountStatus === "frozen";
+}
+
+/**
+ * 锁定账户
+ */
+export async function lockAccount(username: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const user = await getUserByUsername(username);
+  if (!user) throw new Error("User not found");
+  
+  await db.update(users).set({ accountStatus: "frozen" }).where(eq(users.id, user.id));
+}
+
+/**
+ * 解锁账户（仅管理员）
+ */
+export async function unlockAccount(username: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const user = await getUserByUsername(username);
+  if (!user) throw new Error("User not found");
+  
+  await db.update(users).set({ accountStatus: "active" }).where(eq(users.id, user.id));
+}
+
+// ========== 验证码管理 ==========
+
+/**
+ * 生成验证码token和答案
+ */
+export function generateCaptchaAnswer(): { answer: string; answerHash: string } {
+  // 生成4位随机数字
+  const answer = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+  const answerHash = hashPassword(answer);
+  return { answer, answerHash };
+}
+
+/**
+ * 创建验证码记录
+ */
+export async function createCaptcha(answerHash: string): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { captchas } = await import("../drizzle/schema");
+  const token = crypto.randomBytes(32).toString("hex");
+  
+  // 15分钟后过期
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+  
+  await db.insert(captchas).values({
+    token,
+    answerHash,
+    type: "puzzle",
+    verified: false,
+    failureCount: 0,
+    expiresAt,
+  });
+  
+  return token;
+}
+
+/**
+ * 验证验证码
+ */
+export async function verifyCaptcha(token: string, answer: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { captchas } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const captcha = await db.select().from(captchas).where(eq(captchas.token, token)).limit(1);
+  
+  if (!captcha || captcha.length === 0) {
+    return false;
+  }
+  
+  const record = captcha[0];
+  
+  // 检查是否已过期
+  if (new Date() > record.expiresAt) {
+    return false;
+  }
+  
+  // 检查是否已验证
+  if (record.verified) {
+    return false;
+  }
+  
+  // 验证答案
+  const answerHash = hashPassword(answer);
+  if (answerHash !== record.answerHash) {
+    // 增加失败次数
+    await db.update(captchas).set({ failureCount: record.failureCount + 1 }).where(eq(captchas.token, token));
+    return false;
+  }
+  
+  // 标记为已验证
+  await db.update(captchas).set({ verified: true }).where(eq(captchas.token, token));
+  return true;
+}
+
+/**
+ * 获取验证码信息（用于前端显示）
+ */
+export async function getCaptchaInfo(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { captchas } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const captcha = await db.select().from(captchas).where(eq(captchas.token, token)).limit(1);
+  
+  if (!captcha || captcha.length === 0) {
+    return null;
+  }
+  
+  const record = captcha[0];
+  
+  // 检查是否已过期
+  if (new Date() > record.expiresAt) {
+    return null;
+  }
+  
+  return {
+    token: record.token,
+    verified: record.verified,
+    failureCount: record.failureCount,
+    expiresAt: record.expiresAt,
+  };
+}
+
+/**
+ * 清理过期的验证码
+ */
+export async function cleanupExpiredCaptchas() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { captchas } = await import("../drizzle/schema");
+  const { lt } = await import("drizzle-orm");
+  
+  await db.delete(captchas).where(lt(captchas.expiresAt, new Date()));
+}
