@@ -11,6 +11,7 @@ import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, T
 
 export default function WeeklyWinAnalysis() {
   const [investmentAmount, setInvestmentAmount] = useState(100000);
+  const [isCompoundInterest, setIsCompoundInterest] = useState(true);
 
   // 资金配置数据
   const fundAllocation = [
@@ -22,10 +23,13 @@ export default function WeeklyWinAnalysis() {
   const userFund = ((investmentAmount * 0.8) as number).toFixed(2);
   const companyFund = ((investmentAmount * 0.2) as number).toFixed(2);
   const weeklyWithdrawalNum = investmentAmount * 0.01;
-  const weeklyWithdrawal = weeklyWithdrawalNum.toFixed(2);
+  const weeklyWithdrawal = isCompoundInterest ? weeklyWithdrawalNum.toFixed(2) : "0.00";
   const monthlyWithdrawalNum = (weeklyWithdrawalNum / 7) * 30;
-  const monthlyWithdrawal = monthlyWithdrawalNum.toFixed(2);
+  const monthlyWithdrawal = isCompoundInterest ? monthlyWithdrawalNum.toFixed(2) : "0.00";
 
+  const compoundInterestText = isCompoundInterest 
+    ? "启用复利：99%利润继续增长，1%可提现" 
+    : "关闭复利：100%利润可提现，不参与复利增长";
 
 
   // 历史收益案例数据
@@ -410,6 +414,26 @@ export default function WeeklyWinAnalysis() {
               <CardTitle>周周赢 收益计算機</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
+              {/* 复利开关 */}
+              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <div>
+                  <p className="text-sm font-semibold">复利模式</p>
+                  <p className="text-xs text-muted-foreground mt-1">{compoundInterestText}</p>
+                </div>
+                <button
+                  onClick={() => setIsCompoundInterest(!isCompoundInterest)}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                    isCompoundInterest ? 'bg-green-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      isCompoundInterest ? 'translate-x-7' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
               {/* 输入区域 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
