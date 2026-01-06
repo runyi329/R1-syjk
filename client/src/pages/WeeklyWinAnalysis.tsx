@@ -407,7 +407,7 @@ export default function WeeklyWinAnalysis() {
 
           <Card className="border-none shadow-md">
             <CardHeader>
-              <CardTitle>交互式收益计算器</CardTitle>
+              <CardTitle>周周赢 收益计算機</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
               {/* 输入区域 */}
@@ -418,7 +418,7 @@ export default function WeeklyWinAnalysis() {
                     type="range"
                     min="10000"
                     max="1000000"
-                    step="10000"
+                    step="1000"
                     value={investmentAmount}
                     onChange={(e) => setInvestmentAmount(Number(e.target.value))}
                     className="w-full"
