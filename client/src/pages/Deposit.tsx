@@ -13,6 +13,7 @@ import { toast } from "sonner";
 export default function Deposit() {
   const [, setLocation] = useLocation();
   const [selectedNetwork, setSelectedNetwork] = useState("Aptos");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   
   // 模拟收款地址（实际应该从后端获取）
   const depositAddress = "0x993520ae34691c266f8f3e85d0f1fdb9585de6b532356685296c21aa7799584";
@@ -28,6 +29,11 @@ export default function Deposit() {
 
   const { data: deposits, refetch } = trpc.deposits.getMyDeposits.useQuery();
   const createDepositMutation = trpc.deposits.create.useMutation();
+
+  const filteredDeposits = deposits?.filter(deposit => {
+    if (!statusFilter) return true;
+    return deposit.status === statusFilter;
+  }) || [];
 
   const copyAddress = () => {
     navigator.clipboard.writeText(depositAddress);
@@ -86,7 +92,14 @@ export default function Deposit() {
             <span className="hidden sm:inline">返回</span>
           </button>
           <h1 className="text-lg sm:text-xl font-bold">充值 USDT</h1>
-          <div className="w-16"></div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setLocation("/user-center")}
+            className="text-white/80 hover:text-white"
+          >
+            返回
+          </Button>
         </div>
       </header>
 
@@ -224,15 +237,51 @@ export default function Deposit() {
         </Card>
           </TabsContent>
 
-          <TabsContent value="history" className="space-y-3">
-            {!deposits || deposits.length === 0 ? (
+          <TabsContent value="history" className="space-y-4">
+            {/* Status Filter */}
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={statusFilter === null ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter(null)}
+                className={statusFilter === null ? "bg-[#D4AF37] text-black hover:bg-[#D4AF37]/80" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                全部
+              </Button>
+              <Button
+                variant={statusFilter === "pending" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("pending")}
+                className={statusFilter === "pending" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                待确认
+              </Button>
+              <Button
+                variant={statusFilter === "confirmed" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("confirmed")}
+                className={statusFilter === "confirmed" ? "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                已到账
+              </Button>
+              <Button
+                variant={statusFilter === "failed" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("failed")}
+                className={statusFilter === "failed" ? "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                失败
+              </Button>
+            </div>
+
+            {!filteredDeposits || filteredDeposits.length === 0 ? (
               <Card className="bg-black/50 border-white/10">
-                <CardContent className="py-12 text-center text-white/60">
+                <CardContent className="pt-6">
                   <p>暂无充值记录</p>
                 </CardContent>
               </Card>
             ) : (
-              deposits.map((deposit) => (
+              filteredDeposits.map((deposit) => () => (
                 <Card key={deposit.id} className="bg-black/50 border-white/10">
                   <CardHeader>
                     <div className="flex items-start justify-between">

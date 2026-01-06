@@ -23,12 +23,18 @@ export default function Withdraw() {
   const [selectedNetwork, setSelectedNetwork] = useState("Aptos");
   const [selectedWalletId, setSelectedWalletId] = useState<number | null>(null);
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   
   const { data: userData } = trpc.users.getMe.useQuery();
   const balance = userData ? parseFloat(userData.usdtBalance) : 0;
   const { data: walletAddresses } = trpc.walletAddresses.getMyApprovedWalletAddresses.useQuery();
   const { data: withdrawals, refetch } = trpc.withdrawals.getMyWithdrawals.useQuery();
   const createWithdrawalMutation = trpc.withdrawals.create.useMutation();
+
+  const filteredWithdrawals = withdrawals?.filter(withdrawal => {
+    if (!statusFilter) return true;
+    return withdrawal.withdrawal.status === statusFilter;
+  }) || [];
 
   const networks = [
     { name: "Aptos", minAmount: 0.01, fee: "0.5 USDT", arrivalTime: "约 1 分钟" },
@@ -283,14 +289,58 @@ export default function Withdraw() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-3">
-            {!withdrawals || withdrawals.length === 0 ? (
+            {/* Status Filter */}
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={statusFilter === null ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter(null)}
+                className={statusFilter === null ? "bg-[#D4AF37] text-black hover:bg-[#D4AF37]/80" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                全部
+              </Button>
+              <Button
+                variant={statusFilter === "pending" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("pending")}
+                className={statusFilter === "pending" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                待审核
+              </Button>
+              <Button
+                variant={statusFilter === "approved" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("approved")}
+                className={statusFilter === "approved" ? "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                已批准
+              </Button>
+              <Button
+                variant={statusFilter === "completed" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("completed")}
+                className={statusFilter === "completed" ? "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                已完成
+              </Button>
+              <Button
+                variant={statusFilter === "rejected" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter("rejected")}
+                className={statusFilter === "rejected" ? "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30" : "border-white/20 text-white/60 hover:text-white"}
+              >
+                已拒绝
+              </Button>
+            </div>
+
+            {!filteredWithdrawals || filteredWithdrawals.length === 0 ? (
               <Card className="bg-black/50 border-white/10">
                 <CardContent className="py-12 text-center text-white/60">
                   <p>暂无提现记录</p>
                 </CardContent>
               </Card>
             ) : (
-              withdrawals.map(({ withdrawal, walletAddress }) => (
+              filteredWithdrawals.map(({ withdrawal, walletAddress }) => (
                 <Card key={withdrawal.id} className="bg-black/50 border-white/10">
                   <CardHeader>
                     <div className="flex items-start justify-between">
