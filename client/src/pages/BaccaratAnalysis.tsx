@@ -617,7 +617,7 @@ export default function BaccaratAnalysis() {
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="flex justify-between items-center mb-4">
                         <h4 className="font-semibold text-card-foreground">
-                          投注历史（{showAllHistory ? `全部${simulationResult.history.length}局` : '前100局'}）
+                          投注历史（{showAllHistory ? `全部${simulationResult.history.length}局` : '最后100局'}）
                         </h4>
                         {simulationResult.history.length > 100 && (
                           <Button 
@@ -642,7 +642,7 @@ export default function BaccaratAnalysis() {
                             </tr>
                           </thead>
                           <tbody>
-                            {(showAllHistory ? simulationResult.history : simulationResult.history.slice(0, 100)).map((round) => (
+                            {(showAllHistory ? simulationResult.history : simulationResult.history.slice(-100)).map((round) => (
                               <tr key={round.round} className="border-b border-border/50">
                                 <td className="py-2 px-2 text-card-foreground">#{round.round}</td>
                                 <td className="py-2 px-2">
