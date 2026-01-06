@@ -23,6 +23,12 @@ export interface SimulationStats {
   profitLossRate: number; // 盈亏率
   maxBet: number; // 限红
   totalRounds: number; // 实际投注局数
+  minBet: number; // 最小投注金额
+  maxBetAmount: number; // 最大投注金额
+  avgBet: number; // 平均投注金额
+  avgProfitPerRound: number; // 平均每局盈亏
+  minBalance: number; // 资金最低值
+  maxBalance: number; // 资金最高值
   bankerCount: number; // 开庄局数
   playerCount: number; // 开闲局数
   tieCount: number; // 开和局数
@@ -204,6 +210,18 @@ export function runSimulation(config: SimulationConfig): SimulationStats {
   const profitLoss = balance - initialCapital;
   const profitLossRate = (profitLoss / initialCapital) * 100;
 
+  // 计算投注金额统计
+  const betAmounts = history.map(h => h.betAmount);
+  const minBet = betAmounts.length > 0 ? Math.min(...betAmounts) : basebet;
+  const maxBetAmount = betAmounts.length > 0 ? Math.max(...betAmounts) : basebet;
+  const totalBetAmount = betAmounts.reduce((sum, bet) => sum + bet, 0);
+  const avgBet = betAmounts.length > 0 ? totalBetAmount / betAmounts.length : basebet;
+  const avgProfitPerRound = totalRounds > 0 ? profitLoss / totalRounds : 0;
+
+  // 计算资金波动
+  const minBalance = balanceHistory.length > 0 ? Math.min(...balanceHistory) : initialCapital;
+  const maxBalance = balanceHistory.length > 0 ? Math.max(...balanceHistory) : initialCapital;
+
   return {
     initialCapital,
     finalBalance: balance,
@@ -211,6 +229,12 @@ export function runSimulation(config: SimulationConfig): SimulationStats {
     profitLossRate,
     maxBet,
     totalRounds,
+    minBet,
+    maxBetAmount,
+    avgBet,
+    avgProfitPerRound,
+    minBalance,
+    maxBalance,
     bankerCount,
     playerCount,
     tieCount,

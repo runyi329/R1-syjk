@@ -52,6 +52,7 @@ export default function BaccaratAnalysis() {
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
   const [simulationResult, setSimulationResult] = useState<SimulationStats | null>(null);
+  const [showAllHistory, setShowAllHistory] = useState(false);
 
   // 合并所有数据用于综合图表
   const allData = [
@@ -454,6 +455,40 @@ export default function BaccaratAnalysis() {
                     </div>
                   </div>
 
+                  {/* 投注金额统计 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">最小投注</div>
+                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.minBet.toLocaleString('zh-CN')}</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">最大投注</div>
+                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.maxBetAmount.toLocaleString('zh-CN')}</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">平均投注</div>
+                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.avgBet.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">平均每局盈亏</div>
+                      <div className={`text-lg font-bold ${simulationResult.avgProfitPerRound >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        {simulationResult.avgProfitPerRound >= 0 ? '+' : ''}¥{simulationResult.avgProfitPerRound.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 资金波动统计 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">资金最低值</div>
+                      <div className="text-lg font-bold text-green-500">¥{simulationResult.minBalance.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">资金最高值</div>
+                      <div className="text-lg font-bold text-red-500">¥{simulationResult.maxBalance.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                    </div>
+                  </div>
+
                   {/* 开奖统计 */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
@@ -501,15 +536,17 @@ export default function BaccaratAnalysis() {
                     <h4 className="font-semibold text-card-foreground mb-4">资金变化趋势</h4>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }))}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#444444" />
                         <XAxis 
                           dataKey="round" 
-                          stroke="hsl(var(--muted-foreground))" 
-                          label={{ value: '局数', position: 'insideBottom', offset: -5, fill: 'hsl(var(--muted-foreground))' }}
+                          stroke="#94a3b8" 
+                          tick={{ fill: '#94a3b8' }}
+                          label={{ value: '局数', position: 'insideBottom', offset: -5, fill: '#94a3b8' }}
                         />
                         <YAxis 
-                          stroke="hsl(var(--muted-foreground))" 
-                          label={{ value: '余额（元）', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+                          stroke="#94a3b8" 
+                          tick={{ fill: '#94a3b8' }}
+                          label={{ value: '余额（元）', angle: -90, position: 'insideLeft', fill: '#94a3b8' }}
                         />
                         <RechartsTooltip 
                           contentStyle={{ backgroundColor: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
@@ -524,7 +561,20 @@ export default function BaccaratAnalysis() {
                   {/* 投注历史 */}
                   {simulationResult.history.length > 0 && (
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                      <h4 className="font-semibold text-card-foreground mb-4">投注历史（前100局）</h4>
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="font-semibold text-card-foreground">
+                          投注历史（{showAllHistory ? `全部${simulationResult.history.length}局` : '前100局'}）
+                        </h4>
+                        {simulationResult.history.length > 100 && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setShowAllHistory(!showAllHistory)}
+                          >
+                            {showAllHistory ? '收起' : `查看全部 (${simulationResult.history.length}局)`}
+                          </Button>
+                        )}
+                      </div>
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
@@ -538,7 +588,7 @@ export default function BaccaratAnalysis() {
                             </tr>
                           </thead>
                           <tbody>
-                            {simulationResult.history.slice(0, 20).map((round) => (
+                            {(showAllHistory ? simulationResult.history : simulationResult.history.slice(0, 100)).map((round) => (
                               <tr key={round.round} className="border-b border-border/50">
                                 <td className="py-2 px-2 text-card-foreground">#{round.round}</td>
                                 <td className="py-2 px-2">
