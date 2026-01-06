@@ -23,7 +23,7 @@ export default function WeeklyWinAnalysis() {
   const companyFund = ((investmentAmount * 0.2) as number).toFixed(2);
   const weeklyWithdrawalNum = investmentAmount * 0.01;
   const weeklyWithdrawal = weeklyWithdrawalNum.toFixed(2);
-  const monthlyWithdrawalNum = (weeklyWithdrawalNum / 28) * 30;
+  const monthlyWithdrawalNum = (weeklyWithdrawalNum / 7) * 30;
   const monthlyWithdrawal = monthlyWithdrawalNum.toFixed(2);
 
 
@@ -459,19 +459,19 @@ export default function WeeklyWinAnalysis() {
               <div className="grid grid-cols-2 md:grid-cols-2 gap-4 p-6 bg-muted rounded-lg">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">客户账户资金</p>
-                  <p className="text-xl font-bold text-primary">${userFund}</p>
+                  <p className="text-xl font-bold text-green-500">${userFund}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">公司保证金</p>
-                  <p className="text-xl font-bold text-primary">${companyFund}</p>
+                  <p className="text-xl font-bold text-green-500">${companyFund}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">每周提取利润</p>
-                  <p className="text-xl font-bold text-green-500">${weeklyWithdrawal}</p>
+                  <p className="text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">每月提取利润</p>
-                  <p className="text-xl font-bold text-green-500">${monthlyWithdrawal}</p>
+                  <p className="text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
                 </div>
               </div>
             </CardContent>
