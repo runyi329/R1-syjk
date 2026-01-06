@@ -321,3 +321,9 @@
 - [x] 修改CardDescription只显示adminNotes（当有备注时）
 - [x] 完全隐藏没有备注的充值记录的描述部分
 - [x] 与资金流水记录的显示逻辑保持一致
+
+## 修改UserCenter中充值历史的显示逻辑
+- [x] 隐藏UserCenter.tsx中充值历史的network字段显示
+- [x] 移除"Sui 网络"等标签的显示
+- [x] 只保留金额、时间和adminNotes
+- [x] 与Deposit.tsx中的充值历史显示逻辑保持一致

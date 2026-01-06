@@ -323,7 +323,6 @@ export default function UserCenter() {
                       >
                         <div className="flex-1">
                           <div className="text-white font-medium">充值 {parseFloat(deposit.amount).toFixed(2)} USDT</div>
-                          <div className="text-sm text-white/60">{deposit.network} 网络</div>
                           <div className="text-xs text-white/40">
                             {new Date(deposit.createdAt).toLocaleString("zh-CN")}
                           </div>
