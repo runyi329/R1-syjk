@@ -1,0 +1,542 @@
+import ScrollToTop from "@/components/ScrollToTop";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3 } from "lucide-react";
+import { Link } from "wouter";
+import { useState } from "react";
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+
+export default function WeeklyWinAnalysis() {
+  const [investmentAmount, setInvestmentAmount] = useState(10000);
+  const [weeklyProfit, setWeeklyProfit] = useState(500);
+
+  // 资金配置数据
+  const fundAllocation = [
+    { name: "客户交易账户", value: 80, color: "#f59e0b" },
+    { name: "公司保证金账户", value: 20, color: "#3b82f6" }
+  ];
+
+  // 收益演示数据（基于投资金额）
+  const userFund = ((investmentAmount * 0.8) as number).toFixed(2);
+  const companyFund = ((investmentAmount * 0.2) as number).toFixed(2);
+  const weeklyWithdrawalNum = weeklyProfit * 0.01;
+  const weeklyWithdrawal = weeklyWithdrawalNum.toFixed(2);
+  const annualWithdrawalNum = weeklyWithdrawalNum * 52;
+  const annualWithdrawal = annualWithdrawalNum.toFixed(2);
+  const annualYield = ((annualWithdrawalNum / investmentAmount) * 100).toFixed(2);
+
+  // 收益分成演示
+  const profitDistribution = [
+    { week: "第1周", profit: weeklyProfit, withdrawal: weeklyProfit * 0.01, remaining: weeklyProfit * 0.99 },
+    { week: "第2周", profit: weeklyProfit * 1.05, withdrawal: weeklyProfit * 1.05 * 0.01, remaining: weeklyProfit * 1.05 * 0.99 },
+    { week: "第3周", profit: weeklyProfit * 1.1, withdrawal: weeklyProfit * 1.1 * 0.01, remaining: weeklyProfit * 1.1 * 0.99 },
+    { week: "第4周", profit: weeklyProfit * 1.08, withdrawal: weeklyProfit * 1.08 * 0.01, remaining: weeklyProfit * 1.08 * 0.99 }
+  ];
+
+  return (
+    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground">
+      <ScrollToTop />
+
+      {/* 头部区域 */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm z-10">
+        <div className="container mx-auto py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="icon" className="mr-2">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <img src="/logo.png" alt="数金研投 Logo" className="w-8 h-8 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
+            <h1 className="text-xl font-bold tracking-tight">周周赢产品分析</h1>
+          </div>
+          <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
+            <a href="#features" className="hover:text-foreground transition-colors">产品特点</a>
+            <a href="#model" className="hover:text-foreground transition-colors">业务模型</a>
+            <a href="#calculator" className="hover:text-foreground transition-colors">收益计算</a>
+            <a href="#safety" className="hover:text-foreground transition-colors">安全保障</a>
+          </nav>
+        </div>
+      </header>
+
+      <main className="container mx-auto py-8 space-y-12">
+        {/* 产品概览 */}
+        <section className="space-y-6">
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl font-bold tracking-tight">周周赢</h2>
+            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 每周可提现1%本金</p>
+            <div className="flex justify-center gap-4 flex-wrap">
+              <Badge className="bg-green-500/20 text-green-600 border-green-500/30">安全可靠</Badge>
+              <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">全权委托</Badge>
+              <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30">稳定收益</Badge>
+            </div>
+          </div>
+
+          {/* 核心指标 */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">预期年化收益</p>
+                <p className="text-3xl font-bold text-primary">12-18%</p>
+                <p className="text-xs text-muted-foreground mt-2">基于历史平均表现</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">最低投入</p>
+                <p className="text-3xl font-bold text-primary">1,000 USDT</p>
+                <p className="text-xs text-muted-foreground mt-2">灵活投资门槛</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">周期</p>
+                <p className="text-3xl font-bold text-primary">7天</p>
+                <p className="text-xs text-muted-foreground mt-2">每周可提现</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">风险等级</p>
+                <p className="text-3xl font-bold text-yellow-500">中等</p>
+                <p className="text-xs text-muted-foreground mt-2">专业团队管理</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* 产品特点 */}
+        <section id="features" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">产品特点</h2>
+            <p className="text-muted-foreground mb-6">周周赢的核心优势和创新设计</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 资金安全 */}
+            <Card className="border-l-4 border-l-green-500 shadow-md">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-green-500" />
+                  </div>
+                  <CardTitle>资金安全保障</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">80% 客户交易账户</p>
+                      <p className="text-sm text-muted-foreground">您的资金完全在自己的交易账户中，安全可靠</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">20% 公司保证金</p>
+                      <p className="text-sm text-muted-foreground">公司承诺的风险保证金，保护您的投资</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">账户全权委托</p>
+                      <p className="text-sm text-muted-foreground">由数金研投专业团队托管，您无需操作</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 收益模式 */}
+            <Card className="border-l-4 border-l-primary shadow-md">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle>灵活收益提现</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">每周提现1%本金</p>
+                      <p className="text-sm text-muted-foreground">从产生的利润中每周可提现本金的1%</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">收益分成模式</p>
+                      <p className="text-sm text-muted-foreground">99%利润留在账户继续增长，1%可随时提取</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">无需盯盘</p>
+                      <p className="text-sm text-muted-foreground">自动交易，您只需坐享收益</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* 资金配置可视化 */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">资金配置结构</h2>
+            <p className="text-muted-foreground mb-6">您的投资资金如何分配和保护</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 饼图 */}
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">资金分配比例</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={fundAllocation}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name} ${value}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {fundAllocation.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip formatter={(value) => `${value}%`} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 详细说明 */}
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">配置说明</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                  <div className="flex gap-3">
+                    <div className="w-3 h-3 bg-amber-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-semibold text-amber-900">80% 客户交易账户</p>
+                      <p className="text-sm text-amber-800 mt-1">您投入资金的80%存放在您自己的交易账户中，完全由您控制，安全可靠。</p>
+                      <p className="text-xs text-amber-700 mt-2">示例：投入10,000 USDT → 8,000 USDT在您的账户</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <div className="flex gap-3">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-semibold text-blue-900">20% 公司保证金</p>
+                      <p className="text-sm text-blue-800 mt-1">投入资金的20%作为保证金存放在公司账户，用于风险管理和账户保护。</p>
+                      <p className="text-xs text-blue-700 mt-2">示例：投入10,000 USDT → 2,000 USDT在公司账户</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* 业务模型 */}
+        <section id="model" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">业务模型</h2>
+            <p className="text-muted-foreground mb-6">了解周周赢的运作机制和收益流程</p>
+          </div>
+
+          <Card className="border-none shadow-md overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+              <CardTitle>完整的托管交易流程</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-8">
+              <div className="space-y-6">
+                {/* 流程步骤 */}
+                {[
+                  {
+                    step: 1,
+                    title: "投入资金",
+                    description: "您投入初始资金（最低1,000 USDT），系统自动分配80%到您的交易账户，20%到公司保证金账户"
+                  },
+                  {
+                    step: 2,
+                    title: "全权委托",
+                    description: "数金研投专业交易团队接管您的账户，使用成熟的交易策略进行数字货币交易"
+                  },
+                  {
+                    step: 3,
+                    title: "产生利润",
+                    description: "每周交易产生利润，利润完全属于您，公司不收取任何交易手续费"
+                  },
+                  {
+                    step: 4,
+                    title: "每周提现",
+                    description: "您可以从产生的利润中每周提现本金的1%，剩余99%的利润继续在账户中增长"
+                  },
+                  {
+                    step: 5,
+                    title: "复利增长",
+                    description: "保留的利润与本金一起继续交易，实现复利效应，财富加速增长"
+                  }
+                ].map((item, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                        {item.step}
+                      </div>
+                      {index < 4 && <div className="w-0.5 h-12 bg-border mt-2"></div>}
+                    </div>
+                    <div className="pb-6">
+                      <p className="font-semibold text-lg">{item.title}</p>
+                      <p className="text-muted-foreground text-sm mt-1">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 收益计算器 */}
+        <section id="calculator" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">收益计算演示</h2>
+            <p className="text-muted-foreground mb-6">根据您的投资金额计算预期收益</p>
+          </div>
+
+          <Card className="border-none shadow-md">
+            <CardHeader>
+              <CardTitle>交互式收益计算器</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* 输入区域 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
+                  <input
+                    type="range"
+                    min="1000"
+                    max="100000"
+                    step="1000"
+                    value={investmentAmount}
+                    onChange={(e) => setInvestmentAmount(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="mt-2 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-3 block">周均利润 (USDT)</label>
+                  <input
+                    type="range"
+                    min="100"
+                    max="5000"
+                    step="100"
+                    value={weeklyProfit}
+                    onChange={(e) => setWeeklyProfit(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="mt-2 text-2xl font-bold text-green-500">${weeklyProfit.toLocaleString()}</div>
+                </div>
+              </div>
+
+              {/* 计算结果 */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-muted rounded-lg">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">客户账户资金</p>
+                  <p className="text-xl font-bold text-primary">${userFund}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">公司保证金</p>
+                  <p className="text-xl font-bold text-blue-500">${companyFund}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">每周提现额</p>
+                  <p className="text-xl font-bold text-green-500">${weeklyWithdrawal}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">年化收益率</p>
+                  <p className="text-xl font-bold text-yellow-500">{annualYield}%</p>
+                </div>
+              </div>
+
+              {/* 年度收益 */}
+              <div className="p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">年度提现总额</p>
+                    <p className="text-3xl font-bold text-primary">${annualWithdrawal}</p>
+                  </div>
+                  <Zap className="w-12 h-12 text-primary opacity-20" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 收益分成演示 */}
+          <Card className="border-none shadow-md">
+            <CardHeader>
+              <CardTitle>4周收益分成演示</CardTitle>
+              <CardDescription>基于周均利润 ${weeklyProfit.toLocaleString()} 的示例</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={profitDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="week" stroke="var(--muted-foreground)" />
+                    <YAxis stroke="var(--muted-foreground)" />
+                    <RechartsTooltip 
+                      contentStyle={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px'
+                      }}
+                      formatter={(value: any) => `$${value.toFixed(2)}`}
+                    />
+                    <Legend />
+                    <Bar dataKey="withdrawal" name="每周提现" fill="var(--primary)" />
+                    <Bar dataKey="remaining" name="账户保留" fill="var(--muted-foreground)" opacity={0.5} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* 说明 */}
+              <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <p className="text-sm text-blue-900">
+                  <strong>说明：</strong> 每周您可以提现利润的1%，剩余99%的利润继续在账户中增长。这样既能获得稳定的周收入，又能让账户资金通过复利不断增长。
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 安全保障 */}
+        <section id="safety" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">安全保障体系</h2>
+            <p className="text-muted-foreground mb-6">多重保护机制确保您的投资安全</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-l-4 border-l-green-500 shadow-md">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-500" />
+                  <CardTitle className="text-lg">资金安全</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">80%资金在您的交易账户，完全由您控制</p>
+                </div>
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">20%公司保证金作为风险缓冲</p>
+                </div>
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">账户独立，与公司资金完全隔离</p>
+                </div>
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">定期审计，透明的资金管理</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-blue-500 shadow-md">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-blue-500" />
+                  <CardTitle className="text-lg">风险管理</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">专业交易团队，经验丰富的风控体系</p>
+                </div>
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">严格的止损机制，限制单笔损失</p>
+                </div>
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">多策略组合，分散交易风险</p>
+                </div>
+                <div className="flex gap-2">
+                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">实时监控，及时应对市场变化</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 风险提示 */}
+          <Card className="border-l-4 border-l-yellow-500 bg-yellow-500/5">
+            <CardHeader>
+              <CardTitle className="text-yellow-600">⚠️ 重要风险提示</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>• 数字货币市场波动性大，投资存在风险，过往收益不代表未来表现</p>
+              <p>• 周周赢产品属于中等风险投资，请根据自身风险承受能力谨慎投资</p>
+              <p>• 虽然有20%保证金保护，但在极端市场情况下仍可能面临亏损</p>
+              <p>• 投资前请充分了解产品细节，如有疑问请咨询我们的投资顾问</p>
+              <p>• 本产品不保证本金安全，投资需谨慎</p>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 行动号召 */}
+        <section className="space-y-6">
+          <Card className="border-none shadow-md overflow-hidden bg-gradient-to-r from-primary/10 to-primary/5">
+            <CardContent className="pt-8">
+              <div className="text-center space-y-4">
+                <h3 className="text-2xl font-bold">准备开始投资？</h3>
+                <p className="text-muted-foreground">加入数百位投资者，开始您的周周赢之旅</p>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  <Button className="bg-primary hover:bg-primary/90">
+                    立即投资
+                  </Button>
+                  <Button variant="outline">
+                    咨询顾问
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
+      {/* 页脚 */}
+      <footer className="border-t border-border bg-card/50 mt-12 py-8">
+        <div className="container mx-auto text-center">
+          <p className="text-sm text-muted-foreground">© 2026 数金研投 | 周周赢产品分析平台</p>
+        </div>
+      </footer>
+    </div>
+  );
+}

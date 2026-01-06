@@ -7,7 +7,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
 import BaccaratAnalysis from "./pages/BaccaratAnalysis";
-import RouletteAnalysis from "./pages/RouletteAnalysis";
+import CryptoAnalysis from "./pages/CryptoAnalysis";
+import WeeklyWinAnalysis from "./pages/WeeklyWinAnalysis";
 import FootballAnalysis from "./pages/FootballAnalysis";
 import PokerAnalysis from "./pages/PokerAnalysis";
 import Lottery from "./pages/Lottery";
@@ -19,7 +20,6 @@ import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-import CryptoAnalysis from "./pages/CryptoAnalysis";
 import MobileBottomNav from "./components/MobileBottomNav";
 
 function Router() {
@@ -28,12 +28,11 @@ function Router() {
     <>
       <Switch>
         <Route path={"/"} component={Home} />
-         <Route path="/baccarat" component={BaccaratAnalysis} />
-        <Route path="/roulette" component={RouletteAnalysis} />
+        <Route path="/baccarat" component={BaccaratAnalysis} />
         <Route path="/football" component={FootballAnalysis} />
-        <Route path="/poker" component={PokerAnalysis} />
         <Route path="/crypto" component={CryptoAnalysis} />
-          <Route path="/lottery" component={Lottery} />
+        <Route path="/weekly-win" component={WeeklyWinAnalysis} />
+        <Route path="/lottery" component={Lottery} />
           <Route path="/deposit" component={Deposit} />
           <Route path="/withdraw" component={Withdraw} />
           <Route path="/wallet-addresses" component={WalletAddresses} />
