@@ -211,3 +211,12 @@
 - [x] 移动端导航栏取消固定定位，随页面滚动消失（使用md:sticky仅在桌面端固定）
 - [x] 将“积分流水”改为“资金流水”
 - [x] 将公司名称改为“数金研投”（UserCenter、Shop、Lottery页面）
+
+## 品牌名称统一
+- [x] 查找所有页面中的公司名称（澳门润仪投资、RUNYI INVESTMENT等）
+- [x] 将首页（Home.tsx）的公司名称改为“数金研投”
+- [x] 将所有其他页面的公司名称改为“数金研投”
+- [x] 确保所有页面品牌形象一致
+- [x] 更新investment-portal-content.json数据文件中的公司名称
+- [x] 更新轮盘分析页面（RouletteAnalysis.tsx）底部公司名称
+- [x] 更新足球分析页面（FootballAnalysis.tsx）底部公司名称

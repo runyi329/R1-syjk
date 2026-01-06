@@ -1,31 +1,31 @@
 {
   "company": {
     "zh_TW": {
-      "name": "澳門潤儀投資有限公司",
+      "name": "数金研投",
       "tagline": "全面的投資諮詢 · 前沿的市場分析 · 專業的風控建議",
-      "description": "澳門潤儀投資有限公司成立於澳門，是一家專注於全球投資分析與風險管理的專業機構。我們致力於為客戶提供全面、前沿的投資諮詢和風控建議，幫助投資者在複雜多變的金融市場中做出明智決策。",
+      "description": "数金研投成立於澳門，是一家專注於全球投資分析與風險管理的專業機構。我們致力於為客戶提供全面、前沿的投資諮詢和風控建議，幫助投資者在複雜多變的金融市場中做出明智決策。",
       "advantages": [
         "全面的投資覆蓋：涵蓋股票、期貨、外匯、商品、數字資產、固定收益等多個投資領域",
         "前沿的市場分析：基於大數據和專業研究，提供實時、準確的市場洞察",
         "專業的風控建議：幫助客戶識別風險、優化投資組合、實現穩健增長",
         "以客戶為中心：深入理解中國大陸投資者的需求，提供本地化的投資解決方案"
       ],
-      "cta": "無論您是初入投資市場的新手，還是經驗豐富的投資者，澳門潤儀投資都能為您提供專業、可靠的投資指導。"
+      "cta": "無論您是初入投資市場的新手，還是經驗豐富的投資者，数金研投都能為您提供專業、可靠的投資指導。"
     },
     "zh_CN": {
-      "name": "澳门润仪投资有限公司",
+      "name": "数金研投",
       "tagline": "全面的投资咨询 · 前沿的市场分析 · 专业的风控建议",
-      "description": "澳门润仪投资有限公司成立于澳门，是一家专注于全球投资分析与风险管理的专业机构。我们致力于为客户提供全面、前沿的投资咨询和风控建议，帮助投资者在复杂多变的金融市场中做出明智决策。",
+      "description": "数金研投成立于澳门，是一家专注于全球投资分析与风险管理的专业机构。我们致力于为客户提供全面、前沿的投资咨询和风控建议，帮助投资者在复杂多变的金融市场中做出明智决策。",
       "advantages": [
         "全面的投资覆盖：涵盖股票、期货、外汇、商品、数字资产、固定收益等多个投资领域",
         "前沿的市场分析：基于大数据和专业研究，提供实时、准确的市场洞察",
         "专业的风控建议：帮助客户识别风险、优化投资组合、实现稳健增长",
         "以客户为中心：深入理解中国大陆投资者的需求，提供本地化的投资解决方案"
       ],
-      "cta": "无论您是初入投资市场的新手，还是经验丰富的投资者，澳门润仪投资都能为您提供专业、可靠的投资指导。"
+      "cta": "无论您是初入投资市场的新手，还是经验丰富的投资者，数金研投都能为您提供专业、可靠的投资指导。"
     },
     "en": {
-      "name": "Macau Runyi Investment Co., Ltd.",
+      "name": "Runyi Investment",
       "tagline": "Comprehensive Investment Consulting · Cutting-edge Market Analysis · Professional Risk Management",
       "description": "Macau Runyi Investment Co., Ltd. is a professional institution established in Macau, specializing in global investment analysis and risk management. We are committed to providing comprehensive, cutting-edge investment consulting and risk control advice to help investors make informed decisions in complex and ever-changing financial markets.",
       "advantages": [

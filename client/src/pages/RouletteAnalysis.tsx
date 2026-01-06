@@ -285,7 +285,7 @@ export default function RouletteAnalysis() {
           <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-4">
             <span className="italic tracking-tighter">R1</span>
           </div>
-          <p className="font-medium">© 2026 澳门潤儀投资有限公司 | 专业轮盘数据分析</p>
+          <p className="font-medium">© 2026 数金研投 | 专业轮盘数据分析</p>
           <p className="mt-2 text-xs">赌博有风险，请理性娱乐。本站仅供数据分析参考。</p>
         </footer>
       </main>

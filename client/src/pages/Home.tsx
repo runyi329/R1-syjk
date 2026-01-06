@@ -26,7 +26,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col">
               <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
-                {language === 'en' ? 'Runyi Investment' : '澳門潤儀投資'}
+                {language === 'en' ? 'Runyi Investment' : '数金研投'}
               </h1>
               <span className="text-[10px] text-muted-foreground tracking-wider uppercase mt-1">Runyi Investment</span>
             </div>
@@ -99,7 +99,7 @@ export default function Home() {
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
                 {language === 'en' 
                   ? 'Macau Runyi Investment Co., Ltd. covers the Asia-Pacific region, specializing in providing commercial big data analysis and investment risk management services for individual investors.'
-                  : '澳門潤儀投資有限公司業務覆蓋亞太地區，專為個人投資者提供商業大數據分析與投資風險管理服務。'}
+                  : '数金研投業務覆蓋亞太地區，專為個人投資者提供商業大數據分析與投資風險管理服務。'}
               </p>
 
             </div>
