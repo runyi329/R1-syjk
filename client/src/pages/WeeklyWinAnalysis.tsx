@@ -148,7 +148,7 @@ export default function WeeklyWinAnalysis() {
         <section className="space-y-6">
           <div className="text-center space-y-4">
             <h2 className="text-4xl font-bold tracking-tight">周周赢</h2>
-            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 每周可提现1%本金</p>
+            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 年化收益52%+ | 风险等级R4</p>
             <div className="flex justify-center gap-4 flex-wrap">
               <Badge className="bg-green-500/20 text-green-600 border-green-500/30">安全可靠</Badge>
               <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">全权委托</Badge>
@@ -161,28 +161,28 @@ export default function WeeklyWinAnalysis() {
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground mb-2">预期年化收益</p>
-                <p className="text-3xl font-bold text-primary">12-18%</p>
+                <p className="text-3xl font-bold text-primary">52%+</p>
                 <p className="text-xs text-muted-foreground mt-2">基于历史平均表现</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground mb-2">最低投入</p>
-                <p className="text-3xl font-bold text-primary">1,000 USDT</p>
+                <p className="text-3xl font-bold text-primary">10万 USDT</p>
                 <p className="text-xs text-muted-foreground mt-2">灵活投资门槛</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground mb-2">周期</p>
-                <p className="text-3xl font-bold text-primary">7天</p>
-                <p className="text-xs text-muted-foreground mt-2">每周可提现</p>
+                <p className="text-3xl font-bold text-primary">1年</p>
+                <p className="text-xs text-muted-foreground mt-2">投资周期</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground mb-2">风险等级</p>
-                <p className="text-3xl font-bold text-yellow-500">中等</p>
+                <p className="text-3xl font-bold text-red-500">R4</p>
                 <p className="text-xs text-muted-foreground mt-2">专业团队管理</p>
               </CardContent>
             </Card>
