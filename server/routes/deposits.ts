@@ -242,4 +242,57 @@ export const depositsRouter = router({
 
       return { success: true };
     }),
-});
+
+  adminDeposit: adminProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        amount: z.string(),
+        network: z.string().optional(),
+        adminNotes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, input.userId));
+
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      const currentBalance = parseFloat(user.usdtBalance);
+      const addAmount = parseFloat(input.amount);
+      const newBalance = (currentBalance + addAmount).toFixed(8);
+
+      await db
+        .update(users)
+        .set({ usdtBalance: newBalance })
+        .where(eq(users.id, input.userId));
+
+      const [deposit] = await db.insert(deposits).values({
+        userId: input.userId,
+        amount: input.amount,
+        network: input.network || "Admin",
+        depositAddress: "admin-deposit",
+        txHash: `admin-${Date.now()}`,
+        status: "confirmed",
+        adminNotes: input.adminNotes,
+      });
+
+      await db.insert(pointTransactions).values({
+        userId: input.userId,
+        type: "credit",
+        amount: input.amount,
+        balanceAfter: newBalance,
+        operatorId: ctx.user.id,
+        notes: input.adminNotes || `Deposit ${input.amount} USDT`,
+      });
+
+      return { success: true, depositId: deposit.insertId, newBalance };
+    }),
+})

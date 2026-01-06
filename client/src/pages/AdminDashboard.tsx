@@ -47,6 +47,16 @@ export default function AdminDashboard() {
     status: "active" as "active" | "inactive",
   });
 
+  const adminDepositMutation = trpc.deposits.adminDeposit.useMutation({
+    onSuccess: () => {
+      toast.success("充值成功");
+      refetchUsers();
+      setPointsAmount("");
+      setPointsNotes("");
+    },
+    onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
   const addPointsMutation = trpc.points.creditPoints.useMutation({
     onSuccess: () => {
       toast.success("积分添加成功");
@@ -305,10 +315,10 @@ export default function AdminDashboard() {
                                 <Button
                                   onClick={() => {
                                     if (selectedUserId && pointsAmount) {
-                                      addPointsMutation.mutate({
+                                      adminDepositMutation.mutate({
                                         userId: selectedUserId,
                                         amount: pointsAmount,
-                                        notes: pointsNotes || undefined,
+                                        adminNotes: pointsNotes || undefined,
                                       });
                                     }
                                   }}

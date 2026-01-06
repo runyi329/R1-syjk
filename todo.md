@@ -270,3 +270,10 @@
 - [x] 在UserCenter页面的提现历史中添加状态筛选按钮
 - [x] 实现筛选逻辑，支持按状态过滤交易记录
 - [x] 测试验证筛选功能正常工作
+
+## Bug修复 - 充值历史不显示订单数据
+- [x] 查询数据库中的充值记录，确认数据是否正确保存
+- [x] 检查前端getMyDeposits API是否正确获取用户的充值记录
+- [x] 在deposits.ts中添加adminDeposit API，为管理员充值创建订单
+- [x] 修改AdminDashboard使用新的adminDeposit API
+- [ ] 测试新的充值功能是否正常工作
