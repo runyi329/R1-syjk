@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function WeeklyWinAnalysis() {
@@ -717,9 +718,11 @@ export default function WeeklyWinAnalysis() {
                 <h3 className="text-2xl font-bold">准备开始投资？</h3>
                 <p className="text-muted-foreground">加入数百位投资者，开始您的周周赢之旅</p>
                 <div className="flex justify-center gap-4 flex-wrap">
-                  <Button className="bg-primary hover:bg-primary/90">
-                    立即投资
-                  </Button>
+                  <InvestmentApplicationForm 
+                    productName="周周赢" 
+                    minAmount={1000}
+                    triggerButtonText="立即投资"
+                  />
                   <Button variant="outline">
                     咨询顾问
                   </Button>

@@ -512,9 +512,11 @@ export default function CryptoAnalysis() {
                       <p className="text-xl font-bold text-yellow-500">中等</p>
                     </div>
                   </div>
-                  <Button className="w-full mt-4 bg-primary hover:bg-primary/90">
-                    了解详情
-                  </Button>
+                  <Link href="/weekly-win">
+                    <Button className="w-full mt-4 bg-primary hover:bg-primary/90">
+                      了解详情
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 
