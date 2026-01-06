@@ -424,6 +424,34 @@ export default function WeeklyWinAnalysis() {
                     className="w-full"
                   />
                   <div className="mt-2 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
+                  
+                  {/* 快捷预设按钮 */}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setInvestmentAmount(50000)}
+                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
+                    >
+                      5万
+                    </button>
+                    <button
+                      onClick={() => setInvestmentAmount(100000)}
+                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
+                    >
+                      10万
+                    </button>
+                    <button
+                      onClick={() => setInvestmentAmount(500000)}
+                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
+                    >
+                      50万
+                    </button>
+                    <button
+                      onClick={() => setInvestmentAmount(1000000)}
+                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
+                    >
+                      100万
+                    </button>
+                  </div>
                 </div>
               </div>
 
