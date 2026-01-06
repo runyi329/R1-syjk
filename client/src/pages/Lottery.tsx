@@ -125,7 +125,7 @@ export default function Lottery() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       {/* 头部导航 */}
-      <header className="border-b border-gray-800 bg-black/50 backdrop-blur-sm md:sticky md:top-0 z-50">
+      <header className="border-b border-gray-800 bg-black/50 backdrop-blur-sm z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/">
             <a className="flex items-center gap-3">

@@ -95,7 +95,7 @@ export default function UserCenter() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm md:sticky md:top-0 z-50">
+      <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm  z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
           <button onClick={() => setLocation("/")} className="flex items-center gap-2">
             <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded" />

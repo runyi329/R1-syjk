@@ -32,7 +32,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background font-sans text-foreground flex flex-col">
       {/* 头部导航 */}
-      <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-border bg-card/80 backdrop-blur-md  z-50">
         <div className="container mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />

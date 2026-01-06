@@ -327,3 +327,20 @@
 - [x] 移除"Sui 网络"等标签的显示
 - [x] 只保留金额、时间和adminNotes
 - [x] 与Deposit.tsx中的充值历史显示逻辑保持一致
+
+
+## 移除所有页面的sticky定位
+- [x] 移除Home.tsx中的sticky定位
+- [x] 移除BaccaratAnalysis.tsx中的sticky定位
+- [x] 移除RouletteAnalysis.tsx中的sticky定位
+- [x] 移除FootballAnalysis.tsx中的sticky定位
+- [x] 移除PokerAnalysis.tsx中的sticky定位
+- [x] 移除UserCenter.tsx中的md:sticky定位
+- [x] 移除Shop.tsx中的md:sticky定位
+- [x] 移除AdminDashboard.tsx中的sticky定位
+- [x] 移除Lottery.tsx中的md:sticky定位
+- [x] 移除Deposit.tsx中的sticky定位
+- [x] 移除Withdraw.tsx中的sticky定位
+- [x] 移除WalletAddresses.tsx中的sticky定位
+- [x] 验证TypeScript编译通过（0 errors）
+- [x] 所有页面header现在随页面滚动而上下移动

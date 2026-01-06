@@ -118,7 +118,7 @@ export default function BaccaratAnalysis() {
         </DrawerContent>
       </Drawer>
       {/* 头部区域 */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm z-10">
         <div className="container mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/">
