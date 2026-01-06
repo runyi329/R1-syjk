@@ -10,6 +10,8 @@ import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff } fro
 export default function UserCenter() {
   const [, setLocation] = useLocation();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [depositStatusFilter, setDepositStatusFilter] = useState<string | null>(null);
+  const [withdrawStatusFilter, setWithdrawStatusFilter] = useState<string | null>(null);
   const { data: authData, isLoading: authLoading } = trpc.auth.me.useQuery();
   const user = authData;
   const { data: userData, isLoading: userLoading } = trpc.users.getMe.useQuery(undefined, {
@@ -21,6 +23,22 @@ export default function UserCenter() {
   const { data: orders, isLoading: ordersLoading } = trpc.orders.getMyOrders.useQuery(undefined, {
     enabled: !!user,
   });
+  const { data: deposits, isLoading: depositsLoading } = trpc.deposits.getMyDeposits.useQuery(undefined, {
+    enabled: !!user,
+  });
+  const { data: withdrawals, isLoading: withdrawalsLoading } = trpc.withdrawals.getMyWithdrawals.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  const filteredDeposits = deposits?.filter(deposit => {
+    if (!depositStatusFilter) return true;
+    return deposit.status === depositStatusFilter;
+  }) || [];
+
+  const filteredWithdrawals = withdrawals?.filter(withdrawal => {
+    if (!withdrawStatusFilter) return true;
+    return withdrawal.withdrawal.status === withdrawStatusFilter;
+  }) || [];
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -181,9 +199,15 @@ export default function UserCenter() {
 
         {/* Tabs */}
         <Tabs defaultValue="transactions" className="w-full">
-          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-2 w-full">
+          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-4 w-full">
             <TabsTrigger value="transactions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               资金流水
+            </TabsTrigger>
+            <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              充值历史
+            </TabsTrigger>
+            <TabsTrigger value="withdrawals" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              提现历史
             </TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               我的订单
@@ -232,6 +256,184 @@ export default function UserCenter() {
                           <div className="text-xs sm:text-sm text-white/60">
                             余额：{parseFloat(tx.balanceAfter).toFixed(2)}
                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="deposits" className="mt-6">
+            <Card className="bg-black/50 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white">充值历史</CardTitle>
+                <CardDescription className="text-white/60">查看充值记录</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Status Filter */}
+                <div className="flex gap-2 flex-wrap mb-4">
+                  <Button
+                    variant={depositStatusFilter === null ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDepositStatusFilter(null)}
+                    className={depositStatusFilter === null ? "bg-[#D4AF37] text-black hover:bg-[#D4AF37]/80" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    全部
+                  </Button>
+                  <Button
+                    variant={depositStatusFilter === "pending" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDepositStatusFilter("pending")}
+                    className={depositStatusFilter === "pending" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    待确认
+                  </Button>
+                  <Button
+                    variant={depositStatusFilter === "confirmed" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDepositStatusFilter("confirmed")}
+                    className={depositStatusFilter === "confirmed" ? "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    已到账
+                  </Button>
+                  <Button
+                    variant={depositStatusFilter === "failed" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDepositStatusFilter("failed")}
+                    className={depositStatusFilter === "failed" ? "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    失败
+                  </Button>
+                </div>
+
+                {depositsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-[#D4AF37]" />
+                  </div>
+                ) : !filteredDeposits || filteredDeposits.length === 0 ? (
+                  <div className="text-center py-8 text-white/60">暂无充值记录</div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredDeposits.map((deposit) => (
+                      <div
+                        key={deposit.id}
+                        className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
+                      >
+                        <div>
+                          <div className="text-white font-medium">充值 {parseFloat(deposit.amount).toFixed(2)} USDT</div>
+                          <div className="text-sm text-white/60">{deposit.network} 网络</div>
+                          <div className="text-xs text-white/40">
+                            {new Date(deposit.createdAt).toLocaleString("zh-CN")}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge
+                            className={`${
+                              deposit.status === "confirmed"
+                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                : deposit.status === "pending"
+                                ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                : "bg-red-500/20 text-red-400 border-red-500/30"
+                            }`}
+                          >
+                            {deposit.status === "confirmed" ? "已到账" : deposit.status === "pending" ? "待确认" : "失败"}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="withdrawals" className="mt-6">
+            <Card className="bg-black/50 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white">提现历史</CardTitle>
+                <CardDescription className="text-white/60">查看提现记录</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Status Filter */}
+                <div className="flex gap-2 flex-wrap mb-4">
+                  <Button
+                    variant={withdrawStatusFilter === null ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWithdrawStatusFilter(null)}
+                    className={withdrawStatusFilter === null ? "bg-[#D4AF37] text-black hover:bg-[#D4AF37]/80" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    全部
+                  </Button>
+                  <Button
+                    variant={withdrawStatusFilter === "pending" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWithdrawStatusFilter("pending")}
+                    className={withdrawStatusFilter === "pending" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    待审核
+                  </Button>
+                  <Button
+                    variant={withdrawStatusFilter === "approved" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWithdrawStatusFilter("approved")}
+                    className={withdrawStatusFilter === "approved" ? "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    已批准
+                  </Button>
+                  <Button
+                    variant={withdrawStatusFilter === "completed" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWithdrawStatusFilter("completed")}
+                    className={withdrawStatusFilter === "completed" ? "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    已完成
+                  </Button>
+                  <Button
+                    variant={withdrawStatusFilter === "rejected" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWithdrawStatusFilter("rejected")}
+                    className={withdrawStatusFilter === "rejected" ? "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30" : "border-white/20 text-white/60 hover:text-white"}
+                  >
+                    已拒绝
+                  </Button>
+                </div>
+
+                {withdrawalsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-[#D4AF37]" />
+                  </div>
+                ) : !filteredWithdrawals || filteredWithdrawals.length === 0 ? (
+                  <div className="text-center py-8 text-white/60">暂无提现记录</div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredWithdrawals.map(({ withdrawal, walletAddress }) => (
+                      <div
+                        key={withdrawal.id}
+                        className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
+                      >
+                        <div>
+                          <div className="text-white font-medium">提现 {parseFloat(withdrawal.amount).toFixed(2)} USDT</div>
+                          <div className="text-sm text-white/60">{withdrawal.network} 网络</div>
+                          <div className="text-xs text-white/40">
+                            {new Date(withdrawal.createdAt).toLocaleString("zh-CN")}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge
+                            className={`${
+                              withdrawal.status === "completed"
+                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                : withdrawal.status === "approved"
+                                ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                                : withdrawal.status === "pending"
+                                ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                : "bg-red-500/20 text-red-400 border-red-500/30"
+                            }`}
+                          >
+                            {withdrawal.status === "completed" ? "已完成" : withdrawal.status === "approved" ? "已批准" : withdrawal.status === "pending" ? "待审核" : "已拒绝"}
+                          </Badge>
                         </div>
                       </div>
                     ))}
