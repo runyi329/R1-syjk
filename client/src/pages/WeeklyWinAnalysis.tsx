@@ -454,8 +454,8 @@ export default function WeeklyWinAnalysis() {
                     />
                   </div>
                   
-                  {/* 快捷预设按钮 */}
-                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  {/* 快捷预设按钮 - 分散对齐 */}
+                  <div className="mt-4 flex justify-between w-full">
                     <button
                       onClick={() => setInvestmentAmount(50000)}
                       className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
