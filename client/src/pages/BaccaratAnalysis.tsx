@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Info, AlertTriangle, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell } from "recharts";
+import { Bar, BarChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell, CartesianGrid, Legend } from "recharts";
 import baccaratData from "../data/baccaratData.json";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
@@ -17,6 +17,10 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { runSimulation, SimulationStats } from "@/lib/baccaratSimulator";
+import { Loader2 } from "lucide-react";
 
 // 颜色常量
 const COLORS = {
@@ -41,6 +45,12 @@ const RECOMMENDATION_ICONS = {
 
 export default function BaccaratAnalysis() {
   const [activeTab, setActiveTab] = useState("main");
+  
+  // 模拟投注状态
+  const [selectedRounds, setSelectedRounds] = useState<number>(1000);
+  const [initialCapital, setInitialCapital] = useState<string>("10000");
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationResult, setSimulationResult] = useState<SimulationStats | null>(null);
 
   // 合并所有数据用于综合图表
   const allData = [
@@ -290,14 +300,252 @@ export default function BaccaratAnalysis() {
           </div>
         </section>
 
+        {/* 模拟投注区域 */}
+        <section id="simulation" className="py-8">
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-card-foreground">模拟投注</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              基于马丁格尔倍投策略的百家乐模拟投注，了解长期盈亏情况
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* 设置面板 */}
+            <div className="space-y-4">
+              <div>
+                <Label className="text-card-foreground">选择模拟局数</Label>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2">
+                  {[100, 500, 1000, 5000, 10000, 1000000].map((rounds) => (
+                    <Button
+                      key={rounds}
+                      variant={selectedRounds === rounds ? "default" : "outline"}
+                      onClick={() => setSelectedRounds(rounds)}
+                      className="text-xs sm:text-sm"
+                    >
+                      {rounds >= 1000000 ? `${rounds / 1000000}M` : rounds >= 1000 ? `${rounds / 1000}K` : rounds}局
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="capital" className="text-card-foreground">带入资金（元）</Label>
+                <Input
+                  id="capital"
+                  type="number"
+                  min="1000"
+                  max="10000000"
+                  value={initialCapital}
+                  onChange={(e) => setInitialCapital(e.target.value)}
+                  placeholder="输入1000-10000000"
+                  className="mt-2 bg-background border-border text-foreground"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  最小1000元，最大1000万元
+                </p>
+              </div>
+
+              <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                <h4 className="font-semibold text-card-foreground mb-2">投注策略说明</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• 基础投注：500元/局</li>
+                  <li>• 倍投策略：输了翻倍，赢了重置</li>
+                  <li>• 最大单注：200万元</li>
+                  <li>• 下注方向：随机选择庄或闲</li>
+                  <li>• 庄赢抽5%，闲赢不抽，和局退回</li>
+                </ul>
+              </div>
+
+              <Button
+                onClick={handleSimulate}
+                disabled={isSimulating || !initialCapital || parseInt(initialCapital) < 1000 || parseInt(initialCapital) > 10000000}
+                className="w-full"
+                size="lg"
+              >
+                {isSimulating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    模拟中...
+                  </>
+                ) : (
+                  "开始模拟"
+                )}
+              </Button>
+            </div>
+
+            {/* 统计结果 */}
+            {simulationResult && (
+              <div className="space-y-6 mt-8">
+                <div className="border-t border-border pt-6">
+                  <h3 className="text-xl font-bold text-card-foreground mb-4">模拟结果</h3>
+                  
+                  {/* 基本统计 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">初始资金</div>
+                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.initialCapital.toLocaleString()}</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">最终余额</div>
+                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.finalBalance.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">盈亏金额</div>
+                      <div className={`text-lg font-bold ${simulationResult.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {simulationResult.profitLoss >= 0 ? '+' : ''}¥{simulationResult.profitLoss.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">盈亏率</div>
+                      <div className={`text-lg font-bold ${simulationResult.profitLossRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {simulationResult.profitLossRate >= 0 ? '+' : ''}{simulationResult.profitLossRate.toFixed(2)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 开奖统计 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-sm text-muted-foreground mb-2">开庄统计</div>
+                      <div className="text-2xl font-bold text-card-foreground mb-1">{simulationResult.bankerCount}局</div>
+                      <div className="text-xs text-muted-foreground">占比 {simulationResult.bankerRate.toFixed(2)}%</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-sm text-muted-foreground mb-2">开闲统计</div>
+                      <div className="text-2xl font-bold text-card-foreground mb-1">{simulationResult.playerCount}局</div>
+                      <div className="text-xs text-muted-foreground">占比 {simulationResult.playerRate.toFixed(2)}%</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-sm text-muted-foreground mb-2">开和统计</div>
+                      <div className="text-2xl font-bold text-card-foreground mb-1">{simulationResult.tieCount}局</div>
+                      <div className="text-xs text-muted-foreground">占比 {simulationResult.tieRate.toFixed(2)}%</div>
+                    </div>
+                  </div>
+
+                  {/* 连赢连输统计 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">庄最长连赢</div>
+                      <div className="text-xl font-bold text-green-500">{simulationResult.bankerMaxWinStreak}局</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">庄最长连输</div>
+                      <div className="text-xl font-bold text-red-500">{simulationResult.bankerMaxLoseStreak}局</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">闲最长连赢</div>
+                      <div className="text-xl font-bold text-green-500">{simulationResult.playerMaxWinStreak}局</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">闲最长连输</div>
+                      <div className="text-xl font-bold text-red-500">{simulationResult.playerMaxLoseStreak}局</div>
+                    </div>
+                  </div>
+
+                  {/* 资金曲线图 */}
+                  <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                    <h4 className="font-semibold text-card-foreground mb-4">资金变化趋势</h4>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }))}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis 
+                          dataKey="round" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          label={{ value: '局数', position: 'insideBottom', offset: -5, fill: 'hsl(var(--muted-foreground))' }}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--muted-foreground))" 
+                          label={{ value: '余额（元）', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+                        />
+                        <RechartsTooltip 
+                          contentStyle={{ backgroundColor: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
+                          labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
+                          itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
+                        />
+                        <Line type="monotone" dataKey="balance" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* 投注历史 */}
+                  {simulationResult.history.length > 0 && (
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <h4 className="font-semibold text-card-foreground mb-4">投注历史（前100局）</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-border">
+                              <th className="text-left py-2 px-2 text-muted-foreground">局数</th>
+                              <th className="text-left py-2 px-2 text-muted-foreground">开奖</th>
+                              <th className="text-left py-2 px-2 text-muted-foreground">下注</th>
+                              <th className="text-right py-2 px-2 text-muted-foreground">投注金额</th>
+                              <th className="text-right py-2 px-2 text-muted-foreground">赢得金额</th>
+                              <th className="text-right py-2 px-2 text-muted-foreground">余额</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {simulationResult.history.slice(0, 20).map((round) => (
+                              <tr key={round.round} className="border-b border-border/50">
+                                <td className="py-2 px-2 text-card-foreground">#{round.round}</td>
+                                <td className="py-2 px-2">
+                                  <Badge variant={round.outcome === 'banker' ? 'default' : round.outcome === 'player' ? 'secondary' : 'outline'}>
+                                    {round.outcome === 'banker' ? '庄' : round.outcome === 'player' ? '闲' : '和'}
+                                  </Badge>
+                                </td>
+                                <td className="py-2 px-2">
+                                  <Badge variant={round.betOn === 'banker' ? 'default' : 'secondary'}>
+                                    {round.betOn === 'banker' ? '庄' : '闲'}
+                                  </Badge>
+                                </td>
+                                <td className="py-2 px-2 text-right text-card-foreground">¥{round.betAmount.toLocaleString()}</td>
+                                <td className={`py-2 px-2 text-right font-medium ${round.winAmount > round.betAmount ? 'text-green-500' : round.winAmount === round.betAmount ? 'text-yellow-500' : 'text-red-500'}`}>
+                                  ¥{round.winAmount.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
+                                </td>
+                                <td className="py-2 px-2 text-right text-card-foreground">¥{round.balance.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        </section>
+
         <footer className="border-t border-border pt-8 pb-12 text-center text-sm text-muted-foreground">
           <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-4">
             <span className="italic tracking-tighter">R1</span>
           </div>
-          <p className="font-medium">© 2026 澳门潤儀投资有限公司 | 专业百家乐数据分析</p>
+          <p className="font-medium">© 2026 澳门润儀投资有限公司 | 专业百家乐数据分析</p>
           <p className="mt-2 text-xs">赌博有风险，请理性娱乐。本站仅供数据分析参考。</p>
         </footer>
       </main>
     </div>
   );
+
+  function handleSimulate() {
+    const capital = parseInt(initialCapital);
+    if (capital < 1000 || capital > 10000000) {
+      return;
+    }
+
+    setIsSimulating(true);
+    setSimulationResult(null);
+
+    // 使用setTimeout模拟异步计算，避免阻塞UI
+    setTimeout(() => {
+      const result = runSimulation({
+        rounds: selectedRounds,
+        initialCapital: capital,
+        basebet: 500,
+        maxBet: 2000000,
+      });
+      setSimulationResult(result);
+      setIsSimulating(false);
+    }, 100);
+  }
 }
