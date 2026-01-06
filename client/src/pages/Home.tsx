@@ -31,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground flex flex-col">
+    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground flex flex-col">
       {/* 头部导航 */}
       <header className="border-b border-border bg-card/80 backdrop-blur-md  z-50">
         <div className="container mx-auto py-4 flex justify-between items-center">

@@ -90,7 +90,7 @@ export default function BaccaratAnalysis() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground">
+    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground">
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>

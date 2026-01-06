@@ -67,14 +67,14 @@ export default function Register() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen pb-20 md:pb-0 bg-black text-white flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-[#D4AF37]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-black/50 border-white/10">
         <CardHeader className="text-center">
           <div className="mx-auto w-16 h-16 bg-[#D4AF37] rounded-full flex items-center justify-center mb-4">

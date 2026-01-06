@@ -124,7 +124,7 @@ export default function Lottery() {
   const { totalInvestment, expectedReturn, roi } = calculateExpectedReturn();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen pb-20 md:pb-0 bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       {/* 头部导航 */}
       <header className="border-b border-gray-800 bg-black/50 backdrop-blur-sm z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

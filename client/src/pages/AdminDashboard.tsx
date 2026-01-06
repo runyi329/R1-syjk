@@ -167,7 +167,7 @@ export default function AdminDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen pb-20 md:pb-0 bg-black text-white flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-[#D4AF37]" />
       </div>
     );
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white">
       {/* Header */}
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm z-50">
         <div className="container mx-auto flex items-center justify-between py-4">

@@ -360,3 +360,10 @@
 - [x] 在Withdraw页面添加组件
 - [x] 在WalletAddresses页面添加组件
 - [x] 验证所有页面的悬浮按钮正常工作
+
+
+## 添加移动端固定底部导航栏
+- [x] 创建MobileBottomNav组件
+- [x] 在App.tsx中全局添加底部导航
+- [x] 为所有页面添加下方padding（pb-20 md:pb-0）
+- [x] 验证TypeScript编译通过

@@ -18,27 +18,31 @@ import UserCenter from "./pages/UserCenter";
 import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
 import Register from "./pages/Register";
+import MobileBottomNav from "./components/MobileBottomNav";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-       <Route path="/baccarat" component={BaccaratAnalysis} />
-      <Route path="/roulette" component={RouletteAnalysis} />
-      <Route path="/football" component={FootballAnalysis} />
-      <Route path="/poker" component={PokerAnalysis} />
-        <Route path="/lottery" component={Lottery} />
-        <Route path="/deposit" component={Deposit} />
-        <Route path="/withdraw" component={Withdraw} />
-        <Route path="/wallet-addresses" component={WalletAddresses} />
-      <Route path="/register" component={Register} />
-      <Route path="/user-center" component={UserCenter} />
-      <Route path="/shop" component={Shop} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path={"/404"} component={NotFound} />      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <Switch>
+        <Route path={"/"} component={Home} />
+         <Route path="/baccarat" component={BaccaratAnalysis} />
+        <Route path="/roulette" component={RouletteAnalysis} />
+        <Route path="/football" component={FootballAnalysis} />
+        <Route path="/poker" component={PokerAnalysis} />
+          <Route path="/lottery" component={Lottery} />
+          <Route path="/deposit" component={Deposit} />
+          <Route path="/withdraw" component={Withdraw} />
+          <Route path="/wallet-addresses" component={WalletAddresses} />
+        <Route path="/register" component={Register} />
+        <Route path="/user-center" component={UserCenter} />
+        <Route path="/shop" component={Shop} />
+        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/404" component={NotFound} />      {/* Final fallback route */}
+        <Route component={NotFound} />
+      </Switch>
+      <MobileBottomNav />
+    </>
   );
 }
 
