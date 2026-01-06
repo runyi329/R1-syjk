@@ -456,22 +456,22 @@ export default function WeeklyWinAnalysis() {
               </div>
 
               {/* 计算结果 */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-6 bg-muted rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-4 p-6 bg-muted rounded-lg">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">客户账户资金</p>
                   <p className="text-xl font-bold text-primary">${userFund}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">公司保证金</p>
-                  <p className="text-xl font-bold text-blue-500">${companyFund}</p>
+                  <p className="text-xl font-bold text-primary">${companyFund}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">每周提现额</p>
+                  <p className="text-xs text-muted-foreground mb-1">每周提取利润</p>
                   <p className="text-xl font-bold text-green-500">${weeklyWithdrawal}</p>
                 </div>
-                <div className="md:col-span-3">
-                  <p className="text-xs text-muted-foreground mb-1">每月提现额</p>
-                  <p className="text-2xl font-bold text-primary">${monthlyWithdrawal}</p>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">每月提取利润</p>
+                  <p className="text-xl font-bold text-green-500">${monthlyWithdrawal}</p>
                 </div>
               </div>
             </CardContent>
