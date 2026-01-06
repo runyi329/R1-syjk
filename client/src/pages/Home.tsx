@@ -100,14 +100,23 @@ export default function Home() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
       localStorage.clear();
       sessionStorage.clear();
       window.location.href = '/';
-    } catch (error) {
+    },
+    onError: (error) => {
+      toast.error(language === 'en' ? 'Logout failed' : '登出失败');
       console.error('Logout failed:', error);
+    },
+  });
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
