@@ -249,3 +249,29 @@ export const captchas = mysqlTable("captchas", {
 
 export type Captcha = typeof captchas.$inferSelect;
 export type InsertCaptcha = typeof captchas.$inferInsert;
+
+
+/**
+ * 密码重置表 - 存储密码重置请求和验证码
+ */
+export const passwordResets = mysqlTable("passwordResets", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 用户ID */
+  userId: int("userId").notNull(),
+  /** 用户邮箱 */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** 重置码token，用于标识一个密码重置请求 */
+  token: varchar("token", { length: 128 }).notNull().unique(),
+  /** 验证码（4位数字，加密存储） */
+  codeHash: varchar("codeHash", { length: 255 }).notNull(),
+  /** 是否已使用 */
+  used: boolean("used").notNull().default(false),
+  /** 验证失败次数 */
+  failureCount: int("failureCount").default(0).notNull(),
+  /** 过期时间（15分钟后过期） */
+  expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PasswordReset = typeof passwordResets.$inferSelect;
+export type InsertPasswordReset = typeof passwordResets.$inferInsert;

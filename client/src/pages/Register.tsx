@@ -12,6 +12,7 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -118,6 +119,24 @@ export default function Register() {
                 />
                 <p className="text-xs text-muted-foreground">
                   昵称长度2-20个字符
+                </p>
+              </div>
+
+              {/* 邮箱（可选） */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  邮箱（可选，用于密码找回）
+                </label>
+                <Input
+                  type="email"
+                  placeholder="输入邮箱地址"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  className="border-primary/20 focus:border-primary"
+                />
+                <p className="text-xs text-muted-foreground">
+                  可选填写，用于密码找回时接收验证码
                 </p>
               </div>
 

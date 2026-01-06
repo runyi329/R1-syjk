@@ -216,4 +216,85 @@ export const usersRouter = router({
       await db.unlockAccount(input.username);
       return { success: true };
     }),
+
+  // 密码重置：发送重置验证码
+  sendPasswordResetCode: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input }) => {
+      const { sendPasswordResetEmail } = await import("../_core/mailer");
+      
+      // 检查邮箱是否存在
+      const user = await db.getUserByEmail(input.email);
+      if (!user) {
+        // 不返回错误信息，以不泄露邮箱是否存在
+        return { success: true, message: '如果邮箱存在，您将收到重置验证码' };
+      }
+
+      // 生成验证码
+      const { code, codeHash } = db.generatePasswordResetCode();
+      const token = await db.createPasswordReset(user.id, input.email, codeHash);
+
+      // 发送邮件
+      try {
+        const resetLink = `${process.env.VITE_FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+        await sendPasswordResetEmail(input.email, code, resetLink);
+      } catch (error) {
+        console.error('[Users] Failed to send password reset email:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: '发送邮件失败，请稍后再试',
+        });
+      }
+
+      return { success: true, message: '如果邮箱存在，您将收到重置验证码' };
+    }),
+
+  // 密码重置：验证重置码
+  verifyPasswordResetCode: publicProcedure
+    .input(z.object({ token: z.string(), code: z.string() }))
+    .mutation(async ({ input }) => {
+      const isValid = await db.verifyPasswordResetCode(input.token, input.code);
+      if (!isValid) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: '验证码错误或已过期',
+        });
+      }
+      return { success: true };
+    }),
+
+  // 密码重置：重置密码
+  resetPassword: publicProcedure
+    .input(z.object({ token: z.string(), newPassword: z.string().min(8) }))
+    .mutation(async ({ input }) => {
+      // 获取重置请求信息
+      const resetInfo = await db.getPasswordResetInfo(input.token);
+      if (!resetInfo || resetInfo.used) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: '重置链接已过期或已使用',
+        });
+      }
+
+      // 添加密码验证
+      if (input.newPassword.length < 8) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: '密码至少需要8个字符',
+        });
+      }
+
+      if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(input.newPassword)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: '密码必须包含大写字母、小写字母和数字',
+        });
+      }
+
+      // 重置密码
+      const newPasswordHash = db.hashPassword(input.newPassword);
+      await db.resetUserPassword(resetInfo.userId, newPasswordHash);
+
+      return { success: true };
+    }),
 });

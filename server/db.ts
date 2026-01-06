@@ -449,3 +449,152 @@ export async function cleanupExpiredCaptchas() {
   
   await db.delete(captchas).where(lt(captchas.expiresAt, new Date()));
 }
+
+
+// ========== 密码重置管理 ==========
+
+/**
+ * 生成密码重置验证码
+ */
+export function generatePasswordResetCode(): { code: string; codeHash: string } {
+  // 生成4位随机数字
+  const code = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+  const codeHash = hashPassword(code);
+  return { code, codeHash };
+}
+
+/**
+ * 创建密码重置请求
+ */
+export async function createPasswordReset(userId: number, email: string, codeHash: string): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { passwordResets } = await import("../drizzle/schema");
+  const token = crypto.randomBytes(32).toString("hex");
+  
+  // 15分钟后过期
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+  
+  await db.insert(passwordResets).values({
+    userId,
+    email,
+    token,
+    codeHash,
+    used: false,
+    failureCount: 0,
+    expiresAt,
+  });
+  
+  return token;
+}
+
+/**
+ * 验证密码重置码
+ */
+export async function verifyPasswordResetCode(token: string, code: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { passwordResets } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const resetRecord = await db.select().from(passwordResets).where(eq(passwordResets.token, token)).limit(1);
+  
+  if (!resetRecord || resetRecord.length === 0) {
+    return false;
+  }
+  
+  const record = resetRecord[0];
+  
+  // 检查是否已过期
+  if (new Date() > record.expiresAt) {
+    return false;
+  }
+  
+  // 检查是否已使用
+  if (record.used) {
+    return false;
+  }
+  
+  // 验证码
+  const codeHash = hashPassword(code);
+  if (codeHash !== record.codeHash) {
+    // 增加失败次数
+    await db.update(passwordResets).set({ failureCount: record.failureCount + 1 }).where(eq(passwordResets.token, token));
+    return false;
+  }
+  
+  // 标记为已使用
+  await db.update(passwordResets).set({ used: true }).where(eq(passwordResets.token, token));
+  return true;
+}
+
+/**
+ * 获取密码重置请求信息
+ */
+export async function getPasswordResetInfo(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { passwordResets } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  
+  const resetRecord = await db.select().from(passwordResets).where(eq(passwordResets.token, token)).limit(1);
+  
+  if (!resetRecord || resetRecord.length === 0) {
+    return null;
+  }
+  
+  const record = resetRecord[0];
+  
+  // 检查是否已过期
+  if (new Date() > record.expiresAt) {
+    return null;
+  }
+  
+  return {
+    token: record.token,
+    userId: record.userId,
+    email: record.email,
+    used: record.used,
+    failureCount: record.failureCount,
+    expiresAt: record.expiresAt,
+  };
+}
+
+/**
+ * 重置用户密码
+ */
+export async function resetUserPassword(userId: number, newPasswordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users).set({ passwordHash: newPasswordHash }).where(eq(users.id, userId));
+}
+
+/**
+ * 清理过期的密码重置请求
+ */
+export async function cleanupExpiredPasswordResets() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { passwordResets } = await import("../drizzle/schema");
+  const { lt } = await import("drizzle-orm");
+  
+  await db.delete(passwordResets).where(lt(passwordResets.expiresAt, new Date()));
+}
+
+/**
+ * 检查邮箱是否已注册
+ */
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { eq } = await import("drizzle-orm");
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}

@@ -418,3 +418,18 @@
 - [x] 从首页导航栏移除OAuth登录按钮
 - [x] 只保留用户名+密码登录
 - [x] 测试登录和注册功能
+
+
+## 忽记密码功能
+- [x] 修改users表，添加email字段
+- [x] 创建 passwordResets表，存储密码重置请求
+- [x] 配置邀件服务（Nodemailer + Gmail）
+- [x] 实现后端API：发送验证码（users.sendPasswordResetCode）
+- [x] 实现后端API：验证码验证（users.verifyPasswordResetCode）
+- [x] 实现后端API：重置密码（users.resetPassword）
+- [x] 修改Register.tsx，添加邮箱字段（可选）
+- [ ] 创建 ForgotPassword.tsx页面
+- [ ] 在App.tsx中添加忽记密码路由
+- [ ] 在登录对话框中添加"忽记密码"链接
+- [ ] 编写单元测试验证邮件发送和密码重置功能
+- [ ] 测试整个忽记密码流程
