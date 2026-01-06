@@ -367,3 +367,10 @@
 - [x] 在App.tsx中全局添加底部导航
 - [x] 为所有页面添加下方padding（pb-20 md:pb-0）
 - [x] 验证TypeScript编译通过
+
+
+## 修复登出功能
+- [x] 查找登出 API的实现
+- [x] 检查MobileBottomNav中的登出逻辑
+- [x] 修复登出后的缓存清理
+- [x] 验证useAuth hook的登出实现已正确

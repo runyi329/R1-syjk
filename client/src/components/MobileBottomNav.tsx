@@ -2,12 +2,16 @@ import { Home, BarChart3, User, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function MobileBottomNav() {
   const [location, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { data: authData } = trpc.auth.me.useQuery();
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
+      // 清除auth.me查询的缓存
+      queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
       toast.success("已登出");
       setLocation("/");
     },
