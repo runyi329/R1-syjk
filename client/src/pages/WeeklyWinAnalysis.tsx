@@ -414,46 +414,28 @@ export default function WeeklyWinAnalysis() {
               <CardTitle>周周赢 收益计算機</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
-              {/* 复利开关 */}
-              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <div>
-                  <p className="text-sm font-semibold">复利模式</p>
-                  <p className="text-xs text-muted-foreground mt-1">{compoundInterestText}</p>
-                </div>
-                <button
-                  onClick={() => setIsCompoundInterest(!isCompoundInterest)}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    isCompoundInterest ? 'bg-green-500' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      isCompoundInterest ? 'translate-x-7' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
               {/* 输入区域 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
-                  <input
-                    type="range"
-                    min="10000"
-                    max="1000000"
-                    step="1"
-                    value={investmentAmount}
-                    onChange={(e) => setInvestmentAmount(Number(e.target.value))}
-                    className="investment-slider"
-                    style={{
-                      background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb 100%)`
-                    }}
-                  />
-                  <div className="mt-2 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="range"
+                      min="10000"
+                      max="1000000"
+                      step="1"
+                      value={investmentAmount}
+                      onChange={(e) => setInvestmentAmount(Number(e.target.value))}
+                      className="investment-slider w-full"
+                      style={{
+                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                    <div className="mt-3 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
+                  </div>
                   
                   {/* 快捷预设按钮 */}
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
                     <button
                       onClick={() => setInvestmentAmount(50000)}
                       className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
@@ -483,22 +465,37 @@ export default function WeeklyWinAnalysis() {
               </div>
 
               {/* 计算结果 */}
-              <div className="grid grid-cols-2 md:grid-cols-2 gap-4 p-6 bg-muted rounded-lg">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">客户账户资金</p>
-                  <p className="text-xl font-bold text-green-500">${userFund}</p>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-6 bg-muted rounded-lg">
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground">客户账户资金</p>
+                  <p className="text-lg sm:text-xl font-bold text-green-500">${userFund}</p>
+                </div>
+                <div className="relative space-y-1">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
+                      <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
+                    </div>
+                    <button
+                      onClick={() => setIsCompoundInterest(!isCompoundInterest)}
+                      className={`ml-2 px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded transition-colors ${
+                        isCompoundInterest 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-gray-400 text-white'
+                      }`}
+                    >
+                      复利{isCompoundInterest ? '2' : '1'}
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{compoundInterestText}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">公司保证金</p>
-                  <p className="text-xl font-bold text-green-500">${companyFund}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>
+                  <p className="text-lg sm:text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">每周提取利润</p>
-                  <p className="text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">每月提取利润</p>
-                  <p className="text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">每月提取利润</p>
+                  <p className="text-lg sm:text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
                 </div>
               </div>
             </CardContent>
