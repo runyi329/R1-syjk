@@ -19,6 +19,7 @@ import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import CryptoAnalysis from "./pages/CryptoAnalysis";
 import MobileBottomNav from "./components/MobileBottomNav";
 
 function Router() {
@@ -31,6 +32,7 @@ function Router() {
         <Route path="/roulette" component={RouletteAnalysis} />
         <Route path="/football" component={FootballAnalysis} />
         <Route path="/poker" component={PokerAnalysis} />
+        <Route path="/crypto" component={CryptoAnalysis} />
           <Route path="/lottery" component={Lottery} />
           <Route path="/deposit" component={Deposit} />
           <Route path="/withdraw" component={Withdraw} />

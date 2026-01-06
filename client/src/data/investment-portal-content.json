@@ -80,7 +80,7 @@
       },
       "projects": [
         { "id": "forex-analysis", "name_key": "外匯交易分析" },
-        { "id": "crypto-analysis", "name_key": "數字貨幣分析" }
+        { "id": "crypto-analysis", "name_key": "數字貨幣分析", "url": "/crypto" }
       ]
     },
     {

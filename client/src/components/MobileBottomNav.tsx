@@ -52,7 +52,8 @@ export default function MobileBottomNav() {
               isActive("/baccarat") ||
               isActive("/roulette") ||
               isActive("/football") ||
-              isActive("/poker")
+              isActive("/poker") ||
+              isActive("/crypto")
                 ? "text-[#D4AF37]"
                 : "text-white/60 hover:text-white"
             }`}
@@ -86,6 +87,12 @@ export default function MobileBottomNav() {
               className="text-xs text-white/60 hover:text-[#D4AF37] px-3 py-2 rounded hover:bg-white/5 transition-all text-left"
             >
               扑克
+            </button>
+            <button
+              onClick={() => setLocation("/crypto")}
+              className="text-xs text-white/60 hover:text-[#D4AF37] px-3 py-2 rounded hover:bg-white/5 transition-all text-left"
+            >
+              数字货币
             </button>
           </div>
         </div>
