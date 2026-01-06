@@ -6,6 +6,7 @@ import { ArrowLeft, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-re
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { trpc } from "@/lib/trpc";
 
 interface CryptoData {
   symbol: string;
@@ -28,6 +29,12 @@ export default function CryptoAnalysis() {
   const [cryptoData, setCryptoData] = useState<{ [key: string]: CryptoData }>({});
   const [fearGreedData, setFearGreedData] = useState<FearGreedData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // 使用TRPC查询获取Fear & Greed指数
+  const { data: fearGreedResponse, isLoading: fearGreedLoading } = trpc.crypto.getFearGreedIndex.useQuery();
+  
+  // 使用TRPC查询获取市场排名
+  const { data: rankingsResponse, isLoading: rankingsLoading } = trpc.crypto.getMarketRankings.useQuery();
 
   // 生成模拟历史数据
   const generateMockHistory = (basePrice: number, variance: number) => {
@@ -71,62 +78,38 @@ export default function CryptoAnalysis() {
     };
   };
 
-  // 获取Fear & Greed指数
-  const fetchFearGreedIndex = async () => {
-    try {
-      const response = await fetch('https://api.alternative.me/fng/?limit=1');
-      const data = await response.json();
-      if (data.data && data.data.length > 0) {
-        setFearGreedData(data.data[0]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch Fear & Greed Index:', error);
+  // 处理Fear & Greed数据
+  useEffect(() => {
+    if (fearGreedResponse?.data && fearGreedResponse.data.length > 0) {
+      setFearGreedData(fearGreedResponse.data[0]);
     }
-  };
+  }, [fearGreedResponse]);
 
-  // 获取CoinGecko市场排名数据
-  const fetchMarketRankings = async () => {
-    try {
-      const response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false'
-      );
-      const data = await response.json();
-      
-      // 创建排名映射
-      const rankMap: { [key: string]: number } = {};
-      data.forEach((coin: any, index: number) => {
-        if (coin.symbol.toUpperCase() === 'BTC') rankMap['BTC'] = index + 1;
-        if (coin.symbol.toUpperCase() === 'ETH') rankMap['ETH'] = index + 1;
-      });
-      
-      // 更新cryptoData中的排名
+  // 处理排名数据
+  useEffect(() => {
+    if (rankingsResponse?.success && rankingsResponse.rankings) {
       setCryptoData(prev => ({
         ...prev,
-        BTC: { ...prev.BTC, marketRank: rankMap['BTC'] },
-        ETH: { ...prev.ETH, marketRank: rankMap['ETH'] }
+        BTC: { ...prev.BTC, marketRank: rankingsResponse.rankings['BTC'] },
+        ETH: { ...prev.ETH, marketRank: rankingsResponse.rankings['ETH'] }
       }));
-    } catch (error) {
-      console.error('Failed to fetch market rankings:', error);
     }
-  };
+  }, [rankingsResponse]);
 
+  // 初始化数据加载
   useEffect(() => {
-    // 初始化数据加载
     const loadData = async () => {
       // 先加载模拟数据
       setCryptoData(getMockData());
       
-      // 然后异步获取Fear & Greed指数和排名
-      await Promise.all([
-        fetchFearGreedIndex(),
-        fetchMarketRankings()
-      ]);
-      
-      setLoading(false);
+      // 检查是否所有数据都已加载
+      if (!fearGreedLoading && !rankingsLoading) {
+        setLoading(false);
+      }
     };
     
     loadData();
-  }, []);
+  }, [fearGreedLoading, rankingsLoading]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
