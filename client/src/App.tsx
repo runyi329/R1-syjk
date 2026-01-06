@@ -11,6 +11,7 @@ import RouletteAnalysis from "./pages/RouletteAnalysis";
 import FootballAnalysis from "./pages/FootballAnalysis";
 import PokerAnalysis from "./pages/PokerAnalysis";
 import Lottery from "./pages/Lottery";
+import WalletAddresses from "./pages/WalletAddresses";
 import Deposit from "./pages/Deposit";
 import Withdraw from "./pages/Withdraw";
 import UserCenter from "./pages/UserCenter";
@@ -30,6 +31,7 @@ function Router() {
         <Route path="/lottery" component={Lottery} />
         <Route path="/deposit" component={Deposit} />
         <Route path="/withdraw" component={Withdraw} />
+        <Route path="/wallet-addresses" component={WalletAddresses} />
       <Route path="/register" component={Register} />
       <Route path="/user-center" component={UserCenter} />
       <Route path="/shop" component={Shop} />

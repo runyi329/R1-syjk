@@ -101,3 +101,102 @@ export const pointTransactions = mysqlTable("pointTransactions", {
 
 export type PointTransaction = typeof pointTransactions.$inferSelect;
 export type InsertPointTransaction = typeof pointTransactions.$inferInsert;
+/**
+ * 充值订单表 - 记录用户充值申请
+ */
+export const deposits = mysqlTable("deposits", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 关联用户ID */
+  userId: int("userId").notNull(),
+  /** 充值金额（USDT） */
+  amount: decimal("amount", { precision: 20, scale: 8 }).notNull(),
+  /** 充值网络：aptos, ethereum, bsc, polygon */
+  network: varchar("network", { length: 50 }).notNull(),
+  /** 充值地址（收款地址） */
+  depositAddress: varchar("depositAddress", { length: 255 }).notNull(),
+  /** 交易哈希（用户提交的链上交易ID） */
+  txHash: varchar("txHash", { length: 255 }),
+  /** 订单状态：pending-待确认，confirmed-已到账，failed-失败 */
+  status: mysqlEnum("status", ["pending", "confirmed", "failed"]).default("pending").notNull(),
+  /** 管理员备注 */
+  adminNotes: text("adminNotes"),
+  /** 审核人ID */
+  reviewerId: int("reviewerId"),
+  /** 审核时间 */
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Deposit = typeof deposits.$inferSelect;
+export type InsertDeposit = typeof deposits.$inferInsert;
+
+/**
+ * 钱包地址表 - 用户绑定的提现地址
+ */
+export const walletAddresses = mysqlTable("walletAddresses", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 关联用户ID */
+  userId: int("userId").notNull(),
+  /** 钱包地址 */
+  address: varchar("address", { length: 255 }).notNull(),
+  /** 网络类型：aptos, ethereum, bsc, polygon */
+  network: varchar("network", { length: 50 }).notNull(),
+  /** 地址标签（用户自定义） */
+  label: varchar("label", { length: 100 }),
+  /** 二维码图片URL */
+  qrCodeUrl: text("qrCodeUrl"),
+  /** 审核状态：pending-待审核，approved-已批准，rejected-已拒绝 */
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  /** 管理员备注 */
+  adminNotes: text("adminNotes"),
+  /** 审核人ID */
+  reviewerId: int("reviewerId"),
+  /** 审核时间 */
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WalletAddress = typeof walletAddresses.$inferSelect;
+export type InsertWalletAddress = typeof walletAddresses.$inferInsert;
+
+/**
+ * 提现订单表 - 记录用户提现申请
+ */
+export const withdrawals = mysqlTable("withdrawals", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 关联用户ID */
+  userId: int("userId").notNull(),
+  /** 关联钱包地址ID */
+  walletAddressId: int("walletAddressId").notNull(),
+  /** 提现金额（USDT） */
+  amount: decimal("amount", { precision: 20, scale: 8 }).notNull(),
+  /** 手续费 */
+  fee: decimal("fee", { precision: 20, scale: 8 }).notNull(),
+  /** 实际到账金额 */
+  actualAmount: decimal("actualAmount", { precision: 20, scale: 8 }).notNull(),
+  /** 提现网络 */
+  network: varchar("network", { length: 50 }).notNull(),
+  /** 提现地址 */
+  withdrawAddress: varchar("withdrawAddress", { length: 255 }).notNull(),
+  /** 交易哈希（管理员处理后填写） */
+  txHash: varchar("txHash", { length: 255 }),
+  /** 订单状态：pending-待审核，approved-已批准，processing-处理中，completed-已完成，rejected-已拒绝 */
+  status: mysqlEnum("status", ["pending", "approved", "processing", "completed", "rejected"]).default("pending").notNull(),
+  /** 拒绝原因 */
+  rejectReason: text("rejectReason"),
+  /** 管理员备注 */
+  adminNotes: text("adminNotes"),
+  /** 审核人ID */
+  reviewerId: int("reviewerId"),
+  /** 审核时间 */
+  reviewedAt: timestamp("reviewedAt"),
+  /** 完成时间 */
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Withdrawal = typeof withdrawals.$inferSelect;
+export type InsertWithdrawal = typeof withdrawals.$inferInsert;

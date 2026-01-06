@@ -11,6 +11,9 @@ import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock } from "lucide-react";
 import { toast } from "sonner";
+import DepositsManagement from "@/components/admin/DepositsManagement";
+import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
+import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
@@ -184,8 +187,17 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
-        <Tabs defaultValue="users" className="w-full">
-          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-3 w-full">
+        <Tabs defaultValue="deposits" className="w-full">
+          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-6 w-full overflow-x-auto">
+            <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              充值
+            </TabsTrigger>
+            <TabsTrigger value="withdrawals" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              提现
+            </TabsTrigger>
+            <TabsTrigger value="wallets" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              地址
+            </TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               用户
             </TabsTrigger>
@@ -196,6 +208,21 @@ export default function AdminDashboard() {
               订单
             </TabsTrigger>
           </TabsList>
+
+          {/* Deposits Management */}
+          <TabsContent value="deposits" className="mt-6">
+            <DepositsManagement />
+          </TabsContent>
+
+          {/* Withdrawals Management */}
+          <TabsContent value="withdrawals" className="mt-6">
+            <WithdrawalsManagement />
+          </TabsContent>
+
+          {/* Wallet Addresses Management */}
+          <TabsContent value="wallets" className="mt-6">
+            <WalletAddressesManagement />
+          </TabsContent>
 
           {/* Users Management */}
           <TabsContent value="users" className="mt-6">

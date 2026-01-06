@@ -4,6 +4,10 @@ import { useLocation } from "wouter";
 import { ArrowLeft, Copy, Info } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { trpc } from "@/lib/trpc";
+import { CheckCircle, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Deposit() {
@@ -22,9 +26,54 @@ export default function Deposit() {
 
   const currentNetwork = networks.find(n => n.name === selectedNetwork) || networks[0];
 
+  const { data: deposits, refetch } = trpc.deposits.getMyDeposits.useQuery();
+  const createDepositMutation = trpc.deposits.create.useMutation();
+
   const copyAddress = () => {
     navigator.clipboard.writeText(depositAddress);
     toast.success("地址已复制到剪贴板");
+  };
+
+  const handleSubmitDeposit = async () => {
+    try {
+      await createDepositMutation.mutateAsync({
+        amount: "0", // 用户不需要输入金额，由管理员确认
+        network: selectedNetwork,
+        depositAddress: depositAddress,
+      });
+      toast.success("充值申请已提交，请等待管理员确认");
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "提交失败");
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "confirmed":
+        return (
+          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            已到账
+          </Badge>
+        );
+      case "pending":
+        return (
+          <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+            <Clock className="h-3 w-3 mr-1" />
+            待确认
+          </Badge>
+        );
+      case "failed":
+        return (
+          <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
+            <XCircle className="h-3 w-3 mr-1" />
+            失败
+          </Badge>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -42,6 +91,13 @@ export default function Deposit() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4 max-w-2xl">
+        <Tabs defaultValue="deposit" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-white/5 mb-4">
+            <TabsTrigger value="deposit">充值</TabsTrigger>
+            <TabsTrigger value="history">充值记录</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="deposit" className="space-y-4">
         {/* QR Code Card */}
         <Card className="bg-gradient-to-br from-[#D4AF37]/10 to-black border-[#D4AF37]/30 mb-4">
           <CardContent className="pt-6">
@@ -166,6 +222,62 @@ export default function Deposit() {
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-3">
+            {!deposits || deposits.length === 0 ? (
+              <Card className="bg-black/50 border-white/10">
+                <CardContent className="py-12 text-center text-white/60">
+                  <p>暂无充值记录</p>
+                </CardContent>
+              </Card>
+            ) : (
+              deposits.map((deposit) => (
+                <Card key={deposit.id} className="bg-black/50 border-white/10">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-white text-base">
+                          充值 {parseFloat(deposit.amount).toFixed(2)} USDT
+                        </CardTitle>
+                        <CardDescription className="text-white/60 text-xs mt-1">
+                          {deposit.network} 网络
+                        </CardDescription>
+                      </div>
+                      {getStatusBadge(deposit.status)}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-white/60">订单号：</span>
+                      <span className="text-white">#{deposit.id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/60">创建时间：</span>
+                      <span className="text-white">
+                        {new Date(deposit.createdAt).toLocaleString("zh-CN")}
+                      </span>
+                    </div>
+                    {deposit.reviewedAt && (
+                      <div className="flex justify-between">
+                        <span className="text-white/60">审核时间：</span>
+                        <span className="text-white">
+                          {new Date(deposit.reviewedAt).toLocaleString("zh-CN")}
+                        </span>
+                      </div>
+                    )}
+                    {deposit.adminNotes && (
+                      <div className="mt-2 p-2 bg-gray-900/50 rounded text-xs">
+                        <p className="text-white/60 mb-1">管理员备注：</p>
+                        <p className="text-white/80">{deposit.adminNotes}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
