@@ -3,11 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
-import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff } from "lucide-react";
 
 export default function UserCenter() {
   const [, setLocation] = useLocation();
+  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const { data: authData, isLoading: authLoading } = trpc.auth.me.useQuery();
   const user = authData;
   const { data: userData, isLoading: userLoading } = trpc.users.getMe.useQuery(undefined, {
@@ -94,14 +95,30 @@ export default function UserCenter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <Card className="bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/30">
             <CardHeader>
-              <CardTitle className="text-white">USDT 积分余额</CardTitle>
-              <CardDescription className="text-white/60">当前可用余额</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white">总资产</CardTitle>
+                <button
+                  onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  {isBalanceVisible ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                </button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl sm:text-4xl font-bold text-[#D4AF37]">
-                {parseFloat(userData.usdtBalance).toFixed(2)}
+                {isBalanceVisible ? (
+                  <>
+                    {parseFloat(userData.usdtBalance).toFixed(2)}{" "}
+                    <span className="text-xl sm:text-2xl">USDT</span>
+                  </>
+                ) : (
+                  <>
+                    ****{" "}
+                    <span className="text-xl sm:text-2xl">USDT</span>
+                  </>
+                )}
               </div>
-              <div className="text-xs sm:text-sm text-white/60 mt-2">USDT</div>
             </CardContent>
           </Card>
 
