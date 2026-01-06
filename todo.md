@@ -504,3 +504,4 @@
 - [x] 修复fetchCryptoData无限重试问题
 - [x] 移除重复的API调用逻辑
 - [x] 确保错误处理正确设置loading状态
+- [x] 修复AbortSignal.timeout兼容性问题

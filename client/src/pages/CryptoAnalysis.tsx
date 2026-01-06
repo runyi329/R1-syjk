@@ -74,71 +74,82 @@ export default function CryptoAnalysis() {
       setError(null);
       setIsUsingMockData(false);
 
-      // 使用 CoinGecko API（免费，无需认证）
-      const response = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true',
-        { signal: AbortSignal.timeout(8000) }
-      );
+      // 创建超时控制器
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-      if (!response.ok) throw new Error('Failed to fetch crypto data');
+      try {
+        // 使用 CoinGecko API（免费，无需认证）
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true',
+          { signal: controller.signal }
+        );
 
-      const data = await response.json();
+        if (!response.ok) throw new Error('Failed to fetch crypto data');
 
-      // 获取历史数据用于图表
-      const historyResponse = await fetch(
-        'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7',
-        { signal: AbortSignal.timeout(8000) }
-      );
+        const data = await response.json();
 
-      if (!historyResponse.ok) throw new Error('Failed to fetch history data');
+        // 获取历史数据用于图表
+        const historyResponse = await fetch(
+          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7',
+          { signal: controller.signal }
+        );
 
-      const historyData = await historyResponse.json();
+        if (!historyResponse.ok) throw new Error('Failed to fetch history data');
 
-      // 处理 BTC 数据
-      const btcHistory = historyData.prices.map((item: [number, number]) => ({
-        time: new Date(item[0]).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
-        price: Math.round(item[1])
-      }));
+        const historyData = await historyResponse.json();
 
-      // 获取 ETH 历史数据
-      const ethHistoryResponse = await fetch(
-        'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7',
-        { signal: AbortSignal.timeout(8000) }
-      );
+        // 处理 BTC 数据
+        const btcHistory = historyData.prices.map((item: [number, number]) => ({
+          time: new Date(item[0]).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
+          price: Math.round(item[1])
+        }));
 
-      if (!ethHistoryResponse.ok) throw new Error('Failed to fetch ETH history');
+        // 获取 ETH 历史数据
+        const ethHistoryResponse = await fetch(
+          'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7',
+          { signal: controller.signal }
+        );
 
-      const ethHistoryData = await ethHistoryResponse.json();
+        if (!ethHistoryResponse.ok) throw new Error('Failed to fetch ETH history');
 
-      const ethHistory = ethHistoryData.prices.map((item: [number, number]) => ({
-        time: new Date(item[0]).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
-        price: Math.round(item[1])
-      }));
+        const ethHistoryData = await ethHistoryResponse.json();
 
-      if (isMountedRef.current) {
-        setCryptoData({
-          BTC: {
-            symbol: 'BTC',
-            name: 'Bitcoin',
-            price: data.bitcoin.usd,
-            change24h: data.bitcoin.usd_24h_change,
-            marketCap: data.bitcoin.usd_market_cap,
-            volume24h: data.bitcoin.usd_24h_vol,
-            priceHistory: btcHistory
-          },
-          ETH: {
-            symbol: 'ETH',
-            name: 'Ethereum',
-            price: data.ethereum.usd,
-            change24h: data.ethereum.usd_24h_change,
-            marketCap: data.ethereum.usd_market_cap,
-            volume24h: data.ethereum.usd_24h_vol,
-            priceHistory: ethHistory
-          }
-        });
-        setError(null);
-        setIsUsingMockData(false);
-        setLoading(false);
+        const ethHistory = ethHistoryData.prices.map((item: [number, number]) => ({
+          time: new Date(item[0]).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
+          price: Math.round(item[1])
+        }));
+
+        clearTimeout(timeoutId);
+
+        if (isMountedRef.current) {
+          setCryptoData({
+            BTC: {
+              symbol: 'BTC',
+              name: 'Bitcoin',
+              price: data.bitcoin.usd,
+              change24h: data.bitcoin.usd_24h_change,
+              marketCap: data.bitcoin.usd_market_cap,
+              volume24h: data.bitcoin.usd_24h_vol,
+              priceHistory: btcHistory
+            },
+            ETH: {
+              symbol: 'ETH',
+              name: 'Ethereum',
+              price: data.ethereum.usd,
+              change24h: data.ethereum.usd_24h_change,
+              marketCap: data.ethereum.usd_market_cap,
+              volume24h: data.ethereum.usd_24h_vol,
+              priceHistory: ethHistory
+            }
+          });
+          setError(null);
+          setIsUsingMockData(false);
+          setLoading(false);
+        }
+      } catch (fetchErr) {
+        clearTimeout(timeoutId);
+        throw fetchErr;
       }
     } catch (err) {
       console.error('Crypto data fetch error:', err);
