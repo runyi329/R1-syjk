@@ -103,9 +103,7 @@ export default function FootballAnalysis() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <div className="w-8 h-8 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm">
-              <span className="italic tracking-tighter">R1</span>
-            </div>
+            <img src="/logo.png" alt="数金研投 Logo" className="w-8 h-8 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
             <h1 className="text-xl font-bold tracking-tight">足球博彩数据透视</h1>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
@@ -266,9 +264,7 @@ export default function FootballAnalysis() {
         </section>
 
         <footer className="border-t border-border pt-8 pb-12 text-center text-sm text-muted-foreground">
-          <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-4">
-            <span className="italic tracking-tighter">R1</span>
-          </div>
+          <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] mx-auto mb-4" />
           <p className="font-medium">© 2026 数金研投 | 专业足球博彩数据分析</p>
           <p className="mt-2 text-xs">赌博有风险，请理性娱乐。本站仅供数据分析参考。</p>
         </footer>

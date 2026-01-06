@@ -220,3 +220,16 @@
 - [x] 更新investment-portal-content.json数据文件中的公司名称
 - [x] 更新轮盘分析页面（RouletteAnalysis.tsx）底部公司名称
 - [x] 更新足球分析页面（FootballAnalysis.tsx）底部公司名称
+
+## Logo设计与替换
+- [x] 设计“数金研投”专业Logo（金色主题，融合金融投资元素）
+- [x] 生成Logo图片（logo.png, logo-icon.png, logo-256.png）
+- [x] 将Logo保存到client/public/目录
+- [x] 替换首页（Home.tsx）的R1占位符为Logo图片
+- [x] 替换百家乐分析页面的Logo
+- [x] 替换轮盘分析页面的Logo
+- [x] 替换足球分析页面的Logo
+- [x] 替换用户中心页面的Logo
+- [x] 替换兑换商城页面的Logo
+- [x] 替换管理员后台页面的Logo
+- [x] 测试所有页面Logo显示效果

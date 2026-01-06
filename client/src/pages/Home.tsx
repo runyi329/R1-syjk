@@ -21,9 +21,7 @@ export default function Home() {
       <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm">
-              <span className="italic tracking-tighter">R1</span>
-            </div>
+            <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
             <div className="flex flex-col">
               <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                 {language === 'en' ? 'Runyi Investment' : '数金研投'}
@@ -231,9 +229,7 @@ export default function Home() {
 
       <footer className="bg-card border-t border-border py-12 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-6">
-            <span className="italic tracking-tighter">R1</span>
-          </div>
+          <img src="/logo.png" alt="数金研投 Logo" className="w-12 h-12 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)] mx-auto mb-6" />
           <h3 className="font-bold text-lg mb-2">{content.name}</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto mb-8">
             {content.tagline}
