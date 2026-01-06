@@ -1,12 +1,13 @@
-import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import contentData from "../data/investment-portal-content.json";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MarketTicker } from "@/components/MarketTicker";
+import { LogOut } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
   const { data: authData } = trpc.auth.me.useQuery();
@@ -14,6 +15,19 @@ export default function Home() {
   const { language, setLanguage } = useLanguage();
   const content = contentData.company[language];
   const categories = contentData.categories;
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      // Clear local storage and session
+      localStorage.clear();
+      sessionStorage.clear();
+      // Reload page to reset state
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground flex flex-col">
@@ -55,11 +69,22 @@ export default function Home() {
               </Link>
             )}
             {authData ? (
-              <Link href="/user-center">
-                <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
-                  {language === 'en' ? 'User' : '个人'}
+              <div className="flex gap-2 items-center">
+                <Link href="/user-center">
+                  <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
+                    {language === 'en' ? 'User' : '个人'}
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-colors text-xs px-2 flex items-center gap-1"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-3 h-3" />
+                  {language === 'en' ? 'Logout' : '退出'}
                 </Button>
-              </Link>
+              </div>
             ) : (
               <div className="flex gap-2">
                 <Button 
