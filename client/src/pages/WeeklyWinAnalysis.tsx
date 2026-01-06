@@ -414,6 +414,26 @@ export default function WeeklyWinAnalysis() {
               <CardTitle>周周赢 收益计算機</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
+              {/* 计算结果 - 移到顶部 */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-6 bg-muted rounded-lg">
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground">客户账户资金</p>
+                  <p className="text-lg sm:text-xl font-bold text-green-500">${userFund}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
+                  <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>
+                  <p className="text-lg sm:text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">每月提取利润</p>
+                  <p className="text-lg sm:text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
+                </div>
+              </div>
+
               {/* 输入区域 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -461,26 +481,6 @@ export default function WeeklyWinAnalysis() {
                       100万
                     </button>
                   </div>
-                </div>
-              </div>
-
-              {/* 计算结果 */}
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-6 bg-muted rounded-lg">
-                <div className="space-y-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground">客户账户资金</p>
-                  <p className="text-lg sm:text-xl font-bold text-green-500">${userFund}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
-                  <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>
-                  <p className="text-lg sm:text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">每月提取利润</p>
-                  <p className="text-lg sm:text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
                 </div>
               </div>
             </CardContent>
