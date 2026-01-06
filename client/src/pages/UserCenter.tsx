@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
-import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff, ArrowLeft, Crown } from "lucide-react";
 import ScrollToTop from "@/components/ScrollToTop";
 
 export default function UserCenter() {
@@ -93,6 +93,20 @@ export default function UserCenter() {
     }
   };
 
+  // 计算VIP等级
+  const calculateVIPLevel = (balance: number): { level: number; label: string } => {
+    if (balance >= 5000000) return { level: 5, label: "VIP 5" }; // 50万USDT
+    if (balance >= 2000000) return { level: 4, label: "VIP 4" }; // 20万USDT
+    if (balance >= 1000000) return { level: 3, label: "VIP 3" }; // 10万USDT
+    if (balance >= 500000) return { level: 2, label: "VIP 2" };  // 5万USDT
+    if (balance >= 100000) return { level: 1, label: "VIP 1" };  // 1万USDT
+    return { level: 0, label: "普通用户" };
+  };
+
+  const vipInfo = calculateVIPLevel(parseFloat(userData.usdtBalance));
+
+
+
   return (
     <div className="min-h-screen pb-20 md:pb-0 bg-black text-white">
       {/* Header */}
@@ -118,8 +132,9 @@ export default function UserCenter() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
-        {/* Account Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8">
+        {/* Account Overview - Combined Card */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8">
+          {/* Total Assets and Actions */}
           <Card className="bg-gradient-to-br from-[#D4AF37]/20 to-black border-[#D4AF37]/30">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -166,45 +181,51 @@ export default function UserCenter() {
             </CardContent>
           </Card>
 
-          <Card className="bg-black/50 border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white">账户状态</CardTitle>
-              <CardDescription className="text-white/60">当前账户状态</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Badge
-                variant={userData.accountStatus === "active" ? "default" : "destructive"}
-                className={
-                  userData.accountStatus === "active"
-                    ? "bg-green-500/20 text-green-400 border-green-500/50"
-                    : "bg-red-500/20 text-red-400 border-red-500/50"
-                }
-              >
-                {userData.accountStatus === "active" ? "正常" : "已冻结"}
-              </Badge>
-            </CardContent>
-          </Card>
-
+          {/* Account Info - Combined Card */}
           <Card className="bg-black/50 border-white/10">
             <CardHeader>
               <CardTitle className="text-white">账户信息</CardTitle>
               <CardDescription className="text-white/60">基本信息</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 text-xs sm:text-sm">
-                <div className="flex justify-between">
+              <div className="space-y-3 text-xs sm:text-sm">
+                <div className="flex justify-between items-center">
                   <span className="text-white/60">用户名：</span>
-                  <span className="text-white">{userData.name || "未设置"}</span>
+                  <span className="text-white font-medium">{userData.name || "未设置"}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-white/60">角色：</span>
-                  <Badge variant="outline" className="text-[#D4AF37] border-[#D4AF37]/50 text-xs">
-                    {userData.role === "admin" ? "管理员" : "普通用户"}
-                  </Badge>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/60">VIP等级：</span>
+                  <div className="flex items-center gap-1">
+                    {vipInfo.level > 0 && <Crown className="h-4 w-4 text-[#D4AF37]" />}
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs font-semibold ${
+                        vipInfo.level > 0 
+                          ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50" 
+                          : "text-white/60 border-white/20"
+                      }`}
+                    >
+                      {vipInfo.label}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Account Status Badge */}
+        <div className="mb-4 sm:mb-8">
+          <Badge
+            variant={userData.accountStatus === "active" ? "default" : "destructive"}
+            className={`text-sm font-semibold ${
+              userData.accountStatus === "active"
+                ? "bg-green-500/20 text-green-400 border border-green-500/50"
+                : "bg-red-500/20 text-red-400 border border-red-500/50"
+            }`}
+          >
+            账户状态：{userData.accountStatus === "active" ? "正常" : "已冻结"}
+          </Badge>
         </div>
 
         {/* Tabs */}
@@ -519,4 +540,14 @@ export default function UserCenter() {
       <ScrollToTop />
     </div>
   );
+}
+
+// 导出VIP等级计算函数供其他组件使用
+export function getVIPLevel(balance: number): { level: number; label: string } {
+  if (balance >= 5000000) return { level: 5, label: "VIP 5" };
+  if (balance >= 2000000) return { level: 4, label: "VIP 4" };
+  if (balance >= 1000000) return { level: 3, label: "VIP 3" };
+  if (balance >= 500000) return { level: 2, label: "VIP 2" };
+  if (balance >= 100000) return { level: 1, label: "VIP 1" };
+  return { level: 0, label: "普通用户" };
 }
