@@ -238,7 +238,7 @@ export default function UserCenter() {
                           {getTransactionIcon(tx.type)}
                           <div className="flex-1">
                             <div className="text-white font-medium text-sm sm:text-base">{getTransactionLabel(tx.type)}</div>
-                            <div className="text-xs sm:text-sm text-white/60 line-clamp-1">{tx.notes || "无备注"}</div>
+                            {tx.notes && <div className="text-xs sm:text-sm text-white/60 line-clamp-1">{tx.notes}</div>}
                             <div className="text-xs text-white/40">
                               {new Date(tx.createdAt).toLocaleString("zh-CN")}
                             </div>
