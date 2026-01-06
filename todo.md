@@ -277,3 +277,9 @@
 - [x] 在deposits.ts中添加adminDeposit API，为管理员充值创建订单
 - [x] 修改AdminDashboard使用新的adminDeposit API
 - [ ] 测试新的充值功能是否正常工作
+
+## 修复充值历史显示问题
+- [x] 修改Deposit.tsx，认证备注只在有内容时显示（默认不显示）
+- [x] 创建数据迁移脚本，将pointTransactions中的充值记录转换为deposit订单
+- [x] 执行迁移脚本，将历史充值记录导入到deposits表
+- [x] 测试验证所有充值记录都显示在充值历史中

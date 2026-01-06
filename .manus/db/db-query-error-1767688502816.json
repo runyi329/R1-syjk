@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO deposits (userId, amount, network, depositAddress, txHash, status, adminNotes, createdAt, updatedAt)\nSELECT userId, amount, 'Migration' as network, 'migrated' as depositAddress, CONCAT('migration-', id) as txHash, 'confirmed' as status, notes as adminNotes, createdAt, updatedAt\nFROM pointTransactions \nWHERE type = 'credit' \nAND id NOT IN (SELECT CAST(SUBSTRING_INDEX(txHash, '-', -1) AS UNSIGNED) FROM deposits WHERE network = 'Migration');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute INSERT INTO deposits (userId, amount, network, depositAddress, txHash, status, adminNotes, createdAt, updatedAt)\nSELECT userId, amount, 'Migration' as network, 'migrated' as depositAddress, CONCAT('migration-', id) as txHash, 'confirmed' as status, notes as adminNotes, createdAt, updatedAt\nFROM pointTransactions \nWHERE type = 'credit' \nAND id NOT IN (SELECT CAST(SUBSTRING_INDEX(txHash, '-', -1) AS UNSIGNED) FROM deposits WHERE network = 'Migration');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'updatedat' in 'field list'"
+  ]
+}
