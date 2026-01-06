@@ -3,7 +3,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Info, AlertTriangle, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
-import { Bar, BarChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell, CartesianGrid, Legend } from "recharts";
+import { Bar, BarChart, Line, LineChart, Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell, CartesianGrid, Legend } from "recharts";
 import baccaratData from "../data/baccaratData.json";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
@@ -581,48 +581,41 @@ export default function BaccaratAnalysis() {
                   {/* 资金曲线图 */}
                   <div className="p-4 bg-muted/50 rounded-lg border border-border">
                     <h4 className="font-semibold text-card-foreground mb-4">资金变化趋势</h4>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }))}>
-                        <defs>
-                          {simulationRounds.map((round, idx) => {
-                            const colors = ['#f97316', '#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444'];
-                            const color = colors[idx % colors.length];
-                            return (
-                              <linearGradient key={`gradient-${idx}`} id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={color} stopOpacity={0.3} />
-                                <stop offset="100%" stopColor={color} stopOpacity={0} />
-                              </linearGradient>
-                            );
-                          })}
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#444444" />
-                        <XAxis 
-                          dataKey="round" 
-                          stroke="#94a3b8" 
-                          tick={{ fill: '#94a3b8' }}
-                          label={{ value: '局数', position: 'insideBottom', offset: -5, fill: '#94a3b8' }}
-                        />
-                        <YAxis 
-                          stroke="#94a3b8" 
-                          tick={{ fill: '#94a3b8' }}
-                          label={{ value: '余额（元）', angle: -90, position: 'insideLeft', fill: '#94a3b8' }}
-                        />
-                        <RechartsTooltip 
-                          contentStyle={{ backgroundColor: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
-                          labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
-                          itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="balance" 
-                          stroke="#f97316" 
-                          strokeWidth={3} 
-                          dot={false}
-                          fill="url(#gradient-0)"
-                          fillOpacity={1}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    <div className="h-[300px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }))}>
+                          <defs>
+                            <linearGradient id="gradient-balance" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                          <XAxis 
+                            dataKey="round" 
+                            stroke="var(--muted-foreground)" 
+                            tick={{ fill: 'var(--muted-foreground)' }}
+                          />
+                          <YAxis 
+                            stroke="var(--muted-foreground)" 
+                            tick={{ fill: 'var(--muted-foreground)' }}
+                          />
+                          <RechartsTooltip 
+                            contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                            labelStyle={{ color: 'var(--foreground)' }}
+                            itemStyle={{ color: 'var(--foreground)' }}
+                            formatter={(value: any) => `¥${value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}`}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="balance" 
+                            stroke="var(--primary)" 
+                            strokeWidth={2}
+                            fill="url(#gradient-balance)"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
 
                   {/* 投注历史 */}
