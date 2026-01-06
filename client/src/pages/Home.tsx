@@ -268,16 +268,6 @@ export default function Home() {
                     )}
                   </DialogContent>
                 </Dialog>
-
-                {/* OAuth登录按钮 */}
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-primary/80 hover:bg-primary text-primary-foreground transition-colors text-xs px-2"
-                  onClick={() => window.location.href = '/api/oauth/login'}
-                >
-                  {language === 'en' ? 'OAuth' : 'OAuth登录'}
-                </Button>
               </div>
             )}
           </div>
