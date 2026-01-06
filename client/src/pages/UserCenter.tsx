@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
@@ -106,7 +107,7 @@ export default function UserCenter() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl sm:text-4xl font-bold text-[#D4AF37]">
+              <div className="text-3xl sm:text-4xl font-bold text-[#D4AF37] mb-4">
                 {isBalanceVisible ? (
                   <>
                     {parseFloat(userData.usdtBalance).toFixed(2)}{" "}
@@ -118,6 +119,23 @@ export default function UserCenter() {
                     <span className="text-xs sm:text-sm text-white/60">USDT</span>
                   </>
                 )}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  onClick={() => setLocation("/deposit")}
+                  className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-black font-semibold"
+                  size="sm"
+                >
+                  充值
+                </Button>
+                <Button
+                  onClick={() => setLocation("/withdraw")}
+                  variant="outline"
+                  className="border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                  size="sm"
+                >
+                  提现
+                </Button>
               </div>
             </CardContent>
           </Card>
