@@ -6,6 +6,7 @@ import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart,
 import { Link } from "wouter";
 import { useState } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
+import AssetAllocationSection from "@/components/AssetAllocationSection";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function WeeklyWinAnalysis() {
@@ -401,6 +402,9 @@ export default function WeeklyWinAnalysis() {
             </CardContent>
           </Card>
         </section>
+
+        {/* 资产配置比例 */}
+        <AssetAllocationSection />
 
         {/* 收益计算器 */}
         <section id="calculator" className="space-y-6">
