@@ -415,7 +415,7 @@ export default function WeeklyWinAnalysis() {
             </CardHeader>
             <CardContent className="space-y-8">
               {/* 计算结果 - 移到顶部 */}
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-6 bg-muted rounded-lg">
+              <div className="flex justify-between gap-3 sm:gap-4 p-4 sm:p-6 bg-muted rounded-lg">
                 <div className="space-y-1">
                   <p className="text-xs sm:text-sm text-muted-foreground">客户账户资金</p>
                   <p className="text-lg sm:text-xl font-bold text-green-500">${userFund}</p>
@@ -424,11 +424,11 @@ export default function WeeklyWinAnalysis() {
                   <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
                   <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
                 </div>
-                <div>
+                <div className="space-y-1">
                   <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>
                   <p className="text-lg sm:text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
                 </div>
-                <div>
+                <div className="space-y-1">
                   <p className="text-xs sm:text-sm text-muted-foreground">每月提取利润</p>
                   <p className="text-lg sm:text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
                 </div>
@@ -437,7 +437,7 @@ export default function WeeklyWinAnalysis() {
               {/* 输入区域 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
+                  <label className="text-sm font-semibold mb-3 block text-left">投资金额 (USDT)</label>
                   <div className="flex flex-col items-center">
                     <div className="mb-3 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                     <input
