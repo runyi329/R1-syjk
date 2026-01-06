@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
-import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import ScrollToTop from "@/components/ScrollToTop";
 
 export default function UserCenter() {
@@ -105,6 +105,15 @@ export default function UserCenter() {
               <div className="text-xs text-white/60">SHUJIN RESEARCH</div>
             </div>
           </button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2 text-white/60 hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">返回首页</span>
+          </Button>
         </div>
       </header>
 
