@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Badge } from "@/components/ui/badge";
 import { Info, AlertTriangle, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell } from "recharts";
@@ -269,6 +270,7 @@ export default function FootballAnalysis() {
           <p className="mt-2 text-xs">赌博有风险，请理性娱乐。本站仅供数据分析参考。</p>
         </footer>
       </main>
+      <ScrollToTop />
     </div>
   );
 }

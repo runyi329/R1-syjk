@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { Loader2, ShoppingCart, Coins } from "lucide-react";
 import { toast } from "sonner";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Shop() {
   const [, setLocation] = useLocation();
@@ -167,6 +168,7 @@ export default function Shop() {
           </div>
         )}
       </div>
+      <ScrollToTop />
     </div>
   );
 }

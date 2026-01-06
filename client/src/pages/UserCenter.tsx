@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { Loader2, TrendingUp, TrendingDown, Snowflake, Unlock, Eye, EyeOff } from "lucide-react";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function UserCenter() {
   const [, setLocation] = useLocation();
@@ -506,6 +507,7 @@ export default function UserCenter() {
           </TabsContent>
         </Tabs>
       </div>
+      <ScrollToTop />
     </div>
   );
 }

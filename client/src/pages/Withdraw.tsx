@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Withdraw() {
   const [, setLocation] = useLocation();
@@ -452,6 +453,7 @@ export default function Withdraw() {
           </TabsContent>
         </Tabs>
       </div>
+      <ScrollToTop />
     </div>
   );
 }

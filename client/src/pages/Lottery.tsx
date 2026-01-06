@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Calculator, TrendingUp, BarChart3, History } from "lucide-react";
 import { Link } from "wouter";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // 彩票类型定义
 const lotteryTypes = [
@@ -498,6 +499,7 @@ export default function Lottery() {
           </TabsContent>
         </Tabs>
       </div>
+      <ScrollToTop />
     </div>
   );
 }

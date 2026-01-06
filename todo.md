@@ -344,3 +344,19 @@
 - [x] 移除WalletAddresses.tsx中的sticky定位
 - [x] 验证TypeScript编译通过（0 errors）
 - [x] 所有页面header现在随页面滚动而上下移动
+
+
+## 添加返回顶部悬浮按钮
+- [x] 创建ScrollToTop组件
+- [x] 在Home页面添加组件
+- [x] 在BaccaratAnalysis页面添加组件
+- [x] 在RouletteAnalysis页面添加组件
+- [x] 在FootballAnalysis页面添加组件
+- [x] 在PokerAnalysis页面添加组件
+- [x] 在UserCenter页面添加组件
+- [x] 在Shop页面添加组件
+- [x] 在Lottery页面添加组件
+- [x] 在Deposit页面添加组件
+- [x] 在Withdraw页面添加组件
+- [x] 在WalletAddresses页面添加组件
+- [x] 验证所有页面的悬浮按钮正常工作

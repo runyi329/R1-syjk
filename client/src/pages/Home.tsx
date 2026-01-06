@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MarketTicker } from "@/components/MarketTicker";
 import { LogOut } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Home() {
   const { data: authData } = trpc.auth.me.useQuery();
@@ -267,6 +268,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <ScrollToTop />
     </div>
   );
 }

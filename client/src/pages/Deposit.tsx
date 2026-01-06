@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Deposit() {
   const [, setLocation] = useLocation();
@@ -330,6 +331,7 @@ export default function Deposit() {
           </TabsContent>
         </Tabs>
       </div>
+      <ScrollToTop />
     </div>
   );
 }

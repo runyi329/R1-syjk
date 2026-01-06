@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Badge } from "@/components/ui/badge";
 import { Info, AlertTriangle, CheckCircle, XCircle, ArrowLeft, ShieldAlert } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, Cell, LineChart, Line } from "recharts";
@@ -260,6 +261,7 @@ export default function PokerAnalysis() {
           <p>数据基于标准52张扑克牌计算 • 仅供策略研究参考</p>
         </div>
       </main>
+      <ScrollToTop />
     </div>
   );
 }

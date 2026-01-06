@@ -13,6 +13,7 @@ import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock } from "
 import { toast } from "sonner";
 import DepositsManagement from "@/components/admin/DepositsManagement";
 import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
+import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 
 export default function AdminDashboard() {
@@ -727,6 +728,7 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+      <ScrollToTop />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Trash2, CheckCircle, Clock, XCircle } from "lucide-rea
 import { useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import ScrollToTop from "@/components/ScrollToTop";
 import {
   Dialog,
   DialogContent,
@@ -242,6 +243,7 @@ export default function WalletAddresses() {
           )}
         </div>
       </div>
+      <ScrollToTop />
     </div>
   );
 }
