@@ -565,6 +565,20 @@ export default function BaccaratAnalysis() {
                     </div>
                   </div>
 
+                  {/* 玩家连赢连输统计 */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">玩家最长连赢</div>
+                      <div className="text-xl font-bold text-red-500">{simulationResult.betMaxWinStreak}局</div>
+                      <div className="text-xs text-muted-foreground mt-1">（庄闲都算赢，和局不算断）</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">玩家最长连输</div>
+                      <div className="text-xl font-bold text-green-500">{simulationResult.betMaxLoseStreak}局</div>
+                      <div className="text-xs text-muted-foreground mt-1">（和局不算断）</div>
+                    </div>
+                  </div>
+
                   {/* 资金曲线图 */}
                   <div className="p-4 bg-muted/50 rounded-lg border border-border">
                     <h4 className="font-semibold text-card-foreground mb-4">资金变化趋势</h4>

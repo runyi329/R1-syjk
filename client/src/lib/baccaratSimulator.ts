@@ -41,7 +41,9 @@ export interface SimulationStats {
   bankerMaxLoseStreak: number; // 庄最长连输
   playerMaxWinStreak: number; // 闲最长连赢
   playerMaxLoseStreak: number; // 闲最长连输
-  history: RoundResult[]; // 投注历史（前100局）
+  betMaxWinStreak: number; // 玩家最长连赢局数（庄闲都算赢，和局不算断）
+  betMaxLoseStreak: number; // 玩家最长连输局数（和局不算断）
+  history: RoundResult[]; // 投注历史
   balanceHistory: number[]; // 资金曲线
 }
 
@@ -87,6 +89,8 @@ function calculateStreaks(history: RoundResult[]): {
   bankerMaxLoseStreak: number;
   playerMaxWinStreak: number;
   playerMaxLoseStreak: number;
+  betMaxWinStreak: number;
+  betMaxLoseStreak: number;
 } {
   let bankerWinStreak = 0;
   let bankerLoseStreak = 0;
@@ -97,6 +101,11 @@ function calculateStreaks(history: RoundResult[]): {
   let bankerMaxLoseStreak = 0;
   let playerMaxWinStreak = 0;
   let playerMaxLoseStreak = 0;
+
+  let betWinStreak = 0;
+  let betLoseStreak = 0;
+  let betMaxWinStreak = 0;
+  let betMaxLoseStreak = 0;
 
   for (const round of history) {
     if (round.outcome === 'tie') {
@@ -123,6 +132,18 @@ function calculateStreaks(history: RoundResult[]): {
       bankerMaxLoseStreak = Math.max(bankerMaxLoseStreak, bankerLoseStreak);
       bankerWinStreak = 0;
     }
+
+    // 计算玩家连赢连输（基于投注结果）
+    const isWin = round.betOn === round.outcome;
+    if (isWin) {
+      betWinStreak++;
+      betMaxWinStreak = Math.max(betMaxWinStreak, betWinStreak);
+      betLoseStreak = 0;
+    } else {
+      betLoseStreak++;
+      betMaxLoseStreak = Math.max(betMaxLoseStreak, betLoseStreak);
+      betWinStreak = 0;
+    }
   }
 
   return {
@@ -130,6 +151,8 @@ function calculateStreaks(history: RoundResult[]): {
     bankerMaxLoseStreak,
     playerMaxWinStreak,
     playerMaxLoseStreak,
+    betMaxWinStreak,
+    betMaxLoseStreak,
   };
 }
 
