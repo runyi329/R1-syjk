@@ -30,7 +30,7 @@ export const pointsRouter = router({
         amount: input.amount,
         balanceAfter: newBalance,
         operatorId: ctx.user.id,
-        notes: input.notes || `管理员充值 ${input.amount} USDT`,
+        notes: input.notes || `充值 ${input.amount} USDT`,
       });
 
       return { success: true, newBalance };
@@ -67,7 +67,7 @@ export const pointsRouter = router({
         amount: `-${input.amount}`,
         balanceAfter: newBalance,
         operatorId: ctx.user.id,
-        notes: input.notes || `管理员扣除 ${input.amount} USDT`,
+        notes: input.notes || `提现 ${input.amount} USDT`,
       });
 
       return { success: true, newBalance };
