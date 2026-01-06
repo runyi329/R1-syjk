@@ -281,7 +281,7 @@ export default function Deposit() {
                 </CardContent>
               </Card>
             ) : (
-              filteredDeposits.map((deposit) => () => (
+              filteredDeposits.map((deposit) => (
                 <Card key={deposit.id} className="bg-black/50 border-white/10">
                   <CardHeader>
                     <div className="flex items-start justify-between">

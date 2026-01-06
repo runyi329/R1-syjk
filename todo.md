@@ -309,3 +309,9 @@
 - [x] 清空deposits表中network字段中的"Admin 岗位"和"Migration 岗位"
 - [x] 将这些记录的network字段设置为"Sui"
 - [x] 验证修改成功
+
+## 修复Deposit.tsx中的map函数bug
+- [x] 修复第284行的双箭头函数问题
+- [x] 将`(deposit) => () => (`改为`(deposit) => (`
+- [x] 验证TypeScript编译通过（0 errors）
+- [x] 优化充值历史的渲染性能
