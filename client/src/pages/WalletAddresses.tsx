@@ -47,7 +47,7 @@ export default function WalletAddresses() {
         network: newNetwork,
         label: newLabel || undefined,
       });
-      toast.success("钱包地址已提交，等待管理员审核");
+      toast.success("钱包地址已提交，等待审核");
       setIsDialogOpen(false);
       setNewAddress("");
       setNewLabel("");
@@ -135,7 +135,7 @@ export default function WalletAddresses() {
               <DialogHeader>
                 <DialogTitle>添加钱包地址</DialogTitle>
                 <DialogDescription className="text-white/60">
-                  添加后需要管理员审核才能用于提现
+                  添加后需要审核才能用于提现
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-4">
@@ -229,7 +229,7 @@ export default function WalletAddresses() {
                   </div>
                   {wallet.adminNotes && (
                     <div className="mt-3 text-xs text-white/60">
-                      <p className="font-semibold mb-1">管理员备注：</p>
+                        <p className="font-semibold mb-1">备注：</p>
                       <p>{wallet.adminNotes}</p>
                     </div>
                   )}

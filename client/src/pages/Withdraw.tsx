@@ -391,7 +391,7 @@ export default function Withdraw() {
                     )}
                     {withdrawal.adminNotes && (
                       <div className="mt-2 p-2 bg-gray-900/50 rounded text-xs">
-                        <p className="text-white/60 mb-1">管理员备注：</p>
+                        <p className="text-white/60 mb-1">备注：</p>
                         <p className="text-white/80">{withdrawal.adminNotes}</p>
                       </div>
                     )}

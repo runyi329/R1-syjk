@@ -41,7 +41,7 @@ export default function Deposit() {
         network: selectedNetwork,
         depositAddress: depositAddress,
       });
-      toast.success("充值申请已提交，请等待管理员确认");
+      toast.success("充值申请已提交，请等待确认");
       refetch();
     } catch (error: any) {
       toast.error(error.message || "提交失败");
@@ -268,7 +268,7 @@ export default function Deposit() {
                     )}
                     {deposit.adminNotes && (
                       <div className="mt-2 p-2 bg-gray-900/50 rounded text-xs">
-                        <p className="text-white/60 mb-1">管理员备注：</p>
+                        <p className="text-white/60 mb-1">备注：</p>
                         <p className="text-white/80">{deposit.adminNotes}</p>
                       </div>
                     )}
