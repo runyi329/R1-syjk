@@ -374,3 +374,15 @@
 - [x] 检查MobileBottomNav中的登出逻辑
 - [x] 修复登出后的缓存清理
 - [x] 验证useAuth hook的登出实现已正确
+
+
+## 实现用户名+密码注册功能
+- [x] 实现后端注册API（users.register）
+- [x] 实现后端登录API（users.loginWithPassword）
+- [x] 修改数据库schema，添加username、passwordHash、registerMethod字段
+- [x] 创建注册页面组件（Register.tsx）
+- [x] 修复首页个人中心按钮标签
+- [x] 优化首页导航栏（未登录显示注册/登录，登录后显示个人中心/登出）
+- [x] 添加用户名+密码登录对话框
+- [x] 编写vitest测试（11个测试全部通过）
+- [x] 测试注册和登出流程

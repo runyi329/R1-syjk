@@ -1,128 +1,181 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
-import { useState, useEffect } from "react";
-import { Loader2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function Register() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [username, setUsername] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: authData, isLoading: authLoading } = trpc.auth.me.useQuery();
-  const { data: userData } = trpc.users.getMe.useQuery(undefined, {
-    enabled: !!authData,
-  });
-
-  const utils = trpc.useUtils();
-
-  useEffect(() => {
-    // 如果未登录，跳转到首页
-    if (!authLoading && !authData) {
-      setLocation("/");
-    }
-    // 如果已经设置了用户名，跳转到用户中心
-    if (userData && userData.name) {
-      setLocation("/user-center");
-    }
-  }, [authData, authLoading, userData, setLocation]);
-
-  const updateNameMutation = trpc.users.updateMyName.useMutation({
+  const registerMutation = trpc.users.register.useMutation({
     onSuccess: () => {
-      toast.success("注册成功！欢迎使用");
-      utils.users.getMe.invalidate();
-      setLocation("/user-center");
+      toast.success("注册成功！请登录");
+      setLocation("/");
     },
-    onError: (error: any) => {
-      toast.error(`注册失败：${error.message}`);
-      setIsSubmitting(false);
+    onError: (error) => {
+      toast.error(error.message || "注册失败");
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username.trim()) {
-      toast.error("请输入用户名");
+    if (!username || !password || !name) {
+      toast.error("请填写所有字段");
       return;
     }
 
-    if (username.trim().length < 2) {
-      toast.error("用户名至少需要2个字符");
+    if (password.length < 6) {
+      toast.error("密码至少6个字符");
       return;
     }
 
-    if (username.trim().length > 20) {
-      toast.error("用户名不能超过20个字符");
-      return;
+    setIsLoading(true);
+    try {
+      await registerMutation.mutateAsync({
+        username,
+        password,
+        name,
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsSubmitting(true);
-    updateNameMutation.mutate({ name: username.trim() });
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen pb-20 md:pb-0 bg-black text-white flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#D4AF37]" />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-black/50 border-white/10">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-[#D4AF37] rounded-full flex items-center justify-center mb-4">
-            <UserPlus className="h-8 w-8 text-black" />
-          </div>
-          <CardTitle className="text-2xl text-white">欢迎注册</CardTitle>
-          <CardDescription className="text-white/60">
-            请设置您的用户名以完成注册
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-white">
-                用户名
-              </Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="请输入用户名（2-20个字符）"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={isSubmitting}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                maxLength={20}
-              />
-              <p className="text-xs text-white/40">
-                用户名将用于显示您的身份，设置后可以在个人中心修改
-              </p>
+    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground flex flex-col">
+      {/* 头部 */}
+      <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
+        <div className="container mx-auto py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
+            <div className="flex flex-col">
+              <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
+                数金研投
+              </h1>
+              <span className="text-[10px] text-muted-foreground tracking-wider uppercase mt-1">Runyi Investment</span>
             </div>
+          </div>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">返回</span>
+          </Button>
+        </div>
+      </header>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting || !username.trim()}
-              className="w-full bg-[#D4AF37] text-black hover:bg-[#B8941F]"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  注册中...
-                </>
-              ) : (
-                "完成注册"
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      <main className="flex-1 flex items-center justify-center py-8 px-4">
+        <Card className="w-full max-w-md border-primary/20">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">创建账户</CardTitle>
+            <CardDescription>使用用户名和密码注册新账户</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleRegister} className="space-y-4">
+              {/* 用户名 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  用户名
+                </label>
+                <Input
+                  type="text"
+                  placeholder="2-20个字符"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={isLoading}
+                  className="border-primary/20 focus:border-primary"
+                />
+                <p className="text-xs text-muted-foreground">
+                  用户名长度2-20个字符
+                </p>
+              </div>
+
+              {/* 昵称 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  昵称
+                </label>
+                <Input
+                  type="text"
+                  placeholder="2-20个字符"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={isLoading}
+                  className="border-primary/20 focus:border-primary"
+                />
+                <p className="text-xs text-muted-foreground">
+                  昵称长度2-20个字符
+                </p>
+              </div>
+
+              {/* 密码 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  密码
+                </label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="至少6个字符"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    className="border-primary/20 focus:border-primary pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  密码长度至少6个字符
+                </p>
+              </div>
+
+              {/* 注册按钮 */}
+              <Button
+                type="submit"
+                disabled={isLoading || !username || !password || !name}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                {isLoading ? "注册中..." : "注册"}
+              </Button>
+
+              {/* 登录链接 */}
+              <div className="text-center text-sm text-muted-foreground">
+                已有账户？{" "}
+                <button
+                  type="button"
+                  onClick={() => setLocation("/")}
+                  className="text-primary hover:underline font-medium"
+                >
+                  返回登录
+                </button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }

@@ -16,7 +16,13 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
+  /** 用户名 - 用于用户名+密码注册登录 */
+  username: varchar("username", { length: 64 }).unique(),
+  /** 密码哈希 - 用于用户名+密码注册登录 */
+  passwordHash: text("passwordHash"),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  /** 注册方式：oauth-OAuth登录，password-用户名密码注册 */
+  registerMethod: mysqlEnum("registerMethod", ["oauth", "password"]).default("oauth").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

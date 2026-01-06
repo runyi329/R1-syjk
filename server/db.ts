@@ -1,6 +1,16 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, products, orders, pointTransactions, InsertProduct, InsertOrder, InsertPointTransaction } from "../drizzle/schema";
+import * as crypto from 'crypto';
+
+// 密码哈希和验证函数
+export function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+export function verifyPassword(password: string, hash: string): boolean {
+  return hashPassword(password) === hash;
+}
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -120,6 +130,35 @@ export async function updateUserName(userId: number, name: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ name }).where(eq(users.id, userId));
+}
+
+// ========== 用户名+密码注册 ==========
+
+export async function getUserByUsername(username: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function registerUserWithPassword(username: string, passwordHash: string, name: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 生成一个唯一的openId用于内部系统
+  const openId = `password_${username}_${Date.now()}`;
+  
+  await db.insert(users).values({
+    openId,
+    username,
+    passwordHash,
+    name,
+    registerMethod: 'password',
+    role: 'user',
+  });
+  
+  // 返回新创建的用户
+  return await getUserByUsername(username);
 }
 
 // ========== 积分流水 ==========

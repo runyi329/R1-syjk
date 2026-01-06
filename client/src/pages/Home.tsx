@@ -1,29 +1,65 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices } from "lucide-react";
+import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Gem, Layers, PieChart, Dices, LogOut, LogIn } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import contentData from "../data/investment-portal-content.json";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MarketTicker } from "@/components/MarketTicker";
-import { LogOut } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function Home() {
   const { data: authData } = trpc.auth.me.useQuery();
+  const [location, setLocation] = useLocation();
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const { language, setLanguage } = useLanguage();
   const content = contentData.company[language];
   const categories = contentData.categories;
 
+  const loginMutation = trpc.users.loginWithPassword.useMutation({
+    onSuccess: () => {
+      toast.success("登录成功！");
+      setIsLoginDialogOpen(false);
+      setLoginUsername("");
+      setLoginPassword("");
+      window.location.href = "/";
+    },
+    onError: (error) => {
+      toast.error(error.message || "登录失败");
+    },
+  });
+
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loginUsername || !loginPassword) {
+      toast.error("请输入用户名和密码");
+      return;
+    }
+    setIsLoggingIn(true);
+    try {
+      await loginMutation.mutateAsync({
+        username: loginUsername,
+        password: loginPassword,
+      });
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      // Clear local storage and session
       localStorage.clear();
       sessionStorage.clear();
-      // Reload page to reset state
       window.location.href = '/';
     } catch (error) {
       console.error('Logout failed:', error);
@@ -33,7 +69,7 @@ export default function Home() {
   return (
     <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground flex flex-col">
       {/* 头部导航 */}
-      <header className="border-b border-border bg-card/80 backdrop-blur-md  z-50">
+      <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
         <div className="container mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
@@ -73,7 +109,7 @@ export default function Home() {
               <div className="flex gap-2 items-center">
                 <Link href="/user-center">
                   <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
-                    {language === 'en' ? 'User' : '个人'}
+                    {language === 'en' ? 'User Center' : '个人中心'}
                   </Button>
                 </Link>
                 <Button 
@@ -83,26 +119,86 @@ export default function Home() {
                   onClick={handleLogout}
                 >
                   <LogOut className="w-3 h-3" />
-                  {language === 'en' ? 'Logout' : '退出'}
+                  {language === 'en' ? 'Logout' : '登出'}
                 </Button>
               </div>
             ) : (
               <div className="flex gap-2">
+                {/* 注册按钮 */}
                 <Button 
                   variant="outline" 
                   size="sm" 
                   className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2"
-                  onClick={() => window.location.href = '/api/oauth/login'}
+                  onClick={() => setLocation('/register')}
                 >
-                  {language === 'en' ? 'Login' : '登录'}
+                  {language === 'en' ? 'Register' : '注册'}
                 </Button>
+
+                {/* 用户名+密码登录对话框 */}
+                <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2 flex items-center gap-1"
+                    >
+                      <LogIn className="w-3 h-3" />
+                      <span className="hidden sm:inline">{language === 'en' ? 'Login' : '登录'}</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>{language === 'en' ? 'Login' : '登录'}</DialogTitle>
+                      <DialogDescription>
+                        {language === 'en' ? 'Enter your username and password' : '输入用户名和密码登录'}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handlePasswordLogin} className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          {language === 'en' ? 'Username' : '用户名'}
+                        </label>
+                        <Input
+                          type="text"
+                          placeholder={language === 'en' ? 'Enter username' : '输入用户名'}
+                          value={loginUsername}
+                          onChange={(e) => setLoginUsername(e.target.value)}
+                          disabled={isLoggingIn}
+                          className="border-primary/20 focus:border-primary"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          {language === 'en' ? 'Password' : '密码'}
+                        </label>
+                        <Input
+                          type="password"
+                          placeholder={language === 'en' ? 'Enter password' : '输入密码'}
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          disabled={isLoggingIn}
+                          className="border-primary/20 focus:border-primary"
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={isLoggingIn || !loginUsername || !loginPassword}
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                      >
+                        {isLoggingIn ? (language === 'en' ? 'Logging in...' : '登录中...') : (language === 'en' ? 'Login' : '登录')}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+
+                {/* OAuth登录按钮 */}
                 <Button 
                   variant="default" 
                   size="sm" 
                   className="bg-primary/80 hover:bg-primary text-primary-foreground transition-colors text-xs px-2"
-                  onClick={() => window.location.href = '/api/test-login'}
+                  onClick={() => window.location.href = '/api/oauth/login'}
                 >
-                  {language === 'en' ? 'Test Login' : '测试登录'}
+                  {language === 'en' ? 'OAuth' : 'OAuth登录'}
                 </Button>
               </div>
             )}
@@ -118,12 +214,12 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6">
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-yellow-200 to-primary whitespace-nowrap">
-                {language === 'en' ? 'Strategic Research for Personal Investment' : '個人投資的戰略研究'}
+                {language === 'en' ? 'Strategic Research for Personal Investment' : '个人投资的战略研究'}
               </h2>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
                 {language === 'en' 
                   ? 'Macau Runyi Investment Co., Ltd. covers the Asia-Pacific region, specializing in providing commercial big data analysis and investment risk management services for individual investors.'
-                  : '数金研投業務覆蓋亞太地區，專為個人投資者提供商業大數據分析與投資風險管理服務。'}
+                  : '澳門潤儀投資有限公司業務覆蓋亞太地區，專為個人投資者提供商業大數據分析與投資風險管理服務。'}
               </p>
 
             </div>
@@ -194,7 +290,6 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((category, index) => {
               const catData = category[language as keyof typeof category] as any;
-              // 动态分配图标
               const icons = [BarChart3, Coins, Gem, Layers, PieChart, Dices];
               const IconComponent = icons[index % icons.length];
               
@@ -237,16 +332,15 @@ export default function Home() {
             })}
           </div>
         </section>
+
       </main>
 
       {/* 底部行动召唤 */}
       <section className="py-12 container mx-auto px-4 text-center">
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/shop">
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 shadow-[0_0_20px_rgba(var(--primary),0.3)] border border-primary/50 w-full sm:w-auto">
-              {language === 'en' ? 'Redeem Products' : '兑换商城'}
-            </Button>
-          </Link>
+          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 shadow-[0_0_20px_rgba(var(--primary),0.3)] border border-primary/50 w-full sm:w-auto">
+            {language === 'en' ? 'Start Investing' : '開始投資'}
+          </Button>
           <Button size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 text-lg px-8 w-full sm:w-auto">
             {language === 'en' ? 'Contact Us' : '聯繫我們'}
           </Button>
@@ -255,7 +349,9 @@ export default function Home() {
 
       <footer className="bg-card border-t border-border py-12 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <img src="/logo.png" alt="数金研投 Logo" className="w-12 h-12 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)] mx-auto mb-6" />
+          <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-6">
+            <img src="/logo.png" alt="Logo" className="w-full h-full rounded-md" />
+          </div>
           <h3 className="font-bold text-lg mb-2">{content.name}</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto mb-8">
             {content.tagline}
@@ -268,6 +364,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
       <ScrollToTop />
     </div>
   );
