@@ -317,8 +317,8 @@ export default function BaccaratAnalysis() {
             <div className="space-y-4">
               <div>
                 <Label className="text-card-foreground">选择模拟局数</Label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-2">
-                  {[100, 500, 1000, 5000, 10000, 1000000].map((rounds) => (
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
+                  {[100, 500, 1000, 5000, 10000].map((rounds) => (
                     <Button
                       key={rounds}
                       variant={selectedRounds === rounds ? "default" : "outline"}
