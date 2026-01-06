@@ -21,6 +21,7 @@ export default function CryptoAnalysis() {
   const [cryptoData, setCryptoData] = useState<{ [key: string]: CryptoData }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
 
   useEffect(() => {
     fetchCryptoData();
@@ -29,10 +30,51 @@ export default function CryptoAnalysis() {
     return () => clearInterval(interval);
   }, []);
 
+  // 生成模拟历史数据
+  const generateMockHistory = (basePrice: number, variance: number) => {
+    const history = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const randomChange = (Math.random() - 0.5) * variance;
+      history.push({
+        time: date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
+        price: Math.round(basePrice + randomChange)
+      });
+    }
+    return history;
+  };
+
+  // 获取模拟数据
+  const getMockData = (): { [key: string]: CryptoData } => {
+    return {
+      BTC: {
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        price: 93669,
+        change24h: -0.28,
+        marketCap: 1.87e12,
+        volume24h: 50.14e9,
+        priceHistory: generateMockHistory(93669, 5000)
+      },
+      ETH: {
+        symbol: 'ETH',
+        name: 'Ethereum',
+        price: 3274.98,
+        change24h: 2.56,
+        marketCap: 395.27e9,
+        volume24h: 27.37e9,
+        priceHistory: generateMockHistory(3274.98, 200)
+      }
+    };
+  };
+
   const fetchCryptoData = async () => {
     try {
       setLoading(true);
       setError(null);
+      setIsUsingMockData(false);
 
       // 使用 CoinGecko API（免费，无需认证）
       const response = await fetch(
@@ -93,8 +135,11 @@ export default function CryptoAnalysis() {
         }
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
       console.error('Crypto data fetch error:', err);
+      // 使用模拟数据作为备用
+      setCryptoData(getMockData());
+      setIsUsingMockData(true);
+      setError('无法连接到实时数据源，显示示例数据');
     } finally {
       setLoading(false);
     }
@@ -151,21 +196,23 @@ export default function CryptoAnalysis() {
           </div>
         )}
 
-        {/* 错误状态 */}
+        {/* 错误提示 */}
         {error && (
-          <Card className="border-l-4 border-l-red-500">
+          <Card className="border-l-4 border-l-yellow-500 bg-yellow-500/5">
             <CardHeader>
-              <CardTitle className="text-red-500">数据加载失败</CardTitle>
+              <CardTitle className="text-yellow-600">⚠️ 数据提示</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">{error}</p>
-              <Button onClick={fetchCryptoData} className="mt-4">重试</Button>
+              <Button onClick={fetchCryptoData} variant="outline" size="sm">
+                重新加载实时数据
+              </Button>
             </CardContent>
           </Card>
         )}
 
         {/* 总览区域 */}
-        {!loading && !error && (
+        {!loading && (
           <>
             <section id="overview" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
