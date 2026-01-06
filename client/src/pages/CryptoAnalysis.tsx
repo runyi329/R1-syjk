@@ -192,45 +192,151 @@ export default function CryptoAnalysis() {
               </div>
 
               <div className="grid grid-cols-1 gap-6">
-                {Object.entries(cryptoData).map(([key, crypto]) => (
-                  <Card key={`chart-${key}`} className="border-none shadow-md">
-                    <CardHeader>
-                      <CardTitle className="text-lg">{crypto.name} ({crypto.symbol})</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[300px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={crypto.priceHistory}>
-                            <defs>
-                              <linearGradient id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                            <XAxis dataKey="time" stroke="var(--muted-foreground)" />
-                            <YAxis stroke="var(--muted-foreground)" />
-                            <RechartsTooltip 
-                              contentStyle={{
-                                backgroundColor: 'var(--card)',
-                                border: '1px solid var(--border)',
-                                borderRadius: '8px'
-                              }}
-                              formatter={(value: any) => formatPrice(value)}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="price" 
-                              stroke="var(--primary)" 
-                              strokeWidth={2}
-                              fill={`url(#gradient-${key})`}
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                {Object.entries(cryptoData).map(([key, crypto]) => {
+                  // 计算价格统计
+                  const prices = crypto.priceHistory.map(h => h.price);
+                  const maxPrice = Math.max(...prices);
+                  const minPrice = Math.min(...prices);
+                  const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+                  const priceRange = maxPrice - minPrice;
+                  const priceRangePercent = ((priceRange / minPrice) * 100).toFixed(2);
+                  const sevenDayChangePercent = (((crypto.price - prices[0]) / prices[0]) * 100).toFixed(2);
+                  
+                  return (
+                    <Card key={`chart-${key}`} className="border-none shadow-md">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{crypto.name} ({crypto.symbol})</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        {/* 价格统计卡片 */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">最高价</p>
+                            <p className="text-lg font-bold text-green-500">{formatPrice(maxPrice)}</p>
+                          </div>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">最低价</p>
+                            <p className="text-lg font-bold text-red-500">{formatPrice(minPrice)}</p>
+                          </div>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">平均价</p>
+                            <p className="text-lg font-bold">{formatPrice(avgPrice)}</p>
+                          </div>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">价格波幅</p>
+                            <p className="text-lg font-bold text-primary">{priceRangePercent}%</p>
+                          </div>
+                        </div>
+
+                        {/* 7天变化分析 */}
+                        <div className="p-4 bg-secondary/30 rounded-lg border border-border">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-sm text-muted-foreground mb-1">7天价格变化</p>
+                              <p className="text-2xl font-bold">
+                                {sevenDayChangePercent}%
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-muted-foreground mb-1">开盘价</p>
+                              <p className="text-lg font-bold">{formatPrice(prices[0])}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 价格走势图 */}
+                        <div className="h-[300px] w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={crypto.priceHistory}>
+                              <defs>
+                                <linearGradient id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                                  <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                              <XAxis dataKey="time" stroke="var(--muted-foreground)" />
+                              <YAxis stroke="var(--muted-foreground)" />
+                              <RechartsTooltip 
+                                contentStyle={{
+                                  backgroundColor: 'var(--card)',
+                                  border: '1px solid var(--border)',
+                                  borderRadius: '8px'
+                                }}
+                                formatter={(value: any) => formatPrice(value)}
+                              />
+                              <Area 
+                                type="monotone" 
+                                dataKey="price" 
+                                stroke="var(--primary)" 
+                                strokeWidth={2}
+                                fill={`url(#gradient-${key})`}
+                              />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* 市场分析区域 */}
+            <section id="market-analysis" className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight mb-2">市场分析</h2>
+                <p className="text-muted-foreground mb-6">深入了解数字货币市场动态</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Object.entries(cryptoData).map(([key, crypto]) => {
+                  // 计算交易量相关指标
+                  const volumeToMarketCapRatioNum = (crypto.volume24h / crypto.marketCap) * 100;
+                  const volumeToMarketCapRatio = volumeToMarketCapRatioNum.toFixed(2);
+                  const marketHeat = volumeToMarketCapRatioNum > 5 ? '火热' : volumeToMarketCapRatioNum > 2 ? '温暖' : '低迷';
+                  const marketHeatColor = volumeToMarketCapRatioNum > 5 ? 'text-red-500' : volumeToMarketCapRatioNum > 2 ? 'text-yellow-500' : 'text-blue-500';
+                  
+                  return (
+                    <Card key={`analysis-${key}`} className="border-l-4 border-l-primary shadow-md">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{crypto.name} 市场分析</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">交易量</p>
+                            <p className="text-lg font-bold">{formatMarketCap(crypto.volume24h)}</p>
+                          </div>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">市值</p>
+                            <p className="text-lg font-bold">{formatMarketCap(crypto.marketCap)}</p>
+                          </div>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">成交量/市值</p>
+                            <p className="text-lg font-bold text-primary">{volumeToMarketCapRatio}%</p>
+                          </div>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">市场热度</p>
+                            <p className={`text-lg font-bold ${marketHeatColor}`}>{marketHeat}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="p-3 bg-secondary/30 rounded-lg border border-border">
+                          <p className="text-sm text-muted-foreground mb-2">市场评估</p>
+                          <p className="text-sm text-foreground">
+                            {volumeToMarketCapRatioNum > 5 
+                              ? `${crypto.symbol}市场热度高，交易活跃，投资者兴趣高涨。`
+                              : volumeToMarketCapRatioNum > 2
+                              ? `${crypto.symbol}市场较为活跃，交易量适中，投资機会不錄。`
+                              : `${crypto.symbol}市场交易量较低，投资者兴趣有限。`
+                            }
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </section>
 
