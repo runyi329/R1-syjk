@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `vipLevel` int DEFAULT 0 NOT NULL;

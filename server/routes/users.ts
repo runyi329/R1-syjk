@@ -332,4 +332,20 @@ export const usersRouter = router({
 
       return { success: true };
     }),
+
+  // 管理员：修改用户VIP等级
+  updateUserVipLevel: adminProcedure
+    .input(z.object({ userId: z.number(), vipLevel: z.number().min(0).max(5) }))
+    .mutation(async ({ input }) => {
+      await db.updateUserVipLevel(input.userId, input.vipLevel);
+      return { success: true };
+    }),
+
+  // 管理员：修改用户账户状态
+  updateUserStatus: adminProcedure
+    .input(z.object({ userId: z.number(), status: z.enum(['active', 'frozen']) }))
+    .mutation(async ({ input }) => {
+      await db.updateUserStatus(input.userId, input.status);
+      return { success: true };
+    }),
 });

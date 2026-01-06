@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
@@ -43,6 +44,13 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // User edit state
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [editingUserVipLevel, setEditingUserVipLevel] = useState("0");
+  const [editingUserStatus, setEditingUserStatus] = useState<"active" | "frozen">("active");
+  const [isEditingUser, setIsEditingUser] = useState(false);
 
   // Product management state
   const [productForm, setProductForm] = useState({
@@ -97,6 +105,26 @@ export default function AdminDashboard() {
     onSuccess: () => {
       toast.success("账户已解冻");
       refetchUsers();
+    },
+    onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
+  const updateUserVipLevelMutation = trpc.users.updateUserVipLevel.useMutation({
+    onSuccess: () => {
+      toast.success("VIP等级已更新");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setEditingUserId(null);
+    },
+    onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
+  const updateUserStatusMutation = trpc.users.updateUserStatus.useMutation({
+    onSuccess: () => {
+      toast.success("账户状态已更新");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setEditingUserId(null);
     },
     onError: (error: any) => toast.error(`操作失败：${error.message}`),
   });
@@ -316,6 +344,104 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="grid grid-cols-2 sm:flex gap-2">
+                          <Dialog open={isEditUserOpen && editingUserId === user.id} onOpenChange={(open) => {
+                            if (open) {
+                              setEditingUserId(user.id);
+                              setEditingUserVipLevel((user as any).vipLevel?.toString() || "0");
+                              setEditingUserStatus(user.accountStatus);
+                            } else {
+                              setIsEditUserOpen(false);
+                              setEditingUserId(null);
+                            }
+                            setIsEditUserOpen(open);
+                          }}>
+                            <DialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-blue-500/50 text-blue-400 text-xs"
+                              >
+                                <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                <span className="hidden sm:inline">编辑</span>
+                                <span className="sm:hidden">编</span>
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-black border-white/10">
+                              <DialogHeader>
+                                <DialogTitle className="text-white">编辑用户</DialogTitle>
+                                <DialogDescription className="text-white/60">
+                                  修改用户 {user.name || user.id} 的VIP等级和账户状态
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div>
+                                  <Label className="text-white">VIP等级</Label>
+                                  <Select value={editingUserVipLevel} onValueChange={setEditingUserVipLevel}>
+                                    <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-black border-white/10">
+                                      <SelectItem value="0">普通用户</SelectItem>
+                                      <SelectItem value="1">VIP 1</SelectItem>
+                                      <SelectItem value="2">VIP 2</SelectItem>
+                                      <SelectItem value="3">VIP 3</SelectItem>
+                                      <SelectItem value="4">VIP 4</SelectItem>
+                                      <SelectItem value="5">VIP 5</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-white">账户状态</Label>
+                                  <Select value={editingUserStatus} onValueChange={(value) => setEditingUserStatus(value as "active" | "frozen")}>
+                                    <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-black border-white/10">
+                                      <SelectItem value="active">正常</SelectItem>
+                                      <SelectItem value="frozen">冻结</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setIsEditUserOpen(false)}
+                                  className="border-white/20 text-white hover:bg-white/10"
+                                  disabled={isEditingUser}
+                                >
+                                  取消
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    setIsEditingUser(true);
+                                    Promise.all([
+                                      updateUserVipLevelMutation.mutateAsync({
+                                        userId: user.id,
+                                        vipLevel: parseInt(editingUserVipLevel),
+                                      }),
+                                      updateUserStatusMutation.mutateAsync({
+                                        userId: user.id,
+                                        status: editingUserStatus,
+                                      }),
+                                    ]).finally(() => setIsEditingUser(false));
+                                  }}
+                                  className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
+                                  disabled={isEditingUser}
+                                >
+                                  {isEditingUser ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                      保存中...
+                                    </>
+                                  ) : (
+                                    "确认保存"
+                                  )}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button

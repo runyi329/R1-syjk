@@ -30,6 +30,8 @@ export const users = mysqlTable("users", {
   usdtBalance: decimal("usdtBalance", { precision: 20, scale: 8 }).default("0.00000000").notNull(),
   /** 账户状态：active-正常，frozen-冻结 */
   accountStatus: mysqlEnum("accountStatus", ["active", "frozen"]).default("active").notNull(),
+  /** VIP等级：0-普通用户，1-VIP1，2-VIP2，3-VIP3，4-VIP4，5-VIP5 */
+  vipLevel: int("vipLevel").default(0).notNull(),
 });
 
 export type User = typeof users.$inferSelect;

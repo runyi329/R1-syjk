@@ -138,6 +138,12 @@ export async function updateUserPassword(userId: number, passwordHash: string) {
   await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
 }
 
+export async function updateUserVipLevel(userId: number, vipLevel: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ vipLevel }).where(eq(users.id, userId));
+}
+
 // ========== 用户名+密码注册 ==========
 
 export async function getUserByUsername(username: string) {
