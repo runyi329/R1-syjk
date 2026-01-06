@@ -456,7 +456,7 @@ export default function BaccaratAnalysis() {
                   </div>
 
                   {/* 投注金额统计 */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">最小投注</div>
                       <div className="text-lg font-bold text-card-foreground">¥{simulationResult.minBet.toLocaleString('zh-CN')}</div>
@@ -469,11 +469,21 @@ export default function BaccaratAnalysis() {
                       <div className="text-xs text-muted-foreground mb-1">平均投注</div>
                       <div className="text-lg font-bold text-card-foreground">¥{simulationResult.avgBet.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
                     </div>
+                  </div>
+
+                  {/* 总投注统计 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1">总投注金额</div>
+                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.totalBetAmount.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                      <div className="text-xs text-primary mt-1">流水倍数 {simulationResult.turnoverMultiple.toFixed(2)}x</div>
+                    </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">平均每局盈亏</div>
                       <div className={`text-lg font-bold ${simulationResult.avgProfitPerRound >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {simulationResult.avgProfitPerRound >= 0 ? '+' : ''}¥{simulationResult.avgProfitPerRound.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
                       </div>
+                      <div className="text-xs text-primary mt-1">期望亏损 ¥-1.17 (偏差 {(simulationResult.avgProfitPerRound + 1.17).toFixed(2)})</div>
                     </div>
                   </div>
 
@@ -486,6 +496,10 @@ export default function BaccaratAnalysis() {
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">资金最高值</div>
                       <div className="text-lg font-bold text-red-500">¥{simulationResult.maxBalance.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                      <div className="text-xs text-red-500 mt-1">
+                        盈利 +¥{(simulationResult.maxBalance - simulationResult.initialCapital).toLocaleString('zh-CN', { maximumFractionDigits: 2 })} 
+                        ({((simulationResult.maxBalance - simulationResult.initialCapital) / simulationResult.initialCapital * 100).toFixed(2)}%)
+                      </div>
                     </div>
                   </div>
 
@@ -515,19 +529,19 @@ export default function BaccaratAnalysis() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">庄最长连赢</div>
-                      <div className="text-xl font-bold text-green-500">{simulationResult.bankerMaxWinStreak}局</div>
+                      <div className="text-xl font-bold text-red-500">{simulationResult.bankerMaxWinStreak}局</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">庄最长连输</div>
-                      <div className="text-xl font-bold text-red-500">{simulationResult.bankerMaxLoseStreak}局</div>
+                      <div className="text-xl font-bold text-green-500">{simulationResult.bankerMaxLoseStreak}局</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">闲最长连赢</div>
-                      <div className="text-xl font-bold text-green-500">{simulationResult.playerMaxWinStreak}局</div>
+                      <div className="text-xl font-bold text-red-500">{simulationResult.playerMaxWinStreak}局</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">闲最长连输</div>
-                      <div className="text-xl font-bold text-red-500">{simulationResult.playerMaxLoseStreak}局</div>
+                      <div className="text-xl font-bold text-green-500">{simulationResult.playerMaxLoseStreak}局</div>
                     </div>
                   </div>
 

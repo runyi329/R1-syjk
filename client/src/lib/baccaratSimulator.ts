@@ -26,6 +26,8 @@ export interface SimulationStats {
   minBet: number; // 最小投注金额
   maxBetAmount: number; // 最大投注金额
   avgBet: number; // 平均投注金额
+  totalBetAmount: number; // 总投注金额
+  turnoverMultiple: number; // 流水倍数（总投注/本金）
   avgProfitPerRound: number; // 平均每局盈亏
   minBalance: number; // 资金最低值
   maxBalance: number; // 资金最高值
@@ -216,6 +218,7 @@ export function runSimulation(config: SimulationConfig): SimulationStats {
   const maxBetAmount = betAmounts.length > 0 ? Math.max(...betAmounts) : basebet;
   const totalBetAmount = betAmounts.reduce((sum, bet) => sum + bet, 0);
   const avgBet = betAmounts.length > 0 ? totalBetAmount / betAmounts.length : basebet;
+  const turnoverMultiple = initialCapital > 0 ? totalBetAmount / initialCapital : 0;
   const avgProfitPerRound = totalRounds > 0 ? profitLoss / totalRounds : 0;
 
   // 计算资金波动
@@ -232,6 +235,8 @@ export function runSimulation(config: SimulationConfig): SimulationStats {
     minBet,
     maxBetAmount,
     avgBet,
+    totalBetAmount,
+    turnoverMultiple,
     avgProfitPerRound,
     minBalance,
     maxBalance,
