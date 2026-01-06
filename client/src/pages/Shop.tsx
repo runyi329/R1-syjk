@@ -61,15 +61,15 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm md:sticky md:top-0 z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
           <button onClick={() => setLocation("/")} className="flex items-center gap-2">
             <div className="w-10 h-10 bg-[#D4AF37] rounded flex items-center justify-center font-bold text-black">
               R1
             </div>
             <div>
-              <div className="text-[#D4AF37] font-bold text-lg">澳门润仪投资</div>
-              <div className="text-xs text-white/60">RUNYI INVESTMENT</div>
+              <div className="text-[#D4AF37] font-bold text-lg">数金研投</div>
+              <div className="text-xs text-white/60">SHUJIN RESEARCH</div>
             </div>
           </button>
 
