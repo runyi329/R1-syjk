@@ -438,7 +438,7 @@ export default function WeeklyWinAnalysis() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-start">
                     <div className="mb-3 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                     <input
                       type="range"
