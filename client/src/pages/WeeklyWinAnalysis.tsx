@@ -421,7 +421,10 @@ export default function WeeklyWinAnalysis() {
                     step="1"
                     value={investmentAmount}
                     onChange={(e) => setInvestmentAmount(Number(e.target.value))}
-                    className="w-full"
+                    className="investment-slider"
+                    style={{
+                      background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb 100%)`
+                    }}
                   />
                   <div className="mt-2 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                   

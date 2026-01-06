@@ -1,0 +1,61 @@
+/* 投资金额进度条样式 */
+.investment-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #3b82f6 0%, #3b82f6 50%, #e5e7eb 50%, #e5e7eb 100%);
+}
+
+/* Chrome/Safari 滑块样式 */
+.investment-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.5);
+  border: 2px solid #fbbf24;
+  transition: all 0.2s ease;
+}
+
+.investment-slider::-webkit-slider-thumb:hover {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.6);
+}
+
+/* Firefox 滑块样式 */
+.investment-slider::-moz-range-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.5);
+  border: 2px solid #fbbf24;
+  transition: all 0.2s ease;
+}
+
+.investment-slider::-moz-range-thumb:hover {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.6);
+}
+
+/* Firefox 轨道样式 */
+.investment-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+/* 轨道背景 */
+.investment-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #3b82f6 0%, #3b82f6 50%, #e5e7eb 50%, #e5e7eb 100%);
+  height: 8px;
+  border-radius: 4px;
+}
