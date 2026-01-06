@@ -581,41 +581,66 @@ export default function BaccaratAnalysis() {
                   {/* 资金曲线图 */}
                   <div className="p-4 bg-muted/50 rounded-lg border border-border">
                     <h4 className="font-semibold text-card-foreground mb-4">资金变化趋势</h4>
-                    <div className="h-[300px] w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }))}>
-                          <defs>
-                            <linearGradient id="gradient-balance" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                          <XAxis 
-                            dataKey="round" 
-                            stroke="var(--muted-foreground)" 
-                            tick={{ fill: 'var(--muted-foreground)' }}
-                          />
-                          <YAxis 
-                            stroke="var(--muted-foreground)" 
-                            tick={{ fill: 'var(--muted-foreground)' }}
-                          />
-                          <RechartsTooltip 
-                            contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }}
-                            labelStyle={{ color: 'var(--foreground)' }}
-                            itemStyle={{ color: 'var(--foreground)' }}
-                            formatter={(value: any) => `¥${value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}`}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="balance" 
-                            stroke="var(--primary)" 
-                            strokeWidth={2}
-                            fill="url(#gradient-balance)"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
+                    {(() => {
+                      const balanceData = simulationResult.balanceHistory.map((balance, index) => ({ round: index, balance }));
+                      const maxBalance = Math.max(...balanceData.map(d => d.balance));
+                      const maxIndex = balanceData.findIndex(d => d.balance === maxBalance);
+                      return (
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center px-2">
+                            <span className="text-sm text-muted-foreground">最高资金</span>
+                            <span className="text-lg font-bold text-[var(--success)]">¥{maxBalance.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <AreaChart data={balanceData}>
+                                <defs>
+                                  <linearGradient id="gradient-balance" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                                  </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                                <XAxis 
+                                  dataKey="round" 
+                                  stroke="var(--muted-foreground)" 
+                                  tick={{ fill: 'var(--muted-foreground)' }}
+                                />
+                                <YAxis 
+                                  stroke="var(--muted-foreground)" 
+                                  tick={{ fill: 'var(--muted-foreground)' }}
+                                />
+                                <RechartsTooltip 
+                                  contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                                  labelStyle={{ color: 'var(--foreground)' }}
+                                  itemStyle={{ color: 'var(--foreground)' }}
+                                  formatter={(value: any) => `¥${value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}`}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="balance" 
+                                  stroke="var(--primary)" 
+                                  strokeWidth={2}
+                                  fill="url(#gradient-balance)"
+                                />
+                                {/* 最高点标记 */}
+                                {maxIndex >= 0 && (
+                                  <line 
+                                    x1={`${(maxIndex / (balanceData.length - 1)) * 100}%`} 
+                                    y1="0" 
+                                    x2={`${(maxIndex / (balanceData.length - 1)) * 100}%`} 
+                                    y2="100%" 
+                                    stroke="var(--success)" 
+                                    strokeDasharray="5 5" 
+                                    opacity={0.5}
+                                  />
+                                )}
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* 投注历史 */}
