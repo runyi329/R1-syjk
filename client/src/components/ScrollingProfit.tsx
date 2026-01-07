@@ -44,7 +44,13 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
   // 非数字字符（小数点、逗号）不需要动画
   if (digit === '.' || digit === ',' || digit === ' ') {
     return (
-      <span className="inline-block text-red-500" style={{ width: digit === '.' ? '0.3em' : '0.6em' }}>
+      <span 
+        className="inline-block text-red-500" 
+        style={{ 
+          width: digit === '.' ? '8px' : '12px',
+          textAlign: 'center'
+        }}
+      >
         {digit}
       </span>
     );
@@ -54,7 +60,7 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
     <span 
       className="inline-block relative"
       style={{ 
-        width: '0.6em',
+        width: '22px',
         height: '1.2em',
         overflow: 'hidden'
       }}
@@ -152,12 +158,12 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       `}</style>
       <p className="text-sm text-muted-foreground mb-2">累计收益</p>
       <div 
-        className="flex items-end gap-0.5"
-        style={{ overflow: 'visible', justifyContent: 'flex-start' }}
+        className="flex items-end"
+        style={{ justifyContent: 'flex-start' }}
       >
         <span 
-          className="text-3xl sm:text-4xl font-bold font-mono tabular-nums inline-flex"
-          style={{ overflow: 'visible', letterSpacing: '0.35em', textAlign: 'left' }}
+          className="text-3xl sm:text-4xl font-bold font-mono tabular-nums flex"
+          style={{ textAlign: 'left' }}
         >
           {formattedValue.split('').map((char, index) => (
             <DigitRoller 
@@ -167,7 +173,7 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
             />
           ))}
         </span>
-        <span className="text-sm text-muted-foreground">USDT</span>
+        <span className="text-sm text-muted-foreground ml-2">USDT</span>
       </div>
     </div>
   );
