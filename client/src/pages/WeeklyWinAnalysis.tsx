@@ -603,7 +603,7 @@ export default function WeeklyWinAnalysis() {
             ].map((faq, index) => {
               const isExpanded = expandedFAQIndex === index;
               return (
-                <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden rounded-none first:rounded-t-lg last:rounded-b-lg m-0">
+                <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden rounded-none first:rounded-t-lg last:rounded-b-lg m-0 py-0 gap-0">
                   <CardHeader 
                     className="cursor-pointer p-0 hover:bg-muted/50 transition-colors" 
                     onClick={() => {
