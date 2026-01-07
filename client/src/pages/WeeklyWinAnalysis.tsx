@@ -145,7 +145,7 @@ export default function WeeklyWinAnalysis() {
         <section className="space-y-6">
           <div className="text-center space-y-4">
             <h2 className="text-4xl font-bold tracking-tight">周周赢</h2>
-            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 年化收益52%+ | 风险等级R4</p>
+            <p className="text-xl text-muted-foreground">数字货币托管交易 | 收益按周取 | 本金自己户</p>
             <div className="flex justify-center gap-4 flex-wrap">
               <Badge className="bg-green-500/20 text-green-600 border-green-500/30">安全可靠</Badge>
               <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">全权委托</Badge>
@@ -179,7 +179,7 @@ export default function WeeklyWinAnalysis() {
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground mb-2">风险等级</p>
-                <p className="text-3xl font-bold text-red-500">R4</p>
+                <p className="text-3xl font-bold text-red-500" style={{color: '#15d52c'}}>R3</p>
                 <p className="text-xs text-muted-foreground mt-2">专业团队管理</p>
               </CardContent>
             </Card>
@@ -209,7 +209,7 @@ export default function WeeklyWinAnalysis() {
                   <div className="flex gap-3">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">80% 客户交易账户</p>
+                      <p className="font-semibold">80% 大额资金客户本人账户</p>
                       <p className="text-sm text-muted-foreground">您的资金完全在自己的交易账户中，安全可靠</p>
                     </div>
                   </div>
@@ -223,7 +223,7 @@ export default function WeeklyWinAnalysis() {
                   <div className="flex gap-3">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">账户全权委托</p>
+                      <p className="font-semibold">账户全权委托(仅交易权限)</p>
                       <p className="text-sm text-muted-foreground">由数金研投专业团队托管，您无需操作</p>
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export default function WeeklyWinAnalysis() {
                   <div className="flex gap-3">
                     <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">每周提现1%本金</p>
+                      <p className="font-semibold">每周提现1%</p>
                       <p className="text-sm text-muted-foreground">从产生的利润中每周可提现本金的1%</p>
                     </div>
                   </div>
@@ -254,7 +254,7 @@ export default function WeeklyWinAnalysis() {
                     <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold">收益分成模式</p>
-                      <p className="text-sm text-muted-foreground">99%利润留在账户继续增长，1%可随时提取</p>
+                      <p className="text-sm text-muted-foreground">前端每周收益提现 +后端币张分成</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
