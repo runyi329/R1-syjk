@@ -141,7 +141,7 @@ export default function WeeklyWinAnalysis() {
   const avgYield = (successCases.reduce((sum, c) => sum + c.annualYield, 0) / successCases.length).toFixed(2);
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground">
+    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground overflow-hidden">
       <ScrollToTop />
 
       {/* 头部区域 */}
@@ -461,14 +461,14 @@ export default function WeeklyWinAnalysis() {
           </div>
 
           {/* 统计数据 - 单个框内上下排列 */}
-          <Card className="border-none shadow-md max-w-sm mx-auto">
+          <Card className="border-none shadow-md max-w-sm mx-auto overflow-hidden">
             <CardContent className="pt-6 px-6 pb-6">
               <div className="space-y-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
                   <p className="text-4xl font-bold text-green-500">23300000.000 USDT</p>
                 </div>
-                <div className="border-t border-border pt-6">
+                <div className="border-t border-border pt-6 overflow-hidden">
                   <ScrollingProfit totalInvestment={23300000} />
                 </div>
               </div>

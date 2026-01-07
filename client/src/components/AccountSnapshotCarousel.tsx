@@ -51,7 +51,7 @@ export function AccountSnapshotCarousel() {
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 overflow-hidden" style={{ clipPath: 'inset(0)' }}>
       {/* 轮播容器 */}
       <div 
         className="relative w-full overflow-hidden rounded-lg shadow-lg bg-background"
@@ -101,7 +101,7 @@ export function AccountSnapshotCarousel() {
       </div>
 
       {/* 下方指示点 */}
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-2 overflow-hidden">
         {snapshots.map((_, index) => (
           <button
             key={index}
@@ -117,7 +117,7 @@ export function AccountSnapshotCarousel() {
       </div>
 
       {/* 说明文字 */}
-      <div className="text-center text-sm text-muted-foreground">
+      <div className="text-center text-sm text-muted-foreground overflow-hidden">
         <p>真实投资者交易账户快照展示</p>
       </div>
     </div>

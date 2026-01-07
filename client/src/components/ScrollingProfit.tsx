@@ -1,177 +1,166 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 
 interface ScrollingProfitProps {
-  totalInvestment: number; // 累计投入本金（例如2330）
+  totalInvestment: number;
   className?: string;
 }
 
-export default function ScrollingProfit({ totalInvestment, className = '' }: ScrollingProfitProps) {
-  const [displayValue, setDisplayValue] = useState(8810000); // 起始累计收益：881万
-  const profitRef = useRef(8810000);
-  const animationFrameRef = useRef<number | null>(null);
-  const nextUpdateTimeRef = useRef(Date.now());
-  const dailyIncreaseRef = useRef(0);
-  const lastDisplayValueRef = useRef(8810000);
-  const digitTransformsRef = useRef<number[]>([]);
+// 单个数字滚轮组件 - 老虎机式翻滚效果
+const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number }) => {
+  const [currentDigit, setCurrentDigit] = useState(digit);
+  const [prevDigit, setPrevDigit] = useState(digit);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    // 计算每天应该增加的金额 = 投入本金 * 0.52 / 365
+    // 跳过首次渲染
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    if (digit !== currentDigit) {
+      setPrevDigit(currentDigit);
+      setIsAnimating(true);
+      
+      // 延迟更新当前数字，让动画有时间显示
+      const timer = setTimeout(() => {
+        setCurrentDigit(digit);
+        // 动画结束后重置状态
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 300);
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [digit, currentDigit, delay]);
+
+  // 非数字字符（小数点）不需要动画
+  if (digit === '.' || digit === ',' || digit === ' ') {
+    return (
+      <span className="inline-block text-red-500" style={{ width: digit === '.' ? '0.3em' : '0.6em' }}>
+        {digit}
+      </span>
+    );
+  }
+
+  return (
+    <span 
+      className="inline-block relative"
+      style={{ 
+        width: '0.6em',
+        height: '1.2em',
+        overflow: 'hidden'
+      }}
+    >
+      {/* 旧数字 - 向上滚出 */}
+      <span
+        className="absolute inset-0 flex items-center justify-center text-red-500"
+        style={{
+          transform: isAnimating ? 'translateY(-100%)' : 'translateY(0)',
+          transition: 'transform 0.3s ease-out',
+          opacity: isAnimating ? 0 : 1
+        }}
+      >
+        {isAnimating ? prevDigit : currentDigit}
+      </span>
+      
+      {/* 新数字 - 从下方滚入 */}
+      {isAnimating && (
+        <span
+          className="absolute inset-0 flex items-center justify-center text-red-500"
+          style={{
+            transform: 'translateY(0)',
+            animation: 'rollUp 0.3s ease-out forwards'
+          }}
+        >
+          {digit}
+        </span>
+      )}
+    </span>
+  );
+});
+
+DigitRoller.displayName = 'DigitRoller';
+
+export default function ScrollingProfit({ totalInvestment, className = '' }: ScrollingProfitProps) {
+  const [displayValue, setDisplayValue] = useState(8810000);
+  const profitRef = useRef(8810000);
+  const nextUpdateTimeRef = useRef(Date.now());
+  const dailyIncreaseRef = useRef(0);
+
+  // 生成随机间隔时间（0.5-3秒）
+  const getRandomInterval = () => 500 + Math.random() * 2500;
+
+  useEffect(() => {
     const dailyIncrease = (totalInvestment * 0.52) / 365;
     dailyIncreaseRef.current = dailyIncrease;
-    
-    // 初始化下一个更新时间
     nextUpdateTimeRef.current = Date.now() + getRandomInterval();
-    
-    const animate = (): void => {
+
+    let animationFrameId: number;
+
+    const animate = () => {
       const now = Date.now();
-      
-      // 检查是否到达下一个更新时间
+
       if (now >= nextUpdateTimeRef.current) {
-        // 生成随机间隔时间（0.5-3秒）
         const randomInterval = getRandomInterval();
         const dailySeconds = 365 * 24 * 60 * 60;
         const baseIncrease = (dailyIncreaseRef.current / dailySeconds) * randomInterval;
-        
-        // 随机调整增加幅度（模拟真实投注的波动，80%-150%之间）
         const adjustmentFactor = 0.8 + Math.random() * 0.7;
         const randomIncrease = baseIncrease * adjustmentFactor;
-        
+
         profitRef.current += randomIncrease;
-        
-        // 只在数值有明显变化时更新显示
-        if (Math.abs(profitRef.current - lastDisplayValueRef.current) >= 0.01) {
-          setDisplayValue(profitRef.current);
-          triggerRollingAnimation(lastDisplayValueRef.current, profitRef.current);
-          lastDisplayValueRef.current = profitRef.current;
-        }
-        
-        // 设置下一个更新时间
+        setDisplayValue(profitRef.current);
+
         nextUpdateTimeRef.current = now + getRandomInterval();
       }
-      
-      animationFrameRef.current = requestAnimationFrame(animate);
+
+      animationFrameId = requestAnimationFrame(animate);
     };
-    
-    animationFrameRef.current = requestAnimationFrame(animate);
-    
+
+    animationFrameId = requestAnimationFrame(animate);
+
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
       }
     };
   }, [totalInvestment]);
 
-  // 生成随机间隔时间（500ms - 3000ms）
-  const getRandomInterval = (): number => {
-    return 500 + Math.random() * 2500;
-  };
+  // 格式化数字为字符串
+  const formattedValue = displayValue.toFixed(2);
 
-  // 格式化数字为精确到小数点后2位
-  const formatNumber = (num: number) => {
-    return num.toFixed(2);
-  };
-
-  // 触发翻滚动画
-  const triggerRollingAnimation = (oldValue: number, newValue: number) => {
-    const oldStr = formatNumber(oldValue);
-    const newStr = formatNumber(newValue);
-    
-    // 初始化或重置动画状态
-    if (digitTransformsRef.current.length === 0) {
-      digitTransformsRef.current = newStr.split('').map(() => 0);
-    }
-    
-    // 更新需要翻滚的数字
-    for (let i = 0; i < newStr.length; i++) {
-      if (oldStr[i] !== newStr[i]) {
-        const oldDigit = parseInt(oldStr[i]) || 0;
-        const newDigit = parseInt(newStr[i]) || 0;
-        
-        // 计算翻滚距离
-        let distance = newDigit - oldDigit;
-        if (distance < 0) {
-          distance += 10;
-        }
-        
-        // 触发翻滚动画
-        animateDigitRoll(i, distance);
-      }
-    }
-  };
-
-  // 执行单个数字的翻滚动画
-  const animateDigitRoll = (digitIndex: number, distance: number) => {
-    const duration = 600; // 动画持续时间
-    const startTime = Date.now();
-    const startTransform = digitTransformsRef.current[digitIndex] || 0;
-    const endTransform = startTransform + distance;
-    
-    const roll = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // 使用缓动函数
-      const easeProgress = easeOutCubic(progress);
-      
-      // 计算当前的翻滚偏移量
-      const currentTransform = startTransform + distance * easeProgress;
-      digitTransformsRef.current[digitIndex] = currentTransform;
-      
-      // 触发重新渲染
-      setDisplayValue((prev) => prev);
-      
-      if (progress < 1) {
-        requestAnimationFrame(roll);
-      }
-    };
-    
-    roll();
-  };
-
-  // 缓动函数
-  const easeOutCubic = (t: number) => {
-    return 1 - Math.pow(1 - t, 3);
-  };
-
-  const displayText = formatNumber(displayValue);
-  
   return (
-    <div className={className}>
+    <div className={`${className}`}>
+      <style>{`
+        @keyframes rollUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       <p className="text-sm text-muted-foreground mb-2">累计收益</p>
-      <div className="relative py-2">
-        <div className="flex items-center justify-start gap-0.5 min-w-0">
-          <div className="flex gap-0 font-mono flex-shrink-0" style={{ perspective: '1000px' }}>
-            {displayText.split('').map((char, index) => {
-              const transform = digitTransformsRef.current[index] || 0;
-              const digitHeight = 2.25; // rem
-              const offsetY = -transform * digitHeight;
-              
-              return (
-                <div
-                  key={index}
-                  className="relative w-8 h-9 overflow-visible flex-shrink-0"
-                  style={{
-                    transformStyle: 'preserve-3d',
-                  }}
-                >
-                  <div
-                    className="text-4xl font-bold text-red-500 font-mono tracking-wider tabular-nums leading-none transition-transform block"
-                    style={{
-                      transform: `translateY(${offsetY}rem)`,
-                      transitionDuration: '600ms',
-                      transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                      width: '100%',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {char}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <p className="text-sm text-muted-foreground ml-2">USDT</p>
-        </div>
+      <div 
+        className="flex items-center"
+        style={{ overflow: 'hidden' }}
+      >
+        <span 
+          className="text-3xl sm:text-4xl font-bold font-mono tabular-nums inline-flex"
+          style={{ overflow: 'hidden' }}
+        >
+          {formattedValue.split('').map((char, index) => (
+            <DigitRoller 
+              key={index} 
+              digit={char}
+              delay={index * 20} // 每个数字稍微延迟，产生波浪效果
+            />
+          ))}
+        </span>
+        <span className="text-sm text-muted-foreground ml-2">USDT</span>
       </div>
     </div>
   );
