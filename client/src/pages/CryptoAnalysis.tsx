@@ -62,7 +62,7 @@ export default function CryptoAnalysis() {
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground mb-1">风险等级</p>
-                  <p className="text-xl font-bold text-red-500">R4</p>
+                  <p className="text-xl font-bold text-red-500" style={{color: '#14e151'}}>R3</p>
                 </div>
               </div>
               <Link href="/weekly-win">
