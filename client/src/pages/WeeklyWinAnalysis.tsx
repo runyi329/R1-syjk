@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
 import AssetAllocationSection from "@/components/AssetAllocationSection";
 import { AccountSnapshotCarousel } from "@/components/AccountSnapshotCarousel";
+import ScrollingProfit from "@/components/ScrollingProfit";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function WeeklyWinAnalysis() {
@@ -465,11 +466,10 @@ export default function WeeklyWinAnalysis() {
               <div className="space-y-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
-                  <p className="text-4xl font-bold text-green-500">2330万USDT</p>
+                  <p className="text-4xl font-bold text-green-500">23300000.000 USDT</p>
                 </div>
                 <div className="border-t border-border pt-6">
-                  <p className="text-sm text-muted-foreground mb-2">累计收益</p>
-                  <p className="text-4xl font-bold text-red-500">871.22万USDT</p>
+                  <ScrollingProfit totalInvestment={23300000} />
                 </div>
               </div>
             </CardContent>
