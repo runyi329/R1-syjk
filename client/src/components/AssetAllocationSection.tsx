@@ -117,7 +117,7 @@ export default function AssetAllocationSection() {
                 <p className="text-lg font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
               </div>
               <div className="bg-amber-500/5 rounded p-2">
-                <p className="text-xs text-muted-foreground">BTC+ETH占比</p>
+                <p className="text-xs text-muted-foreground">主流币占比</p>
                 <p className="text-lg font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
               </div>
               <div className="bg-emerald-500/5 rounded p-2">
