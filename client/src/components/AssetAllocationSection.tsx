@@ -118,38 +118,8 @@ export default function AssetAllocationSection() {
         </div>
       </div>
 
-      {/* 饼图和表格 */}
+      {/* 配置表格和饼图 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 饼图 */}
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">配置分布</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[350px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name }) => name}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip formatter={(value) => `${value}%`} />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* 配置表格 */}
         <Card className="border-none shadow-md">
           <CardHeader>
@@ -205,6 +175,36 @@ export default function AssetAllocationSection() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 饼图 */}
+        <Card className="border-none shadow-md">
+          <CardHeader>
+            <CardTitle className="text-lg">配置分布</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[350px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name }) => name}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip formatter={(value) => `${value}%`} />
+                </RechartsPieChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
