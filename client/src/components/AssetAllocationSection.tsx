@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
@@ -57,6 +57,7 @@ const assetData = {
 
 export default function AssetAllocationSection() {
   const [marketMode, setMarketMode] = useState<"bull" | "bear" | "range">("bull");
+  const [displayAllocation, setDisplayAllocation] = useState(70);
   
   const currentData = assetData[marketMode];
   const totalAllocation = currentData.reduce((sum, item) => sum + item.allocation, 0);
@@ -69,6 +70,34 @@ export default function AssetAllocationSection() {
     bear: 30,
     range: 50
   }[marketMode];
+  
+  // 动画效果：当仓位变化时，平滑过渡显示数字
+  useEffect(() => {
+    let animationFrame: number;
+    let currentValue = displayAllocation;
+    const targetValue = expectedAllocation;
+    const duration = 600; // 动画持续时间（毫秒）
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // 使用缓动函数实现平滑过渡
+      const easeOutQuad = 1 - Math.pow(1 - progress, 2);
+      currentValue = displayAllocation + (targetValue - displayAllocation) * easeOutQuad;
+      
+      setDisplayAllocation(Math.round(currentValue * 10) / 10);
+      
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+    
+    animationFrame = requestAnimationFrame(animate);
+    
+    return () => cancelAnimationFrame(animationFrame);
+  }, [expectedAllocation]);
   
   // 准备饼图数据
   const pieData = currentData.map(item => ({
@@ -119,9 +148,9 @@ export default function AssetAllocationSection() {
             <CardTitle className="text-lg">配置详情</CardTitle>
             {/* 统计信息 - 表格上方横排3列 */}
             <div className="grid grid-cols-3 gap-2 mt-4">
-              <div className="bg-primary/5 rounded p-2">
+              <div className="bg-primary/5 rounded p-2 transition-all duration-300">
                 <p className="text-xs text-muted-foreground">总仓位</p>
-                <p className="text-lg font-bold text-primary">{expectedAllocation}%</p>
+                <p className="text-lg font-bold text-primary transition-all duration-300 opacity-100">{Math.round(displayAllocation)}%</p>
               </div>
               <div className="bg-amber-500/5 rounded p-2">
                 <p className="text-xs text-muted-foreground">主流币占比</p>
