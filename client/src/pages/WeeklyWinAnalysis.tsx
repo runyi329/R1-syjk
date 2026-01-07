@@ -270,75 +270,7 @@ export default function WeeklyWinAnalysis() {
           </div>
         </section>
 
-        {/* 资金配置可视化 */}
-        <section className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">资金配置结构</h2>
-            <p className="text-muted-foreground mb-6">您的投资资金如何分配和保护</p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 饼图 */}
-            <Card className="border-none shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg">资金分配比例</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                      <Pie
-                        data={fundAllocation}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, value }) => `${name} ${value}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {fundAllocation.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip formatter={(value) => `${value}%`} />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 详细说明 */}
-            <Card className="border-none shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg">配置说明</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                  <div className="flex gap-3">
-                    <div className="w-3 h-3 bg-amber-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                    <div>
-                      <p className="font-semibold text-amber-900">80% 客户交易账户</p>
-                      <p className="text-sm text-amber-800 mt-1">您投入资金的80%存放在您自己的交易账户中，完全由您控制，安全可靠。</p>
-                      <p className="text-xs text-amber-700 mt-2">示例：投入10,000 USDT → 8,000 USDT在您的账户</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                  <div className="flex gap-3">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                    <div>
-                      <p className="font-semibold text-blue-900">20% 公司保证金</p>
-                      <p className="text-sm text-blue-800 mt-1">投入资金的20%作为保证金存放在公司账户，用于风险管理和账户保护。</p>
-                      <p className="text-xs text-blue-700 mt-2">示例：投入10,000 USDT → 2,000 USDT在公司账户</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
 
         {/* 业务模型 */}
         <section id="model" className="space-y-6">
