@@ -109,6 +109,9 @@ export default function AssetAllocationSection() {
     color: item.color
   }));
 
+  // 获取除BTC和ETH外的其他币种
+  const otherCoins = pieData.filter(item => item.symbol !== "BTC" && item.symbol !== "ETH");
+
   return (
     <section className="space-y-4">
       <div>
@@ -163,15 +166,15 @@ export default function AssetAllocationSection() {
         </CardHeader>
       </Card>
 
-      {/* 配置分布饼图 - 简化显示 */}
+      {/* 配置分布饼图 - 左右并排布局 */}
       <Card className="border-none shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">配置分布</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="w-full flex flex-col md:flex-row gap-4">
-            {/* 饼图部分 - BTC和ETH标签在内部 */}
-            <div className="w-full md:w-1/2 h-[240px]">
+          <div className="w-full flex flex-col lg:flex-row gap-4">
+            {/* 饼图部分 - 靠左 */}
+            <div className="w-full lg:w-2/5 flex-shrink-0 h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
@@ -211,10 +214,10 @@ export default function AssetAllocationSection() {
               </ResponsiveContainer>
             </div>
             
-            {/* 图例部分 - 仅显示其他币种代码 */}
-            <div className="w-full md:w-1/2 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 flex items-center">
-              <div className="grid grid-cols-2 gap-3 w-full">
-                {pieData.filter(item => item.symbol !== "BTC" && item.symbol !== "ETH").map((item, index) => (
+            {/* 小币种列表 - 靠右，每行2个，7-8行 */}
+            <div className="w-full lg:w-3/5 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 max-h-[240px] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                {otherCoins.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div 
                       className="w-3 h-3 rounded-full flex-shrink-0" 
