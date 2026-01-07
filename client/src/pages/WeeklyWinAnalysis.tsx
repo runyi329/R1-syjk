@@ -683,6 +683,68 @@ export default function WeeklyWinAnalysis() {
           </Card>
         </section>
 
+        {/* 常见问题 FAQ */}
+        <section id="faq" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">常见问题</h2>
+            <p className="text-muted-foreground mb-6">关于周周赢产品的常见问题解答</p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                question: "周周赢的风险等级是多少？如何评估风险？",
+                answer: "周周赢的风险等级为R3（中等风险）。我们采用多重风险控制机制：80%的资金在您的交易账户，完全由您控制；20%的公司保证金作为风险缓冲；专业交易团队使用成熟的风险管理策略；账户独立，与公司资金完全隔离。虽然历史表现良好，但数字货币市场波动较大，投资需谨慎。"
+              },
+              {
+                question: "如何提现我的收益？提现有限制吗？",
+                answer: "您可以每周从产生的利润中提现本金的1%。提现流程简单快捷：登录账户 → 点击提现 → 输入提现金额 → 确认提现。提现通常在24小时内到账。没有提现次数限制，也没有最低提现金额限制。剩余的99%利润会继续在账户中增长，实现复利效应。"
+              },
+              {
+                question: "账户全权委托是什么意思？我的账户安全吗？",
+                answer: "账户全权委托是指您授权数金研投专业交易团队管理您的账户，但仅限交易权限。这意味着：交易团队可以执行买卖操作，但无法提取您的资金；您的账户完全在您名下，资金安全由交易所保障；您可以随时查看账户余额和交易记录；您可以随时申请取消委托。这种模式既保证了专业的交易管理，又确保了您的资金安全。"
+              },
+              {
+                question: "最低投资金额是多少？可以随时追加投资吗？",
+                answer: "周周赢的最低投资金额为10,000 USDT。您可以随时追加投资，追加的金额同样遵循80%/20%的分配比例。追加投资会立即开始产生收益。没有最高投资限制，但建议根据自己的风险承受能力合理配置投资金额。"
+              },
+              {
+                question: "如果市场行情不好，我的本金会损失吗？",
+                answer: "虽然我们的专业交易团队采用了成熟的风险管理策略，但数字货币市场波动较大，存在本金损失的风险。为了保护投资者，我们设置了20%的公司保证金作为风险缓冲。如果账户出现亏损，公司保证金会首先用于弥补亏损。但请注意，本产品不保证本金安全，投资需谨慎。"
+              },
+              {
+                question: "投资周期是多长？可以提前退出吗？",
+                answer: "周周赢的投资周期为1年。在投资周期内，您可以随时申请退出，但需要提前7个工作日提出申请。退出时，您将获得当前账户余额（包括本金和未提现的利润）。提前退出可能会影响复利收益的积累，建议根据自己的投资计划合理安排。"
+              },
+              {
+                question: "收益是如何计算的？年化收益率是固定的吗？",
+                answer: "收益完全来自交易利润，与市场行情和交易策略的表现直接相关。历史年化收益率为52%+，但这不是固定收益率。不同时期的收益率会有所不同，主要取决于市场行情、交易策略的执行效果和投资时间长度。我们提供收益计算器，您可以根据自己的投资金额和预期收益率进行模拟计算。"
+              },
+              {
+                question: "如何联系客服？有专业的投资顾问吗？",
+                answer: "我们提供24小时客服支持。您可以通过以下方式联系我们：在线客服 → 点击页面右下角的客服按钮；电话咨询 → 拨打我们的客服热线；邮件咨询 → 发送邮件至service@runyi.com。我们还配备了专业的投资顾问团队，可以为您提供个性化的投资建议和产品咨询。"
+              }
+            ].map((faq, index) => (
+              <Card key={index} className="border-none shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader className="cursor-pointer" onClick={() => {
+                  const element = document.getElementById(`faq-answer-${index}`);
+                  if (element) {
+                    element.classList.toggle('hidden');
+                  }
+                }}>
+                  <div className="flex items-start justify-between gap-4">
+                    <CardTitle className="text-base font-semibold text-left">{faq.question}</CardTitle>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  </div>
+                </CardHeader>
+                <CardContent id={`faq-answer-${index}`} className="hidden">
+                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
         {/* 行动号召 */}
         <section className="space-y-6">
           <Card className="border-none shadow-md overflow-hidden bg-gradient-to-r from-primary/10 to-primary/5">
