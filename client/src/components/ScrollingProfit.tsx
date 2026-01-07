@@ -48,7 +48,8 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
         className="inline-block text-red-500" 
         style={{ 
           width: digit === '.' ? '8px' : '12px',
-          textAlign: 'center'
+          textAlign: 'center',
+          marginRight: digit === '.' ? '6px' : '0'
         }}
       >
         {digit}
