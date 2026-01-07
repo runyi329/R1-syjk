@@ -242,7 +242,7 @@ export default function AssetAllocationSection() {
           <CardTitle className="text-xs">配置分布</CardTitle>
         </CardHeader>
         <CardContent className="p-1">
-          <div className="w-full flex flex-row gap-1">
+          <div className="w-full flex flex-row gap-0.5">
             {/* 饼图部分 - 靠左，占50-60% */}
             <div className="w-1/2 flex-shrink-0 h-[180px] relative">
               <ResponsiveContainer width="100%" height="100%">
@@ -278,21 +278,21 @@ export default function AssetAllocationSection() {
               </ResponsiveContainer>
               
               {/* 固定标签 - BTC在正上方，ETH在11:00方向 */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                {/* BTC标签 - 正上方 */}
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8">
-                  <div className="text-xs font-bold text-orange-500">BTC</div>
+              <div className="absolute inset-0 flex items-start justify-center pointer-events-none pt-0">
+                {/* BTC标签 - 上沿与列表框对齐 */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-0.5">
+                  <div className="text-xs font-bold text-orange-500 whitespace-nowrap">BTC</div>
                 </div>
                 
-                {/* ETH标签 - 11:00方向 */}
-                <div className="absolute left-1/4 top-1/4 transform -translate-x-8 -translate-y-2">
-                  <div className="text-xs font-bold text-cyan-400">ETH</div>
+                {/* ETH标签 - 11:00方向，高度与BTC对齐 */}
+                <div className="absolute left-1/4 top-0 transform -translate-x-8 -translate-y-0.5">
+                  <div className="text-xs font-bold text-cyan-400 whitespace-nowrap">ETH</div>
                 </div>
               </div>
             </div>
             
             {/* 小币种列表 - 靠右，占40-50% */}
-            <div className="w-1/2 bg-blue-500/10 rounded-lg p-0.75 border border-blue-500/20 max-h-[180px] overflow-y-auto">
+            <div className="w-1/2 bg-blue-500/10 rounded-lg p-0.75 border border-blue-500/20 overflow-y-auto" style={{ height: 'auto', maxHeight: `${Math.ceil(otherCoins.length / 2) * 20}px` }}>
               <div className="grid grid-cols-2 gap-x-0.25 gap-y-0.25">
                 {otherCoins.map((item, index) => (
                   <div key={index} className="flex items-center gap-0.5">
