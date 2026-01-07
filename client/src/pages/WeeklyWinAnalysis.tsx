@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3, ChevronDown, Clock } from "lucide-react";
 import { Link } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
 import AssetAllocationSection from "@/components/AssetAllocationSection";
 import { AccountSnapshotCarousel } from "@/components/AccountSnapshotCarousel";
@@ -15,6 +15,8 @@ export default function WeeklyWinAnalysis() {
   const [investmentAmount, setInvestmentAmount] = useState(100000);
   const [isCompoundInterest, setIsCompoundInterest] = useState(true);
   const [currentTime, setCurrentTime] = useState<string>("");
+  const [expandedFAQIndex, setExpandedFAQIndex] = useState<number | null>(null);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // 实时北京时间
   useEffect(() => {
@@ -564,7 +566,7 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6">关于周周赢产品的常见问题解答</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2">
             {[
               {
                 question: "周周赢的风险等级是多少？如何评估风险？",
@@ -598,24 +600,36 @@ export default function WeeklyWinAnalysis() {
                 question: "如何联系客服？有专业的投资顾问吗？",
                 answer: "我们提供24小时客服支持。您可以通过以下方式联系我们：在线客服 → 点击页面右下角的客服按钮；电话咨询 → 拨打我们的客服热线；邮件咨询 → 发送邮件至service@runyi.com。我们还配备了专业的投资顾问团队，可以为您提供个性化的投资建议和产品咨询。"
               }
-            ].map((faq, index) => (
-              <Card key={index} className="border-none shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="cursor-pointer" onClick={() => {
-                  const element = document.getElementById(`faq-answer-${index}`);
-                  if (element) {
-                    element.classList.toggle('hidden');
-                  }
-                }}>
-                  <div className="flex items-start justify-between gap-4">
-                    <CardTitle className="text-base font-semibold text-left">{faq.question}</CardTitle>
-                    <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+            ].map((faq, index) => {
+              const isExpanded = expandedFAQIndex === index;
+              return (
+                <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden">
+                  <CardHeader 
+                    className="cursor-pointer py-2 px-3 hover:bg-muted/50 transition-colors" 
+                    onClick={() => {
+                      setExpandedFAQIndex(isExpanded ? null : index);
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <CardTitle className="text-xs sm:text-sm font-medium text-left leading-tight">{faq.question}</CardTitle>
+                      <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </CardHeader>
+                  <div 
+                    ref={(el) => { contentRefs.current[index] = el; }}
+                    className="overflow-hidden transition-all duration-300"
+                    style={{
+                      maxHeight: isExpanded && contentRefs.current[index] ? contentRefs.current[index]!.scrollHeight + 'px' : '0px',
+                      opacity: isExpanded ? 1 : 0
+                    }}
+                  >
+                    <CardContent className="py-2 px-3">
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                    </CardContent>
                   </div>
-                </CardHeader>
-                <CardContent id={`faq-answer-${index}`} className="hidden">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
-                </CardContent>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </section>
 
