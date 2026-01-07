@@ -141,96 +141,80 @@ export default function AssetAllocationSection() {
 
 
       {/* 配置表格和饼图 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 配置表格 */}
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">配置详情</CardTitle>
-            {/* 统计信息 - 表格上方横排3列 */}
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              <div className="bg-primary/5 rounded p-2 transition-all duration-300">
-                <p className="text-xs text-muted-foreground">总仓位</p>
-                <p className="text-lg font-bold text-primary transition-all duration-300 opacity-100">{Math.round(displayAllocation)}%</p>
-              </div>
-              <div className="bg-amber-500/5 rounded p-2">
-                <p className="text-xs text-muted-foreground">主流币占比</p>
-                <p className="text-lg font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
-              </div>
-              <div className="bg-emerald-500/5 rounded p-2">
-                <p className="text-xs text-muted-foreground">币种范围</p>
-                <p className="text-lg font-bold text-emerald-600">{currentData.length}</p>
-              </div>
+      {/* 配置详情卡片 */}
+      <Card className="border-none shadow-md">
+        <CardHeader>
+          <CardTitle className="text-lg">配置详情</CardTitle>
+          {/* 统计信息 - 表格上方横扙3列 */}
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="bg-primary/5 rounded p-2 transition-all duration-300">
+              <p className="text-xs text-muted-foreground">总仓位</p>
+              <p className="text-lg font-bold text-primary transition-all duration-300 opacity-100">{Math.round(displayAllocation)}%</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-2 font-semibold">币种</th>
-                    <th className="text-left py-3 px-2 font-semibold">名称</th>
-                    <th className="text-right py-3 px-2 font-semibold">配置比例</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentData.map((item, index) => (
-                    <tr key={index} className="border-b border-border/50 hover:bg-muted/50">
-                      <td className="py-3 px-2">
-                        <span className="font-semibold text-foreground">{item.symbol}</span>
-                      </td>
-                      <td className="py-3 px-2 text-muted-foreground">{item.name}</td>
-                      <td className="py-3 px-2 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <div className="w-20 bg-muted rounded-full h-2">
-                            <div
-                              className="h-2 rounded-full transition-all"
-                              style={{
-                                width: `${(item.allocation / Math.max(...currentData.map(d => d.allocation))) * 100}%`,
-                                backgroundColor: item.color
-                              }}
-                            ></div>
-                          </div>
-                          <span className="font-semibold w-10 text-right">{item.allocation}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="bg-amber-500/5 rounded p-2">
+              <p className="text-xs text-muted-foreground">主流币占比</p>
+              <p className="text-lg font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
             </div>
-          </CardContent>
-        </Card>
+            <div className="bg-emerald-500/5 rounded p-2">
+              <p className="text-xs text-muted-foreground">币种范围</p>
+              <p className="text-lg font-bold text-emerald-600">{currentData.length}</p>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
-        {/* 饼图 */}
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">配置分布</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[350px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name }) => name}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip formatter={(value) => `${value}%`} />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* 配置分布饮图 - 全幅显示 */}
+      <Card className="border-none shadow-md">
+        <CardHeader>
+          <CardTitle className="text-lg">配置分布</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="w-full h-[280px] sm:h-[320px] md:h-[380px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsPieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  label={({ value }) => {
+                    // 仅为比例大于等于5%的项目显示标签，其他项目仅在hover时显示
+                    return value >= 5 ? `${value}%` : '';
+                  }}
+                  outerRadius={70}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <RechartsTooltip 
+                  formatter={(value) => `${value}%`}
+                  contentStyle={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    border: 'none',
+                    borderRadius: '4px',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }}
+                />
+                <Legend 
+                  layout="vertical" 
+                  align="right" 
+                  verticalAlign="middle"
+                  wrapperStyle={{
+                    paddingLeft: '8px',
+                    fontSize: '11px',
+                    lineHeight: '1.4'
+                  }}
+                />
+              </RechartsPieChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
 
       {/* 配置说明 */}
       <Card className="border-none shadow-md border-l-4 border-l-primary">
