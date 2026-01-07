@@ -215,7 +215,10 @@ export default function AssetAllocationSection() {
             </p>
           </div>
           <div>
-            <p className="font-semibold mb-2">📊 震荡模式 (50%仓位)</p>
+            <div className="flex items-center gap-2 mb-2">
+              <img src="/consolidation-icon.png" alt="震荡行情" className="w-6 h-6" />
+              <p className="font-semibold">震荡模式 (50%仓位)</p>
+            </div>
             <p className="text-sm text-muted-foreground">
               在市场波动较大时，采用中等仓位配置，平衡BTC和ETH的配置（合计43%），适度配置其他币种，实现风险与收益的平衡。
             </p>
