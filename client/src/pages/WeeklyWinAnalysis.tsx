@@ -566,7 +566,7 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6">关于周周赢产品的常见问题解答</p>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-0">
             {[
               {
                 question: "周周赢的风险等级是多少？如何评估风险？",
@@ -603,7 +603,7 @@ export default function WeeklyWinAnalysis() {
             ].map((faq, index) => {
               const isExpanded = expandedFAQIndex === index;
               return (
-                <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden">
+                <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden rounded-none first:rounded-t-lg last:rounded-b-lg">
                   <CardHeader 
                     className="cursor-pointer p-0 hover:bg-muted/50 transition-colors" 
                     onClick={() => {
