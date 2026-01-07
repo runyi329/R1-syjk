@@ -203,13 +203,19 @@ export default function AssetAllocationSection() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <p className="font-semibold mb-2">🐂 牛市模式 (70%仓位)</p>
+            <div className="flex items-center gap-2 mb-2">
+              <img src="/bull-icon.png" alt="牛市行情" className="w-6 h-6" />
+              <p className="font-semibold">牛市模式 (70%仓位)</p>
+            </div>
             <p className="text-sm text-muted-foreground">
               在市场看好时，采用较高的仓位配置，重点配置BTC和ETH（合计52%），同时增加SOL等高成长性币种的配置。
             </p>
           </div>
           <div>
-            <p className="font-semibold mb-2">🐻 熊市模式 (30%仓位)</p>
+            <div className="flex items-center gap-2 mb-2">
+              <img src="/bear-icon.png" alt="熊市行情" className="w-6 h-6" />
+              <p className="font-semibold">熊市模式 (30%仓位)</p>
+            </div>
             <p className="text-sm text-muted-foreground">
               在市场不确定时，降低整体仓位，保持BTC和ETH的配置（合计35%），减少高风险币种的配置，保护本金。
             </p>
