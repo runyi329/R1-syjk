@@ -64,6 +64,7 @@ const DigitRoller = memo(({
         style={{ 
           width: digit === '.' ? '8px' : '12px',
           textAlign: 'center',
+          marginLeft: digit === '.' ? '6px' : '0',
           marginRight: digit === '.' ? '6px' : '0'
         }}
       >
@@ -113,8 +114,8 @@ const DigitRoller = memo(({
 
 DigitRoller.displayName = 'DigitRoller';
 
-// 每秒增长金额（约每秒2元平均）
-const PROFIT_PER_SECOND = 2;
+// 每秒增长金额（约每分钟23 USDT）
+const PROFIT_PER_SECOND = 0.38;
 
 export default function ScrollingProfit({ totalInvestment, className = '' }: ScrollingProfitProps) {
   // 每一位数字的当前值
