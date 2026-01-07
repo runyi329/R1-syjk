@@ -428,20 +428,20 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6">数百位投资者已获得丰厚收益，以下是上个月的真实案例</p>
           </div>
 
-          {/* 统计数据 - 左右排列 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 统计数据 - 手机端左右紧凑排列 */}
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
             <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
-                <p className="text-4xl font-bold text-primary">2330万USDT</p>
-                <p className="text-xs text-muted-foreground mt-2">{successCases.length}位投资者参与</p>
+              <CardContent className="pt-3 md:pt-6 px-3 md:px-6 pb-3 md:pb-6">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">累计投资额</p>
+                <p className="text-2xl md:text-4xl font-bold text-primary">2330万USDT</p>
+                <p className="text-xs text-muted-foreground mt-1 md:mt-2">{successCases.length}位投资者</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">累计收益</p>
-                <p className="text-4xl font-bold text-green-500">871.22万USDT</p>
-                <p className="text-xs text-muted-foreground mt-2">平均收益率 {avgYield}%</p>
+              <CardContent className="pt-3 md:pt-6 px-3 md:px-6 pb-3 md:pb-6">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">累计收益</p>
+                <p className="text-2xl md:text-4xl font-bold text-red-500">871.22万USDT</p>
+                <p className="text-xs text-muted-foreground mt-1 md:mt-2">平均收益率 {avgYield}%</p>
               </CardContent>
             </Card>
           </div>
