@@ -566,7 +566,7 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6">关于周周赢产品的常见问题解答</p>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             {[
               {
                 question: "周周赢的风险等级是多少？如何评估风险？",
