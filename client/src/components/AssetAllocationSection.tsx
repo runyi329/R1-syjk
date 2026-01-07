@@ -84,21 +84,21 @@ export default function AssetAllocationSection() {
           variant={marketMode === "bull" ? "default" : "outline"}
           className="px-2 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
         >
-          🐂 牛市 (70%)
+          🐂 牛市行情
         </Button>
         <Button
           onClick={() => setMarketMode("bear")}
           variant={marketMode === "bear" ? "default" : "outline"}
           className="px-2 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
         >
-          🐻 熊市 (30%)
+          🐻 熊市行情
         </Button>
         <Button
           onClick={() => setMarketMode("range")}
           variant={marketMode === "range" ? "default" : "outline"}
           className="px-2 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
         >
-          📊 震荡 (50%)
+          📊 震荡行情
         </Button>
       </div>
 
@@ -161,11 +161,11 @@ export default function AssetAllocationSection() {
                 <p className="text-lg font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
               </div>
               <div className="bg-amber-500/5 rounded p-2">
-                <p className="text-xs text-muted-foreground">BTC+ETH</p>
+                <p className="text-xs text-muted-foreground">BTC+ETH占比</p>
                 <p className="text-lg font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
               </div>
               <div className="bg-emerald-500/5 rounded p-2">
-                <p className="text-xs text-muted-foreground">币种数</p>
+                <p className="text-xs text-muted-foreground">币种范围</p>
                 <p className="text-lg font-bold text-emerald-600">{currentData.length}</p>
               </div>
             </div>
