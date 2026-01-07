@@ -102,21 +102,7 @@ export default function AssetAllocationSection() {
         </Button>
       </div>
 
-      {/* 配置概览 - 横排3列 */}
-      <div className="grid grid-cols-3 gap-3 md:gap-4">
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 md:p-4 border border-primary/20">
-          <p className="text-xs md:text-sm text-muted-foreground mb-1">总仓位</p>
-          <p className="text-xl md:text-2xl font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
-        </div>
-        <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-lg p-3 md:p-4 border border-amber-500/20">
-          <p className="text-xs md:text-sm text-muted-foreground mb-1">BTC+ETH占比</p>
-          <p className="text-xl md:text-2xl font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
-        </div>
-        <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 rounded-lg p-3 md:p-4 border border-emerald-500/20">
-          <p className="text-xs md:text-sm text-muted-foreground mb-1">币种数量</p>
-          <p className="text-xl md:text-2xl font-bold text-emerald-600">{currentData.length}</p>
-        </div>
-      </div>
+
 
       {/* 配置表格和饼图 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
