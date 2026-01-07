@@ -154,33 +154,33 @@ export default function WeeklyWinAnalysis() {
           </div>
 
           {/* 核心指标 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">预期年化收益</p>
-                <p className="text-3xl font-bold text-primary">52%+</p>
-                <p className="text-xs text-muted-foreground mt-2">基于历史平均表现</p>
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground mb-1">预期年化收益</p>
+                <p className="text-2xl font-bold text-primary">52%+</p>
+                <p className="text-xs text-muted-foreground mt-1">基于历史平均表现</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">最低投入</p>
-                <p className="text-3xl font-bold text-primary">10万 USDT</p>
-                <p className="text-xs text-muted-foreground mt-2">灵活投资门槛</p>
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground mb-1">最低投入</p>
+                <p className="text-2xl font-bold text-primary">10万 USDT</p>
+                <p className="text-xs text-muted-foreground mt-1">灵活投资门槛</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">周期</p>
-                <p className="text-3xl font-bold text-primary">1年</p>
-                <p className="text-xs text-muted-foreground mt-2">投资周期</p>
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground mb-1">投资周期</p>
+                <p className="text-2xl font-bold text-primary">1年</p>
+                <p className="text-xs text-muted-foreground mt-1">投资周期</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">风险等级</p>
-                <p className="text-3xl font-bold text-red-500" style={{color: '#15d52c'}}>R3</p>
-                <p className="text-xs text-muted-foreground mt-2">专业团队管理</p>
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground mb-1">风险等级</p>
+                <p className="text-2xl font-bold text-red-500" style={{color: '#15d52c'}}>R3</p>
+                <p className="text-xs text-muted-foreground mt-1">专业团队管理</p>
               </CardContent>
             </Card>
           </div>
