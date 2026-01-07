@@ -9,7 +9,7 @@ const assetData = {
     { symbol: "BTC", name: "比特币", allocation: 30, color: "#f7931a" },
     { symbol: "ETH", name: "以太坊", allocation: 22, color: "#627eea" },
     { symbol: "SOL", name: "Solana", allocation: 8, color: "#14f195" },
-    { symbol: "XRP", name: "瑞波币", allocation: 6, color: "#23292f" },
+    { symbol: "XRP", name: "瑞波币", allocation: 6, color: "#3498db" },
     { symbol: "BNB", name: "币安币", allocation: 5, color: "#f3ba2f" },
     { symbol: "AAVE", name: "Aave", allocation: 4, color: "#b6509e" },
     { symbol: "LINK", name: "Chainlink", allocation: 4, color: "#2a5ade" },
@@ -25,7 +25,7 @@ const assetData = {
     { symbol: "BTC", name: "比特币", allocation: 20, color: "#f7931a" },
     { symbol: "ETH", name: "以太坊", allocation: 15, color: "#627eea" },
     { symbol: "SOL", name: "Solana", allocation: 3, color: "#14f195" },
-    { symbol: "XRP", name: "瑞波币", allocation: 2, color: "#23292f" },
+    { symbol: "XRP", name: "瑞波币", allocation: 2, color: "#3498db" },
     { symbol: "BNB", name: "币安币", allocation: 2, color: "#f3ba2f" },
     { symbol: "AAVE", name: "Aave", allocation: 1, color: "#b6509e" },
     { symbol: "LINK", name: "Chainlink", allocation: 1, color: "#2a5ade" },
@@ -41,7 +41,7 @@ const assetData = {
     { symbol: "BTC", name: "比特币", allocation: 25, color: "#f7931a" },
     { symbol: "ETH", name: "以太坊", allocation: 18, color: "#627eea" },
     { symbol: "SOL", name: "Solana", allocation: 5, color: "#14f195" },
-    { symbol: "XRP", name: "瑞波币", allocation: 4, color: "#23292f" },
+    { symbol: "XRP", name: "瑞波币", allocation: 4, color: "#3498db" },
     { symbol: "BNB", name: "币安币", allocation: 3, color: "#f3ba2f" },
     { symbol: "AAVE", name: "Aave", allocation: 2, color: "#b6509e" },
     { symbol: "LINK", name: "Chainlink", allocation: 2, color: "#2a5ade" },
@@ -184,9 +184,13 @@ export default function AssetAllocationSection() {
                   outerRadius={70}
                   fill="#8884d8"
                   dataKey="value"
+
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color}
+                    />
                   ))}
                 </Pie>
                 <RechartsTooltip 
