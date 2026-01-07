@@ -102,33 +102,20 @@ export default function AssetAllocationSection() {
         </Button>
       </div>
 
-      {/* 配置概览 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-none shadow-md">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-2">总仓位</p>
-            <p className="text-3xl font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {marketMode === "bull" ? "牛市配置" : marketMode === "bear" ? "熊市配置" : "震荡配置"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-md">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-2">BTC + ETH</p>
-            <p className="text-3xl font-bold text-primary">{btcEthTotal.toFixed(1)}%</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {btcEthTotal >= 50 ? "✓ 符合要求" : "✗ 未达标"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-md">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-2">币种数量</p>
-            <p className="text-3xl font-bold text-primary">{currentData.length}</p>
-            <p className="text-xs text-muted-foreground mt-2">个数字资产</p>
-          </CardContent>
-        </Card>
+      {/* 配置概览 - 横排3列 */}
+      <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 md:p-4 border border-primary/20">
+          <p className="text-xs md:text-sm text-muted-foreground mb-1">总仓位</p>
+          <p className="text-xl md:text-2xl font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
+        </div>
+        <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-lg p-3 md:p-4 border border-amber-500/20">
+          <p className="text-xs md:text-sm text-muted-foreground mb-1">BTC+ETH占比</p>
+          <p className="text-xl md:text-2xl font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
+        </div>
+        <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 rounded-lg p-3 md:p-4 border border-emerald-500/20">
+          <p className="text-xs md:text-sm text-muted-foreground mb-1">币种数量</p>
+          <p className="text-xl md:text-2xl font-bold text-emerald-600">{currentData.length}</p>
+        </div>
       </div>
 
       {/* 饼图和表格 */}
@@ -167,6 +154,21 @@ export default function AssetAllocationSection() {
         <Card className="border-none shadow-md">
           <CardHeader>
             <CardTitle className="text-lg">配置详情</CardTitle>
+            {/* 统计信息 - 表格上方横排3列 */}
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <div className="bg-primary/5 rounded p-2">
+                <p className="text-xs text-muted-foreground">总仓位</p>
+                <p className="text-lg font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
+              </div>
+              <div className="bg-amber-500/5 rounded p-2">
+                <p className="text-xs text-muted-foreground">BTC+ETH</p>
+                <p className="text-lg font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
+              </div>
+              <div className="bg-emerald-500/5 rounded p-2">
+                <p className="text-xs text-muted-foreground">币种数</p>
+                <p className="text-lg font-bold text-emerald-600">{currentData.length}</p>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
