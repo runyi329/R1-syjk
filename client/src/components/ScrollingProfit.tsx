@@ -152,12 +152,12 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       `}</style>
       <p className="text-sm text-muted-foreground mb-2">累计收益</p>
       <div 
-        className="flex items-end gap-1"
-        style={{ overflow: 'hidden' }}
+        className="flex items-end gap-0.5"
+        style={{ overflow: 'visible', justifyContent: 'flex-start' }}
       >
         <span 
           className="text-3xl sm:text-4xl font-bold font-mono tabular-nums inline-flex"
-          style={{ overflow: 'hidden', letterSpacing: '0.14em' }}
+          style={{ overflow: 'visible', letterSpacing: '0.35em', textAlign: 'left' }}
         >
           {formattedValue.split('').map((char, index) => (
             <DigitRoller 
