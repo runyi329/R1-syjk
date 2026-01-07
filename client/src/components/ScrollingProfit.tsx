@@ -157,7 +157,7 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       >
         <span 
           className="text-3xl sm:text-4xl font-bold font-mono tabular-nums inline-flex"
-          style={{ overflow: 'hidden', letterSpacing: '0.05em' }}
+          style={{ overflow: 'hidden', letterSpacing: '0.07em' }}
         >
           {formattedValue.split('').map((char, index) => (
             <DigitRoller 
