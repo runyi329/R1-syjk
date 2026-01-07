@@ -428,34 +428,20 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6">数百位投资者已获得丰厚收益，以下是上个月的真实案例</p>
           </div>
 
-          {/* 统计数据 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* 统计数据 - 左右排列 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">累计投资</p>
-                <p className="text-3xl font-bold text-primary">${(totalInvestment / 10000).toFixed(1)}W</p>
-                <p className="text-xs text-muted-foreground mt-2">{successCases.length}位投资者</p>
+                <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
+                <p className="text-4xl font-bold text-primary">2330万USDT</p>
+                <p className="text-xs text-muted-foreground mt-2">{successCases.length}位投资者参与</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground mb-2">累计收益</p>
-                <p className="text-3xl font-bold text-green-500">${(totalProfit / 10000).toFixed(1)}W</p>
+                <p className="text-4xl font-bold text-green-500">871.22万USDT</p>
                 <p className="text-xs text-muted-foreground mt-2">平均收益率 {avgYield}%</p>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">累计提现</p>
-                <p className="text-3xl font-bold text-blue-500">${(totalWithdrawal / 10000).toFixed(1)}W</p>
-                <p className="text-xs text-muted-foreground mt-2">每位平均提现 ${(totalWithdrawal / successCases.length / 1000).toFixed(1)}K</p>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-md">
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground mb-2">账户余额</p>
-                <p className="text-3xl font-bold text-yellow-500">${((totalInvestment + totalProfit - totalWithdrawal) / 10000).toFixed(1)}W</p>
-                <p className="text-xs text-muted-foreground mt-2">持续增长中</p>
               </CardContent>
             </Card>
           </div>
@@ -491,14 +477,7 @@ export default function WeeklyWinAnalysis() {
                       <p className="text-xs text-muted-foreground mb-1">年化收益率</p>
                       <p className="font-semibold text-yellow-500">{caseItem.annualYield}%</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">累计提现</p>
-                      <p className="font-semibold text-blue-500">${caseItem.totalWithdrawal.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">当前余额</p>
-                      <p className="font-semibold">${caseItem.remainingBalance.toLocaleString()}</p>
-                    </div>
+
                   </div>
                   <div className="pt-3 border-t border-border">
                     <div className="flex justify-between items-center">
