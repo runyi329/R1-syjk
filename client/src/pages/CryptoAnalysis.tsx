@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Zap } from "lucide-react";
 import { Link } from "wouter";
+import AssetAllocationSection from "@/components/AssetAllocationSection";
 
 export default function CryptoAnalysis() {
   return (
@@ -26,6 +27,9 @@ export default function CryptoAnalysis() {
           <h2 className="text-4xl font-bold tracking-tight">数字货币投资产品</h2>
           <p className="text-lg text-muted-foreground">探索我们的数字货币投资产品</p>
         </section>
+
+        {/* 资产配置比例 */}
+        <AssetAllocationSection />
 
         {/* 周周赢产品卡片 */}
         <section className="space-y-6">

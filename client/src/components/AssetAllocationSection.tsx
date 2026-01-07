@@ -113,32 +113,32 @@ export default function AssetAllocationSection() {
   const otherCoins = pieData.filter(item => item.symbol !== "BTC" && item.symbol !== "ETH");
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-2">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-2">资产配置比例</h2>
-        <p className="text-muted-foreground mb-4">根据市场行情灵活调整投资组合配置</p>
+        <h2 className="text-xl font-bold tracking-tight mb-1">资产配置比例</h2>
+        <p className="text-xs text-muted-foreground mb-2">根据市场行情灵活调整投资组合配置</p>
       </div>
 
       {/* 市场模式切换 - 手机版本3列布局 */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+      <div className="grid grid-cols-3 gap-1 sm:gap-2 md:gap-3">
         <Button
           onClick={() => setMarketMode("bull")}
           variant={marketMode === "bull" ? "default" : "outline"}
-          className="px-2 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
+          className="px-1 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap h-auto"
         >
           🐂 牛市行情
         </Button>
         <Button
           onClick={() => setMarketMode("bear")}
           variant={marketMode === "bear" ? "default" : "outline"}
-          className="px-2 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
+          className="px-1 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap h-auto"
         >
           🐻 熊市行情
         </Button>
         <Button
           onClick={() => setMarketMode("range")}
           variant={marketMode === "range" ? "default" : "outline"}
-          className="px-2 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
+          className="px-1 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap h-auto"
         >
           📊 震荡行情
         </Button>
@@ -146,21 +146,21 @@ export default function AssetAllocationSection() {
 
       {/* 配置详情卡片 - 紧凑布局 */}
       <Card className="border-none shadow-md">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">配置详情</CardTitle>
+        <CardHeader className="pb-1 pt-3 px-3">
+          <CardTitle className="text-sm">配置详情</CardTitle>
           {/* 统计信息 - 紧凑3列 */}
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            <div className="bg-primary/5 rounded p-2 transition-all duration-300">
+          <div className="grid grid-cols-3 gap-1 mt-1">
+            <div className="bg-primary/5 rounded p-1.5 transition-all duration-300">
               <p className="text-xs text-muted-foreground">总仓位</p>
-              <p className="text-base font-bold text-primary transition-all duration-300"><AnimatedNumber value={expectedAllocation} decimals={0} />%</p>
+              <p className="text-sm font-bold text-primary transition-all duration-300"><AnimatedNumber value={expectedAllocation} decimals={0} />%</p>
             </div>
-            <div className="bg-amber-500/5 rounded p-2">
+            <div className="bg-amber-500/5 rounded p-1.5">
               <p className="text-xs text-muted-foreground">主流币占比</p>
-              <p className="text-base font-bold text-amber-600"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
+              <p className="text-sm font-bold text-amber-600"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
             </div>
-            <div className="bg-emerald-500/5 rounded p-2">
+            <div className="bg-emerald-500/5 rounded p-1.5">
               <p className="text-xs text-muted-foreground">币种范围</p>
-              <p className="text-base font-bold text-emerald-600"><AnimatedNumber value={currentData.length} decimals={0} /></p>
+              <p className="text-sm font-bold text-emerald-600"><AnimatedNumber value={currentData.length} decimals={0} /></p>
             </div>
           </div>
         </CardHeader>
@@ -168,13 +168,13 @@ export default function AssetAllocationSection() {
 
       {/* 配置分布饼图 - 左右并排布局 */}
       <Card className="border-none shadow-md">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">配置分布</CardTitle>
+        <CardHeader className="pb-1 pt-3 px-3">
+          <CardTitle className="text-sm">配置分布</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="w-full flex flex-row gap-4">
+        <CardContent className="p-2">
+          <div className="w-full flex flex-row gap-2">
             {/* 饼图部分 - 靠左 */}
-            <div className="w-2/5 flex-shrink-0 h-[240px]">
+            <div className="w-2/5 flex-shrink-0 h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
@@ -189,7 +189,7 @@ export default function AssetAllocationSection() {
                       }
                       return '';
                     }}
-                    outerRadius={70}
+                    outerRadius={60}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -215,15 +215,15 @@ export default function AssetAllocationSection() {
             </div>
             
             {/* 小币种列表 - 靠右，每行2个，7-8行 */}
-            <div className="w-3/5 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 max-h-[240px] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <div className="w-3/5 bg-blue-500/10 rounded-lg p-2 border border-blue-500/20 max-h-[200px] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                 {otherCoins.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2">
+                  <div key={index} className="flex items-center gap-1">
                     <div 
-                      className="w-3 h-3 rounded-full flex-shrink-0" 
+                      className="w-2 h-2 rounded-full flex-shrink-0" 
                       style={{ backgroundColor: item.color }}
                     />
-                    <span className="text-sm font-medium text-foreground">{item.symbol}</span>
+                    <span className="text-xs font-medium text-foreground">{item.symbol}</span>
                   </div>
                 ))}
               </div>
