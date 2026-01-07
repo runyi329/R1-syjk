@@ -5,38 +5,43 @@ interface ScrollingProfitProps {
   className?: string;
 }
 
-// 单个数字滚轮组件 - 老虎机式翻滚效果
+// 单个数字滚轮组件 - 老虎机式翻滚效果（统一从下往上滚动）
 const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number }) => {
-  const [currentDigit, setCurrentDigit] = useState(digit);
-  const [prevDigit, setPrevDigit] = useState(digit);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [displayDigit, setDisplayDigit] = useState(digit);
+  const [previousDigit, setPreviousDigit] = useState(digit);
+  const [animationPhase, setAnimationPhase] = useState<'idle' | 'animating'>('idle');
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     // 跳过首次渲染
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      setDisplayDigit(digit);
+      setPreviousDigit(digit);
       return;
     }
 
-    if (digit !== currentDigit) {
-      setPrevDigit(currentDigit);
-      setIsAnimating(true);
+    // 只有当数字真正变化时才触发动画
+    if (digit !== displayDigit) {
+      // 保存当前显示的数字作为"旧数字"
+      setPreviousDigit(displayDigit);
+      // 开始动画
+      setAnimationPhase('animating');
       
-      // 延迟更新当前数字，让动画有时间显示
+      // 延迟后更新显示数字
       const timer = setTimeout(() => {
-        setCurrentDigit(digit);
+        setDisplayDigit(digit);
         // 动画结束后重置状态
         setTimeout(() => {
-          setIsAnimating(false);
+          setAnimationPhase('idle');
         }, 300);
       }, delay);
       
       return () => clearTimeout(timer);
     }
-  }, [digit, currentDigit, delay]);
+  }, [digit, displayDigit, delay]);
 
-  // 非数字字符（小数点）不需要动画
+  // 非数字字符（小数点、逗号）不需要动画
   if (digit === '.' || digit === ',' || digit === ' ') {
     return (
       <span className="inline-block text-red-500" style={{ width: digit === '.' ? '0.3em' : '0.6em' }}>
@@ -54,25 +59,25 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
         overflow: 'hidden'
       }}
     >
-      {/* 旧数字 - 向上滚出 */}
+      {/* 当前/旧数字 - 动画时向上滚出 */}
       <span
         className="absolute inset-0 flex items-center justify-center text-red-500"
         style={{
-          transform: isAnimating ? 'translateY(-100%)' : 'translateY(0)',
-          transition: 'transform 0.3s ease-out',
-          opacity: isAnimating ? 0 : 1
+          transform: animationPhase === 'animating' ? 'translateY(-100%)' : 'translateY(0)',
+          transition: animationPhase === 'animating' ? 'transform 0.3s ease-out' : 'none',
+          opacity: animationPhase === 'animating' ? 0 : 1
         }}
       >
-        {isAnimating ? prevDigit : currentDigit}
+        {animationPhase === 'animating' ? previousDigit : displayDigit}
       </span>
       
-      {/* 新数字 - 从下方滚入 */}
-      {isAnimating && (
+      {/* 新数字 - 从下方滚入（只在动画时显示） */}
+      {animationPhase === 'animating' && (
         <span
           className="absolute inset-0 flex items-center justify-center text-red-500"
           style={{
             transform: 'translateY(0)',
-            animation: 'rollUp 0.3s ease-out forwards'
+            animation: 'slideUpFromBottom 0.3s ease-out forwards'
           }}
         >
           {digit}
@@ -134,12 +139,14 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
   return (
     <div className={`${className}`}>
       <style>{`
-        @keyframes rollUp {
-          from {
+        @keyframes slideUpFromBottom {
+          0% {
             transform: translateY(100%);
+            opacity: 0;
           }
-          to {
+          100% {
             transform: translateY(0);
+            opacity: 1;
           }
         }
       `}</style>
