@@ -2,7 +2,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3 } from "lucide-react";
+import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3, ChevronDown } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
