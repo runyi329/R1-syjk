@@ -129,6 +129,8 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
   const targetDigitsRef = useRef<string[]>([]);
   // 每一位数字的当前显示值
   const currentDigitsRef = useRef<string[]>([]);
+  // 是否已启动更新循环
+  const isRunningRef = useRef(false);
 
   // 获取服务端累计收益数据
   const { data: serverData, refetch } = trpc.cumulativeProfit.getCurrent.useQuery(undefined, {
@@ -182,53 +184,6 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
     }
   }, []);
 
-  // 更新单个数字位
-  const updateDigitAtPosition = useCallback((position: number) => {
-    const targetDigit = targetDigitsRef.current[position];
-    const currentDigit = currentDigitsRef.current[position];
-    
-    // 如果是小数点，不更新
-    if (targetDigit === '.' || currentDigit === '.') {
-      return;
-    }
-    
-    // 如果目标值和当前值不同，更新显示
-    if (targetDigit !== currentDigit) {
-      currentDigitsRef.current[position] = targetDigit;
-      setDigits([...currentDigitsRef.current]);
-    }
-    
-    // 设置下一次更新
-    const nextInterval = getUpdateInterval(position);
-    if (nextInterval !== Infinity) {
-      const timer = setTimeout(() => {
-        updateDigitAtPosition(position);
-      }, nextInterval);
-      digitTimersRef.current.set(position, timer);
-    }
-  }, [getUpdateInterval]);
-
-  // 启动所有数字位的独立更新循环
-  const startDigitUpdates = useCallback(() => {
-    // 清除所有现有计时器
-    digitTimersRef.current.forEach((timer) => clearTimeout(timer));
-    digitTimersRef.current.clear();
-    
-    // 为每一位数字启动独立的更新循环
-    const numDigits = currentDigitsRef.current.length;
-    for (let i = 0; i < numDigits; i++) {
-      // 跳过小数点
-      if (currentDigitsRef.current[i] === '.') continue;
-      
-      // 每一位数字有不同的初始延迟，让启动更自然
-      const initialDelay = Math.random() * getUpdateInterval(i);
-      const timer = setTimeout(() => {
-        updateDigitAtPosition(i);
-      }, initialDelay);
-      digitTimersRef.current.set(i, timer);
-    }
-  }, [getUpdateInterval, updateDigitAtPosition]);
-
   // 当服务端数据加载完成后初始化
   useEffect(() => {
     if (serverData && !serverBaseRef.current) {
@@ -244,9 +199,6 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       targetDigitsRef.current = [...initialDigits];
       setDigits(initialDigits);
       setIsLoading(false);
-      
-      // 启动数字更新循环
-      startDigitUpdates();
     } else if (serverData && serverBaseRef.current) {
       // 后续同步：更新基准值
       serverBaseRef.current = {
@@ -254,14 +206,15 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
         timestamp: Date.now()
       };
     }
-  }, [serverData, formatNumber, stringToDigits, startDigitUpdates]);
+  }, [serverData, formatNumber, stringToDigits]);
 
-  // 主循环：更新实际收益值
+  // 主循环：更新实际收益值并驱动数字更新
   useEffect(() => {
     if (isLoading) return;
 
     let animationFrameId: number;
     let lastSyncTime = Date.now();
+    let lastUpdateTime = Date.now();
 
     const animate = () => {
       const now = Date.now();
@@ -273,7 +226,58 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       }
       
       // 更新目标数字
-      targetDigitsRef.current = stringToDigits(formatNumber(profitRef.current));
+      const newTargetDigits = stringToDigits(formatNumber(profitRef.current));
+      targetDigitsRef.current = newTargetDigits;
+
+      // 每100ms检查一次是否需要更新显示的数字
+      if (now - lastUpdateTime >= 100) {
+        lastUpdateTime = now;
+        
+        // 检查每一位数字是否需要更新
+        let hasChanges = false;
+        const newCurrentDigits = [...currentDigitsRef.current];
+        
+        for (let i = 0; i < newTargetDigits.length; i++) {
+          const targetDigit = newTargetDigits[i];
+          const currentDigit = newCurrentDigits[i];
+          
+          // 跳过小数点
+          if (targetDigit === '.') continue;
+          
+          // 如果目标值和当前值不同，根据位置决定是否更新
+          if (targetDigit !== currentDigit) {
+            // 计算位置（从右到左）
+            const position = newTargetDigits.length - 1 - i;
+            
+            // 根据位置决定更新概率
+            // 低位更新频率高，高位更新频率低
+            let updateProbability: number;
+            if (position === 0) {
+              updateProbability = 0.8; // 分的个位：80%概率更新
+            } else if (position === 1) {
+              updateProbability = 0.6; // 分的十位：60%概率更新
+            } else if (position === 3) {
+              updateProbability = 0.4; // 角：40%概率更新
+            } else if (position === 4) {
+              updateProbability = 0.2; // 十位：20%概率更新
+            } else if (position === 5) {
+              updateProbability = 0.1; // 百位：10%概率更新
+            } else {
+              updateProbability = 0.05; // 千位及以上：5%概率更新
+            }
+            
+            if (Math.random() < updateProbability) {
+              newCurrentDigits[i] = targetDigit;
+              hasChanges = true;
+            }
+          }
+        }
+        
+        if (hasChanges) {
+          currentDigitsRef.current = newCurrentDigits;
+          setDigits([...newCurrentDigits]);
+        }
+      }
 
       // 每30秒同步一次数据到服务端
       if (now - lastSyncTime >= 30000) {
