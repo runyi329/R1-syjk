@@ -59,7 +59,7 @@ export function AccountSnapshotCarousel() {
         onMouseLeave={() => setAutoPlay(true)}
       >
         {/* 图片显示 */}
-        <div className="relative w-full aspect-video md:aspect-auto md:h-[600px]">
+        <div className="relative w-full h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px]">
           {snapshots.map((snapshot, index) => (
             <div
               key={snapshot.id}
