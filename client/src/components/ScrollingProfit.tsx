@@ -1,16 +1,25 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo, useCallback } from 'react';
 
 interface ScrollingProfitProps {
   totalInvestment: number;
   className?: string;
 }
 
-// 单个数字滚轮组件 - 老虎机式翻滚效果（统一从下往上滚动）
-const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number }) => {
+// 单个数字滚轮组件 - 独立跳动，每位数字有自己的节奏
+const DigitRoller = memo(({ 
+  digit, 
+  position,
+  onAnimationComplete 
+}: { 
+  digit: string; 
+  position: number; // 0=最右边（分的个位），1=分的十位，2=角，3=元个位...
+  onAnimationComplete?: () => void;
+}) => {
   const [displayDigit, setDisplayDigit] = useState(digit);
   const [previousDigit, setPreviousDigit] = useState(digit);
-  const [animationPhase, setAnimationPhase] = useState<'idle' | 'animating'>('idle');
+  const [isAnimating, setIsAnimating] = useState(false);
   const isFirstRender = useRef(true);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // 跳过首次渲染
@@ -22,24 +31,29 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
     }
 
     // 只有当数字真正变化时才触发动画
-    if (digit !== displayDigit) {
-      // 保存当前显示的数字作为"旧数字"
+    if (digit !== displayDigit && !isAnimating) {
       setPreviousDigit(displayDigit);
-      // 开始动画
-      setAnimationPhase('animating');
+      setIsAnimating(true);
       
-      // 延迟后更新显示数字
-      const timer = setTimeout(() => {
+      // 动画持续时间根据位置不同而不同
+      // 低位（分）动画快，高位（元）动画慢
+      const animationDuration = position <= 1 ? 150 : position <= 3 ? 200 : 250;
+      
+      animationTimeoutRef.current = setTimeout(() => {
         setDisplayDigit(digit);
-        // 动画结束后重置状态
         setTimeout(() => {
-          setAnimationPhase('idle');
-        }, 300);
-      }, delay);
-      
-      return () => clearTimeout(timer);
+          setIsAnimating(false);
+          onAnimationComplete?.();
+        }, animationDuration);
+      }, 0);
     }
-  }, [digit, displayDigit, delay]);
+
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, [digit, displayDigit, isAnimating, position, onAnimationComplete]);
 
   // 非数字字符（小数点、逗号）不需要动画
   if (digit === '.' || digit === ',' || digit === ' ') {
@@ -57,6 +71,9 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
     );
   }
 
+  // 动画速度根据位置调整
+  const transitionDuration = position <= 1 ? '0.15s' : position <= 3 ? '0.2s' : '0.25s';
+
   return (
     <span 
       className="inline-block relative"
@@ -70,21 +87,20 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
       <span
         className="absolute inset-0 flex items-center justify-center text-red-500"
         style={{
-          transform: animationPhase === 'animating' ? 'translateY(-100%)' : 'translateY(0)',
-          transition: animationPhase === 'animating' ? 'transform 0.3s ease-out' : 'none',
-          opacity: animationPhase === 'animating' ? 0 : 1
+          transform: isAnimating ? 'translateY(-100%)' : 'translateY(0)',
+          transition: isAnimating ? `transform ${transitionDuration} ease-out, opacity ${transitionDuration} ease-out` : 'none',
+          opacity: isAnimating ? 0 : 1
         }}
       >
-        {animationPhase === 'animating' ? previousDigit : displayDigit}
+        {isAnimating ? previousDigit : displayDigit}
       </span>
       
-      {/* 新数字 - 从下方滚入（只在动画时显示） */}
-      {animationPhase === 'animating' && (
+      {/* 新数字 - 从下方滚入 */}
+      {isAnimating && (
         <span
           className="absolute inset-0 flex items-center justify-center text-red-500"
           style={{
-            transform: 'translateY(0)',
-            animation: 'slideUpFromBottom 0.3s ease-out forwards'
+            animation: `slideUpFromBottom ${transitionDuration} ease-out forwards`
           }}
         >
           {digit}
@@ -100,9 +116,9 @@ DigitRoller.displayName = 'DigitRoller';
 const STORAGE_KEY = 'scrolling_profit_data';
 
 interface ProfitData {
-  baseProfit: number; // 基础累计收益
-  lastTimestamp: number; // 上次保存的时间戳
-  totalInvestment: number; // 总投资额
+  baseProfit: number;
+  lastTimestamp: number;
+  totalInvestment: number;
 }
 
 // 从 localStorage 获取或初始化累计收益数据
@@ -111,7 +127,6 @@ const getProfitData = (totalInvestment: number): ProfitData => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const data = JSON.parse(stored) as ProfitData;
-      // 如果总投资额改变，重置数据
       if (data.totalInvestment !== totalInvestment) {
         const newData: ProfitData = {
           baseProfit: 8810000,
@@ -127,7 +142,6 @@ const getProfitData = (totalInvestment: number): ProfitData => {
     console.error('Failed to parse profit data from localStorage:', error);
   }
 
-  // 首次初始化
   const initialData: ProfitData = {
     baseProfit: 8810000,
     lastTimestamp: Date.now(),
@@ -147,15 +161,108 @@ const saveProfitData = (data: ProfitData) => {
 };
 
 export default function ScrollingProfit({ totalInvestment, className = '' }: ScrollingProfitProps) {
-  const [displayValue, setDisplayValue] = useState(8810000);
+  // 每一位数字的当前值
+  const [digits, setDigits] = useState<string[]>([]);
   const profitRef = useRef(8810000);
-  const nextUpdateTimeRef = useRef(Date.now());
-  const dailyIncreaseRef = useRef(0);
   const profitDataRef = useRef<ProfitData | null>(null);
   const lastSaveTimeRef = useRef(Date.now());
+  
+  // 每一位数字独立的更新计时器
+  const digitTimersRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
+  // 每一位数字的目标值
+  const targetDigitsRef = useRef<string[]>([]);
+  // 每一位数字的当前显示值
+  const currentDigitsRef = useRef<string[]>([]);
 
-  // 生成随机间隔时间（0.5-3秒）
-  const getRandomInterval = () => 500 + Math.random() * 2500;
+  // 格式化数字为固定格式的字符串
+  const formatNumber = useCallback((value: number): string => {
+    return value.toFixed(2);
+  }, []);
+
+  // 将数字字符串转换为数字数组（从右到左）
+  const stringToDigits = useCallback((str: string): string[] => {
+    return str.split('');
+  }, []);
+
+  // 获取每一位数字的更新间隔（毫秒）
+  // position: 0=最右边（分的个位），越大越靠左
+  const getUpdateInterval = useCallback((position: number): number => {
+    // 基础间隔 + 随机波动，让跳动更自然
+    const randomFactor = 0.5 + Math.random() * 1.0; // 0.5 - 1.5 的随机因子
+    
+    if (position === 0) {
+      // 分的个位：最快，50-150ms
+      return (50 + Math.random() * 100) * randomFactor;
+    } else if (position === 1) {
+      // 分的十位：次快，100-300ms
+      return (100 + Math.random() * 200) * randomFactor;
+    } else if (position === 2) {
+      // 小数点：不更新
+      return Infinity;
+    } else if (position === 3) {
+      // 角（元的个位）：较快，200-500ms
+      return (200 + Math.random() * 300) * randomFactor;
+    } else if (position === 4) {
+      // 十位：中等，400-800ms
+      return (400 + Math.random() * 400) * randomFactor;
+    } else if (position === 5) {
+      // 百位：较慢，800-1500ms
+      return (800 + Math.random() * 700) * randomFactor;
+    } else if (position === 6) {
+      // 千位：慢，1500-3000ms
+      return (1500 + Math.random() * 1500) * randomFactor;
+    } else {
+      // 万位及以上：很慢，3000-6000ms
+      return (3000 + Math.random() * 3000) * randomFactor;
+    }
+  }, []);
+
+  // 更新单个数字位
+  const updateDigitAtPosition = useCallback((position: number) => {
+    const targetDigit = targetDigitsRef.current[position];
+    const currentDigit = currentDigitsRef.current[position];
+    
+    // 如果是小数点，不更新
+    if (targetDigit === '.' || currentDigit === '.') {
+      return;
+    }
+    
+    // 如果目标值和当前值不同，更新显示
+    if (targetDigit !== currentDigit) {
+      currentDigitsRef.current[position] = targetDigit;
+      setDigits([...currentDigitsRef.current]);
+    }
+    
+    // 设置下一次更新
+    const nextInterval = getUpdateInterval(position);
+    if (nextInterval !== Infinity) {
+      const timer = setTimeout(() => {
+        updateDigitAtPosition(position);
+      }, nextInterval);
+      digitTimersRef.current.set(position, timer);
+    }
+  }, [getUpdateInterval]);
+
+  // 启动所有数字位的独立更新循环
+  const startDigitUpdates = useCallback(() => {
+    // 清除所有现有计时器
+    digitTimersRef.current.forEach((timer) => clearTimeout(timer));
+    digitTimersRef.current.clear();
+    
+    // 为每一位数字启动独立的更新循环
+    const numDigits = currentDigitsRef.current.length;
+    for (let i = 0; i < numDigits; i++) {
+      // 跳过小数点
+      if (currentDigitsRef.current[i] === '.') continue;
+      
+      // 每一位数字有不同的初始延迟，让启动更自然
+      const initialDelay = Math.random() * getUpdateInterval(i);
+      const timer = setTimeout(() => {
+        updateDigitAtPosition(i);
+      }, initialDelay);
+      digitTimersRef.current.set(i, timer);
+    }
+  }, [getUpdateInterval, updateDigitAtPosition]);
 
   useEffect(() => {
     // 初始化：从 localStorage 恢复数据
@@ -169,32 +276,34 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
     const increasePerMs = dailyIncrease / dailySeconds;
     const accumulatedIncrease = increasePerMs * timeSinceLastSave;
 
-    // 设置初始值为基础值 + 累积增长
+    // 设置初始值
     const initialProfit = profitData.baseProfit + accumulatedIncrease;
     profitRef.current = initialProfit;
-    setDisplayValue(initialProfit);
+    
+    const initialDigits = stringToDigits(formatNumber(initialProfit));
+    currentDigitsRef.current = [...initialDigits];
+    targetDigitsRef.current = [...initialDigits];
+    setDigits(initialDigits);
 
-    dailyIncreaseRef.current = dailyIncrease;
-    nextUpdateTimeRef.current = Date.now() + getRandomInterval();
     lastSaveTimeRef.current = Date.now();
 
+    // 启动数字更新循环
+    startDigitUpdates();
+
+    // 主循环：更新实际收益值
     let animationFrameId: number;
+    const dailySecondsConst = 365 * 24 * 60 * 60;
+    const baseIncreasePerMs = dailyIncrease / dailySecondsConst;
 
     const animate = () => {
       const now = Date.now();
-
-      if (now >= nextUpdateTimeRef.current) {
-        const randomInterval = getRandomInterval();
-        const dailySeconds = 365 * 24 * 60 * 60;
-        const baseIncrease = (dailyIncreaseRef.current / dailySeconds) * randomInterval;
-        const adjustmentFactor = 0.8 + Math.random() * 0.7;
-        const randomIncrease = baseIncrease * adjustmentFactor;
-
-        profitRef.current += randomIncrease;
-        setDisplayValue(profitRef.current);
-
-        nextUpdateTimeRef.current = now + getRandomInterval();
-      }
+      
+      // 持续增加收益（每帧都增加一点点）
+      const frameIncrease = baseIncreasePerMs * 16 * (0.8 + Math.random() * 0.4); // 约16ms一帧
+      profitRef.current += frameIncrease;
+      
+      // 更新目标数字
+      targetDigitsRef.current = stringToDigits(formatNumber(profitRef.current));
 
       // 每10秒保存一次数据到 localStorage
       if (now - lastSaveTimeRef.current >= 10000) {
@@ -226,6 +335,10 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
+      // 清除所有数字更新计时器
+      digitTimersRef.current.forEach((timer) => clearTimeout(timer));
+      digitTimersRef.current.clear();
+      
       window.removeEventListener('beforeunload', handleBeforeUnload);
       // 卸载时保存最后的数据
       if (profitDataRef.current) {
@@ -234,10 +347,12 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
         saveProfitData(profitDataRef.current);
       }
     };
-  }, [totalInvestment]);
+  }, [totalInvestment, formatNumber, stringToDigits, startDigitUpdates]);
 
-  // 格式化数字为字符串
-  const formattedValue = displayValue.toFixed(2);
+  // 计算每个字符的位置（从右到左，用于确定更新速度）
+  const getPosition = (index: number, totalLength: number): number => {
+    return totalLength - 1 - index;
+  };
 
   return (
     <div className={`${className}`}>
@@ -262,11 +377,11 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
           className="text-3xl sm:text-4xl font-bold font-mono tabular-nums flex"
           style={{ textAlign: 'left' }}
         >
-          {formattedValue.split('').map((char, index) => (
+          {digits.map((char, index) => (
             <DigitRoller 
               key={index} 
               digit={char}
-              delay={index * 20} // 每个数字稍微延迟，产生波浪效果
+              position={getPosition(index, digits.length)}
             />
           ))}
         </span>
