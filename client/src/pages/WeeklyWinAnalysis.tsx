@@ -610,7 +610,7 @@ export default function WeeklyWinAnalysis() {
                       setExpandedFAQIndex(isExpanded ? null : index);
                     }}
                   >
-                    <div className="flex items-start justify-between gap-3 py-2 px-3">
+                    <div className="flex items-start justify-between gap-2 py-1.5 px-3">
                       <CardTitle className="text-xs sm:text-sm font-medium text-left leading-tight">{faq.question}</CardTitle>
                       <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                     </div>
@@ -623,8 +623,8 @@ export default function WeeklyWinAnalysis() {
                       opacity: isExpanded ? 1 : 0
                     }}
                   >
-                    <CardContent className="py-2 px-3">
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                    <CardContent className="py-0 px-3">
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-tight">{faq.answer}</p>
                     </CardContent>
                   </div>
                 </Card>
