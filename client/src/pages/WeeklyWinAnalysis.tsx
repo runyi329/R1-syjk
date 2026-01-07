@@ -468,7 +468,7 @@ export default function WeeklyWinAnalysis() {
               <div className="space-y-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
-                  <p className="text-4xl font-bold text-green-500">23300000.000 USDT</p>
+                  <p className="text-4xl font-bold text-green-500">2330<span className="text-2xl">万</span> USDT</p>
                 </div>
                 <div className="border-t border-border pt-6 overflow-hidden">
                   <ScrollingProfit totalInvestment={23300000} />
