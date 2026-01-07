@@ -96,19 +96,87 @@ const DigitRoller = memo(({ digit, delay = 0 }: { digit: string; delay?: number 
 
 DigitRoller.displayName = 'DigitRoller';
 
+// 持久化存储的键名
+const STORAGE_KEY = 'scrolling_profit_data';
+
+interface ProfitData {
+  baseProfit: number; // 基础累计收益
+  lastTimestamp: number; // 上次保存的时间戳
+  totalInvestment: number; // 总投资额
+}
+
+// 从 localStorage 获取或初始化累计收益数据
+const getProfitData = (totalInvestment: number): ProfitData => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored) as ProfitData;
+      // 如果总投资额改变，重置数据
+      if (data.totalInvestment !== totalInvestment) {
+        const newData: ProfitData = {
+          baseProfit: 8810000,
+          lastTimestamp: Date.now(),
+          totalInvestment
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+        return newData;
+      }
+      return data;
+    }
+  } catch (error) {
+    console.error('Failed to parse profit data from localStorage:', error);
+  }
+
+  // 首次初始化
+  const initialData: ProfitData = {
+    baseProfit: 8810000,
+    lastTimestamp: Date.now(),
+    totalInvestment
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
+  return initialData;
+};
+
+// 保存累计收益数据到 localStorage
+const saveProfitData = (data: ProfitData) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Failed to save profit data to localStorage:', error);
+  }
+};
+
 export default function ScrollingProfit({ totalInvestment, className = '' }: ScrollingProfitProps) {
   const [displayValue, setDisplayValue] = useState(8810000);
   const profitRef = useRef(8810000);
   const nextUpdateTimeRef = useRef(Date.now());
   const dailyIncreaseRef = useRef(0);
+  const profitDataRef = useRef<ProfitData | null>(null);
+  const lastSaveTimeRef = useRef(Date.now());
 
   // 生成随机间隔时间（0.5-3秒）
   const getRandomInterval = () => 500 + Math.random() * 2500;
 
   useEffect(() => {
+    // 初始化：从 localStorage 恢复数据
+    const profitData = getProfitData(totalInvestment);
+    profitDataRef.current = profitData;
+
+    // 计算从上次保存到现在应该增长的金额
+    const timeSinceLastSave = Date.now() - profitData.lastTimestamp;
     const dailyIncrease = (totalInvestment * 0.52) / 365;
+    const dailySeconds = 365 * 24 * 60 * 60;
+    const increasePerMs = dailyIncrease / dailySeconds;
+    const accumulatedIncrease = increasePerMs * timeSinceLastSave;
+
+    // 设置初始值为基础值 + 累积增长
+    const initialProfit = profitData.baseProfit + accumulatedIncrease;
+    profitRef.current = initialProfit;
+    setDisplayValue(initialProfit);
+
     dailyIncreaseRef.current = dailyIncrease;
     nextUpdateTimeRef.current = Date.now() + getRandomInterval();
+    lastSaveTimeRef.current = Date.now();
 
     let animationFrameId: number;
 
@@ -128,14 +196,42 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
         nextUpdateTimeRef.current = now + getRandomInterval();
       }
 
+      // 每10秒保存一次数据到 localStorage
+      if (now - lastSaveTimeRef.current >= 10000) {
+        if (profitDataRef.current) {
+          profitDataRef.current.baseProfit = profitRef.current;
+          profitDataRef.current.lastTimestamp = now;
+          saveProfitData(profitDataRef.current);
+          lastSaveTimeRef.current = now;
+        }
+      }
+
       animationFrameId = requestAnimationFrame(animate);
     };
 
     animationFrameId = requestAnimationFrame(animate);
 
+    // 页面卸载时保存最后的数据
+    const handleBeforeUnload = () => {
+      if (profitDataRef.current) {
+        profitDataRef.current.baseProfit = profitRef.current;
+        profitDataRef.current.lastTimestamp = Date.now();
+        saveProfitData(profitDataRef.current);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
+      }
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // 卸载时保存最后的数据
+      if (profitDataRef.current) {
+        profitDataRef.current.baseProfit = profitRef.current;
+        profitDataRef.current.lastTimestamp = Date.now();
+        saveProfitData(profitDataRef.current);
       }
     };
   }, [totalInvestment]);
