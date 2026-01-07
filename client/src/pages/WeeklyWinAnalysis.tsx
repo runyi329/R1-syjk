@@ -2,9 +2,9 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3, ChevronDown } from "lucide-react";
+import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3, ChevronDown, Clock } from "lucide-react";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
 import AssetAllocationSection from "@/components/AssetAllocationSection";
 import { AccountSnapshotCarousel } from "@/components/AccountSnapshotCarousel";
@@ -13,6 +13,30 @@ import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, T
 export default function WeeklyWinAnalysis() {
   const [investmentAmount, setInvestmentAmount] = useState(100000);
   const [isCompoundInterest, setIsCompoundInterest] = useState(true);
+  const [currentTime, setCurrentTime] = useState<string>("");
+
+  // 实时北京时间
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      // 转换为北京时间（UTC+8）
+      const beijingTime = new Date(now.getTime() + (8 - now.getTimezoneOffset() / 60) * 60 * 60 * 1000);
+      const formatted = beijingTime.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      setCurrentTime(formatted);
+    };
+    
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // 资金配置数据
   const fundAllocation = [
@@ -429,23 +453,27 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6">数百位投资者已获得丰厚收益，以下是上个月的真实案例</p>
           </div>
 
-          {/* 统计数据 - 手机端左右紧凑排列 */}
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
-            <Card className="border-none shadow-md">
-              <CardContent className="pt-3 md:pt-6 px-3 md:px-6 pb-3 md:pb-6">
-                <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">累计投资额</p>
-                <p className="text-2xl md:text-4xl font-bold text-primary">2330万USDT</p>
-                <p className="text-xs text-muted-foreground mt-1 md:mt-2">{successCases.length}位投资者</p>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-md">
-              <CardContent className="pt-3 md:pt-6 px-3 md:px-6 pb-3 md:pb-6">
-                <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">累计收益</p>
-                <p className="text-2xl md:text-4xl font-bold text-red-500">871.22万USDT</p>
-                <p className="text-xs text-muted-foreground mt-1 md:mt-2">平均收益率 {avgYield}%</p>
-              </CardContent>
-            </Card>
+          {/* 实时时钟 */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <Clock className="w-5 h-5 text-primary" />
+            <p className="text-lg font-semibold text-primary">北京时间：{currentTime}</p>
           </div>
+
+          {/* 统计数据 - 单个框内上下排列 */}
+          <Card className="border-none shadow-md max-w-sm mx-auto">
+            <CardContent className="pt-6 px-6 pb-6">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
+                  <p className="text-4xl font-bold text-green-500">2330万USDT</p>
+                </div>
+                <div className="border-t border-border pt-6">
+                  <p className="text-sm text-muted-foreground mb-2">累计收益</p>
+                  <p className="text-4xl font-bold text-red-500">871.22万USDT</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* 交易账户快照轮播 */}
           <AccountSnapshotCarousel />
