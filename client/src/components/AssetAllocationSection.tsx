@@ -86,6 +86,76 @@ function AnimatedNumber({ value, decimals = 0 }: { value: number; decimals?: num
   return <>{decimals > 0 ? displayValue.toFixed(decimals) : Math.round(displayValue)}</>;
 }
 
+// 自定义饼图标签组件 - 固定位置
+function PieLabel({ cx, cy, midAngle, outerRadius, symbol, needsLine }: any) {
+  // BTC固定在正上方
+  if (symbol === "BTC") {
+    return (
+      <g>
+        {needsLine && (
+          <line
+            x1={cx}
+            y1={cy - outerRadius - 5}
+            x2={cx}
+            y2={cy - outerRadius - 25}
+            stroke="#f7931a"
+            strokeWidth="1"
+            strokeDasharray="3,3"
+          />
+        )}
+        <text
+          x={cx}
+          y={cy - outerRadius - 30}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#f7931a"
+          fontSize="14"
+          fontWeight="bold"
+        >
+          BTC
+        </text>
+      </g>
+    );
+  }
+  
+  // ETH固定在11:00方向
+  if (symbol === "ETH") {
+    const angle = -60; // 11:00方向
+    const radian = (angle * Math.PI) / 180;
+    const x = cx + (outerRadius + 35) * Math.cos(radian);
+    const y = cy + (outerRadius + 35) * Math.sin(radian);
+    
+    return (
+      <g>
+        {needsLine && (
+          <line
+            x1={cx + outerRadius * Math.cos(radian)}
+            y1={cy + outerRadius * Math.sin(radian)}
+            x2={x}
+            y2={y}
+            stroke="#00d4ff"
+            strokeWidth="1"
+            strokeDasharray="3,3"
+          />
+        )}
+        <text
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#00d4ff"
+          fontSize="14"
+          fontWeight="bold"
+        >
+          ETH
+        </text>
+      </g>
+    );
+  }
+  
+  return null;
+}
+
 export default function AssetAllocationSection() {
   const [marketMode, setMarketMode] = useState<"bull" | "bear" | "range">("bull");
   
@@ -113,32 +183,32 @@ export default function AssetAllocationSection() {
   const otherCoins = pieData.filter(item => item.symbol !== "BTC" && item.symbol !== "ETH");
 
   return (
-    <section className="space-y-2">
+    <section className="space-y-1">
       <div>
-        <h2 className="text-xl font-bold tracking-tight mb-1">资产配置比例</h2>
-        <p className="text-xs text-muted-foreground mb-2">根据市场行情灵活调整投资组合配置</p>
+        <h2 className="text-lg font-bold tracking-tight mb-0.5">资产配置比例</h2>
+        <p className="text-xs text-muted-foreground mb-1">根据市场行情灵活调整投资组合配置</p>
       </div>
 
       {/* 市场模式切换 - 手机版本3列布局 */}
-      <div className="grid grid-cols-3 gap-1 sm:gap-2 md:gap-3">
+      <div className="grid grid-cols-3 gap-0.5 sm:gap-2 md:gap-3">
         <Button
           onClick={() => setMarketMode("bull")}
           variant={marketMode === "bull" ? "default" : "outline"}
-          className="px-1 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap h-auto"
+          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto"
         >
           🐂 牛市行情
         </Button>
         <Button
           onClick={() => setMarketMode("bear")}
           variant={marketMode === "bear" ? "default" : "outline"}
-          className="px-1 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap h-auto"
+          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto"
         >
           🐻 熊市行情
         </Button>
         <Button
           onClick={() => setMarketMode("range")}
           variant={marketMode === "range" ? "default" : "outline"}
-          className="px-1 sm:px-3 py-1 text-xs sm:text-sm whitespace-nowrap h-auto"
+          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto"
         >
           📊 震荡行情
         </Button>
@@ -146,21 +216,21 @@ export default function AssetAllocationSection() {
 
       {/* 配置详情卡片 - 紧凑布局 */}
       <Card className="border-none shadow-md">
-        <CardHeader className="pb-1 pt-3 px-3">
-          <CardTitle className="text-sm">配置详情</CardTitle>
+        <CardHeader className="pb-0 pt-1 px-2">
+          <CardTitle className="text-xs">配置详情</CardTitle>
           {/* 统计信息 - 紧凑3列 */}
-          <div className="grid grid-cols-3 gap-1 mt-1">
-            <div className="bg-primary/5 rounded p-1.5 transition-all duration-300">
-              <p className="text-xs text-muted-foreground">总仓位</p>
-              <p className="text-sm font-bold text-primary transition-all duration-300"><AnimatedNumber value={expectedAllocation} decimals={0} />%</p>
+          <div className="grid grid-cols-3 gap-0.5 mt-0.25">
+            <div className="bg-primary/5 rounded p-0.5 transition-all duration-300">
+              <p className="text-xs text-muted-foreground leading-tight">总仓位</p>
+              <p className="text-xs font-bold text-primary transition-all duration-300 leading-tight"><AnimatedNumber value={expectedAllocation} decimals={0} />%</p>
             </div>
-            <div className="bg-amber-500/5 rounded p-1.5">
-              <p className="text-xs text-muted-foreground">主流币占比</p>
-              <p className="text-sm font-bold text-amber-600"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
+            <div className="bg-amber-500/5 rounded p-0.5">
+              <p className="text-xs text-muted-foreground leading-tight">主流币占比</p>
+              <p className="text-xs font-bold text-amber-600 leading-tight"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
             </div>
-            <div className="bg-emerald-500/5 rounded p-1.5">
-              <p className="text-xs text-muted-foreground">币种范围</p>
-              <p className="text-sm font-bold text-emerald-600"><AnimatedNumber value={currentData.length} decimals={0} /></p>
+            <div className="bg-emerald-500/5 rounded p-0.5">
+              <p className="text-xs text-muted-foreground leading-tight">币种范围</p>
+              <p className="text-xs font-bold text-emerald-600 leading-tight"><AnimatedNumber value={currentData.length} decimals={0} /></p>
             </div>
           </div>
         </CardHeader>
@@ -168,13 +238,13 @@ export default function AssetAllocationSection() {
 
       {/* 配置分布饼图 - 左右并排布局 */}
       <Card className="border-none shadow-md">
-        <CardHeader className="pb-1 pt-3 px-3">
-          <CardTitle className="text-sm">配置分布</CardTitle>
+        <CardHeader className="pb-0 pt-1 px-2">
+          <CardTitle className="text-xs">配置分布</CardTitle>
         </CardHeader>
-        <CardContent className="p-2">
-          <div className="w-full flex flex-row gap-2">
-            {/* 饼图部分 - 靠左 */}
-            <div className="w-2/5 flex-shrink-0 h-[200px]">
+        <CardContent className="p-1">
+          <div className="w-full flex flex-row gap-1">
+            {/* 饼图部分 - 靠左，占50-60% */}
+            <div className="w-1/2 flex-shrink-0 h-[180px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
@@ -182,14 +252,8 @@ export default function AssetAllocationSection() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ symbol, value }) => {
-                      // 仅显示BTC和ETH的标签在饼图内部
-                      if (symbol === "BTC" || symbol === "ETH") {
-                        return symbol;
-                      }
-                      return '';
-                    }}
-                    outerRadius={60}
+                    label={false}
+                    outerRadius={55}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -212,15 +276,28 @@ export default function AssetAllocationSection() {
                   />
                 </RechartsPieChart>
               </ResponsiveContainer>
+              
+              {/* 固定标签 - BTC在正上方，ETH在11:00方向 */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {/* BTC标签 - 正上方 */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8">
+                  <div className="text-xs font-bold text-orange-500">BTC</div>
+                </div>
+                
+                {/* ETH标签 - 11:00方向 */}
+                <div className="absolute left-1/4 top-1/4 transform -translate-x-8 -translate-y-2">
+                  <div className="text-xs font-bold text-cyan-400">ETH</div>
+                </div>
+              </div>
             </div>
             
-            {/* 小币种列表 - 靠右，每行2个，7-8行 */}
-            <div className="w-3/5 bg-blue-500/10 rounded-lg p-2 border border-blue-500/20 max-h-[200px] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+            {/* 小币种列表 - 靠右，占40-50% */}
+            <div className="w-1/2 bg-blue-500/10 rounded-lg p-0.75 border border-blue-500/20 max-h-[180px] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-x-0.25 gap-y-0.25">
                 {otherCoins.map((item, index) => (
-                  <div key={index} className="flex items-center gap-1">
+                  <div key={index} className="flex items-center gap-0.5">
                     <div 
-                      className="w-2 h-2 rounded-full flex-shrink-0" 
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
                       style={{ backgroundColor: item.color }}
                     />
                     <span className="text-xs font-medium text-foreground">{item.symbol}</span>
