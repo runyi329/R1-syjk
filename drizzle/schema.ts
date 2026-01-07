@@ -277,3 +277,19 @@ export const passwordResets = mysqlTable("passwordResets", {
 
 export type PasswordReset = typeof passwordResets.$inferSelect;
 export type InsertPasswordReset = typeof passwordResets.$inferInsert;
+
+
+/**
+ * 累计收益表 - 存储全局累计收益数据，所有用户共享
+ */
+export const cumulativeProfit = mysqlTable("cumulativeProfit", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 累计收益金额 */
+  amount: decimal("amount", { precision: 20, scale: 2 }).notNull(),
+  /** 最后更新时间 */
+  lastUpdatedAt: timestamp("lastUpdatedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CumulativeProfit = typeof cumulativeProfit.$inferSelect;
+export type InsertCumulativeProfit = typeof cumulativeProfit.$inferInsert;

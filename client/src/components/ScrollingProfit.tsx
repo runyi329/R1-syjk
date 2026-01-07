@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, memo, useCallback } from 'react';
+import { trpc } from '@/lib/trpc';
 
 interface ScrollingProfitProps {
   totalInvestment: number;
@@ -112,60 +113,15 @@ const DigitRoller = memo(({
 
 DigitRoller.displayName = 'DigitRoller';
 
-// 持久化存储的键名
-const STORAGE_KEY = 'scrolling_profit_data';
-
-interface ProfitData {
-  baseProfit: number;
-  lastTimestamp: number;
-  totalInvestment: number;
-}
-
-// 从 localStorage 获取或初始化累计收益数据
-const getProfitData = (totalInvestment: number): ProfitData => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const data = JSON.parse(stored) as ProfitData;
-      if (data.totalInvestment !== totalInvestment) {
-        const newData: ProfitData = {
-          baseProfit: 8810000,
-          lastTimestamp: Date.now(),
-          totalInvestment
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
-        return newData;
-      }
-      return data;
-    }
-  } catch (error) {
-    console.error('Failed to parse profit data from localStorage:', error);
-  }
-
-  const initialData: ProfitData = {
-    baseProfit: 8810000,
-    lastTimestamp: Date.now(),
-    totalInvestment
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
-  return initialData;
-};
-
-// 保存累计收益数据到 localStorage
-const saveProfitData = (data: ProfitData) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (error) {
-    console.error('Failed to save profit data to localStorage:', error);
-  }
-};
+// 每秒增长金额（约每秒2元平均）
+const PROFIT_PER_SECOND = 2;
 
 export default function ScrollingProfit({ totalInvestment, className = '' }: ScrollingProfitProps) {
   // 每一位数字的当前值
   const [digits, setDigits] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const profitRef = useRef(8810000);
-  const profitDataRef = useRef<ProfitData | null>(null);
-  const lastSaveTimeRef = useRef(Date.now());
+  const serverBaseRef = useRef<{ amount: number; timestamp: number } | null>(null);
   
   // 每一位数字独立的更新计时器
   const digitTimersRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
@@ -173,6 +129,15 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
   const targetDigitsRef = useRef<string[]>([]);
   // 每一位数字的当前显示值
   const currentDigitsRef = useRef<string[]>([]);
+
+  // 获取服务端累计收益数据
+  const { data: serverData, refetch } = trpc.cumulativeProfit.getCurrent.useQuery(undefined, {
+    refetchInterval: 60000, // 每60秒从服务端同步一次
+    staleTime: 30000,
+  });
+
+  // 同步数据到服务端
+  const syncMutation = trpc.cumulativeProfit.sync.useMutation();
 
   // 格式化数字为固定格式的字符串
   const formatNumber = useCallback((value: number): string => {
@@ -264,55 +229,56 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
     }
   }, [getUpdateInterval, updateDigitAtPosition]);
 
+  // 当服务端数据加载完成后初始化
   useEffect(() => {
-    // 初始化：从 localStorage 恢复数据
-    const profitData = getProfitData(totalInvestment);
-    profitDataRef.current = profitData;
+    if (serverData && !serverBaseRef.current) {
+      // 首次加载服务端数据
+      serverBaseRef.current = {
+        amount: serverData.amount,
+        timestamp: Date.now()
+      };
+      profitRef.current = serverData.amount;
+      
+      const initialDigits = stringToDigits(formatNumber(serverData.amount));
+      currentDigitsRef.current = [...initialDigits];
+      targetDigitsRef.current = [...initialDigits];
+      setDigits(initialDigits);
+      setIsLoading(false);
+      
+      // 启动数字更新循环
+      startDigitUpdates();
+    } else if (serverData && serverBaseRef.current) {
+      // 后续同步：更新基准值
+      serverBaseRef.current = {
+        amount: serverData.amount,
+        timestamp: Date.now()
+      };
+    }
+  }, [serverData, formatNumber, stringToDigits, startDigitUpdates]);
 
-    // 计算从上次保存到现在应该增长的金额
-    const timeSinceLastSave = Date.now() - profitData.lastTimestamp;
-    const dailyIncrease = (totalInvestment * 0.52) / 365;
-    const dailySeconds = 365 * 24 * 60 * 60;
-    const increasePerMs = dailyIncrease / dailySeconds;
-    const accumulatedIncrease = increasePerMs * timeSinceLastSave;
+  // 主循环：更新实际收益值
+  useEffect(() => {
+    if (isLoading) return;
 
-    // 设置初始值
-    const initialProfit = profitData.baseProfit + accumulatedIncrease;
-    profitRef.current = initialProfit;
-    
-    const initialDigits = stringToDigits(formatNumber(initialProfit));
-    currentDigitsRef.current = [...initialDigits];
-    targetDigitsRef.current = [...initialDigits];
-    setDigits(initialDigits);
-
-    lastSaveTimeRef.current = Date.now();
-
-    // 启动数字更新循环
-    startDigitUpdates();
-
-    // 主循环：更新实际收益值
     let animationFrameId: number;
-    const dailySecondsConst = 365 * 24 * 60 * 60;
-    const baseIncreasePerMs = dailyIncrease / dailySecondsConst;
+    let lastSyncTime = Date.now();
 
     const animate = () => {
       const now = Date.now();
       
-      // 持续增加收益（每帧都增加一点点）
-      const frameIncrease = baseIncreasePerMs * 16 * (0.8 + Math.random() * 0.4); // 约16ms一帧
-      profitRef.current += frameIncrease;
+      // 基于服务端基准值 + 本地时间差计算当前值
+      if (serverBaseRef.current) {
+        const timeSinceBase = (now - serverBaseRef.current.timestamp) / 1000;
+        profitRef.current = serverBaseRef.current.amount + (timeSinceBase * PROFIT_PER_SECOND);
+      }
       
       // 更新目标数字
       targetDigitsRef.current = stringToDigits(formatNumber(profitRef.current));
 
-      // 每10秒保存一次数据到 localStorage
-      if (now - lastSaveTimeRef.current >= 10000) {
-        if (profitDataRef.current) {
-          profitDataRef.current.baseProfit = profitRef.current;
-          profitDataRef.current.lastTimestamp = now;
-          saveProfitData(profitDataRef.current);
-          lastSaveTimeRef.current = now;
-        }
+      // 每30秒同步一次数据到服务端
+      if (now - lastSyncTime >= 30000) {
+        syncMutation.mutate();
+        lastSyncTime = now;
       }
 
       animationFrameId = requestAnimationFrame(animate);
@@ -320,13 +286,9 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
 
     animationFrameId = requestAnimationFrame(animate);
 
-    // 页面卸载时保存最后的数据
+    // 页面卸载时同步数据到服务端
     const handleBeforeUnload = () => {
-      if (profitDataRef.current) {
-        profitDataRef.current.baseProfit = profitRef.current;
-        profitDataRef.current.lastTimestamp = Date.now();
-        saveProfitData(profitDataRef.current);
-      }
+      syncMutation.mutate();
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -340,19 +302,27 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
       digitTimersRef.current.clear();
       
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      // 卸载时保存最后的数据
-      if (profitDataRef.current) {
-        profitDataRef.current.baseProfit = profitRef.current;
-        profitDataRef.current.lastTimestamp = Date.now();
-        saveProfitData(profitDataRef.current);
-      }
     };
-  }, [totalInvestment, formatNumber, stringToDigits, startDigitUpdates]);
+  }, [isLoading, formatNumber, stringToDigits, syncMutation]);
 
   // 计算每个字符的位置（从右到左，用于确定更新速度）
   const getPosition = (index: number, totalLength: number): number => {
     return totalLength - 1 - index;
   };
+
+  // 加载中显示
+  if (isLoading) {
+    return (
+      <div className={`${className}`}>
+        <p className="text-sm text-muted-foreground mb-2">累计收益</p>
+        <div className="flex items-end">
+          <span className="text-3xl sm:text-4xl font-bold font-mono tabular-nums text-red-500">
+            加载中...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${className}`}>
