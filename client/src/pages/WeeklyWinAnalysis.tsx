@@ -7,6 +7,7 @@ import { Link } from "wouter";
 import { useState } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
 import AssetAllocationSection from "@/components/AssetAllocationSection";
+import { AccountSnapshotCarousel } from "@/components/AccountSnapshotCarousel";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function WeeklyWinAnalysis() {
@@ -446,74 +447,8 @@ export default function WeeklyWinAnalysis() {
             </Card>
           </div>
 
-          {/* 案例卡片 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {successCases.map((caseItem) => (
-              <Card key={caseItem.id} className="border-l-4 border-l-primary shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{caseItem.investorName}</CardTitle>
-                      <CardDescription>投资时间: {caseItem.joinDate}</CardDescription>
-                    </div>
-                    <Badge className="bg-green-500/20 text-green-600 border-green-500/30">{caseItem.status}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">初始投资</p>
-                      <p className="font-semibold text-primary">${caseItem.investmentAmount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">投资时长</p>
-                      <p className="font-semibold">{caseItem.investmentDuration}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">累计收益</p>
-                      <p className="font-semibold text-green-500">${caseItem.totalProfit.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">年化收益率</p>
-                      <p className="font-semibold text-yellow-500">{caseItem.annualYield}%</p>
-                    </div>
-
-                  </div>
-                  <div className="pt-3 border-t border-border">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">收益水平</span>
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-primary to-green-500 rounded-full" 
-                          style={{width: `${Math.min(caseItem.annualYield / 40 * 100, 100)}%`}}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* 案例说明 */}
-          <Card className="border-none shadow-md bg-gradient-to-r from-primary/5 to-primary/10">
-            <CardContent className="pt-6">
-              <div className="space-y-3">
-                <div className="flex gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm"><strong>真实数据验证：</strong> 以上案例数据来自真实投资者账户，每个案例都已经过第三方审计验证</p>
-                </div>
-                <div className="flex gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm"><strong>收益水平说明：</strong> 不同投资者的收益率不同，主要取决于市场行情、交易策略和投资时间</p>
-                </div>
-                <div className="flex gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm"><strong>提现步骤：</strong> 每个案例中的提现金额都是每周不断提现的累计，可随时提现，不受任何限制</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* 交易账户快照轮播 */}
+          <AccountSnapshotCarousel />
         </section>
 
         {/* 安全保障 */}
