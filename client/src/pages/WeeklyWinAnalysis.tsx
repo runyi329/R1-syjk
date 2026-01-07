@@ -456,12 +456,6 @@ export default function WeeklyWinAnalysis() {
             <p className="text-muted-foreground mb-6"></p>
           </div>
 
-          {/* 实时时钟 */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Clock className="w-5 h-5 text-primary" />
-            <p className="text-lg font-semibold text-primary">北京时间：{currentTime}</p>
-          </div>
-
           {/* 统计数据 - 单个框内上下排列 */}
           <Card className="border-none shadow-md max-w-sm mx-auto overflow-hidden">
             <CardContent className="pt-6 px-6 pb-6">
@@ -474,6 +468,11 @@ export default function WeeklyWinAnalysis() {
                   </div>
                 </div>
                 <div className="border-t border-border pt-6 overflow-hidden">
+                  {/* 实时时钟 */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock className="w-4 h-4 text-primary" />
+                    <p className="text-sm font-semibold text-primary">{currentTime}</p>
+                  </div>
                   <ScrollingProfit totalInvestment={23300000} />
                 </div>
               </div>
