@@ -190,7 +190,7 @@ export default function WeeklyWinAnalysis() {
         {/* 产品特点 */}
         <section id="features" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">产品特点</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-2">产品特点</h2>
             <p className="text-muted-foreground mb-6">周周赢的核心优势和创新设计</p>
           </div>
 
@@ -277,7 +277,7 @@ export default function WeeklyWinAnalysis() {
         {/* 收益计算器 */}
         <section id="calculator" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">收益计算演示</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-2">收益计算演示</h2>
             <p className="text-muted-foreground mb-6">根据您的投资金额计算预期收益</p>
           </div>
 
@@ -366,7 +366,7 @@ export default function WeeklyWinAnalysis() {
         {/* 业务模型 */}
         <section id="model" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">业务模型</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-2">业务模型</h2>
             <p className="text-muted-foreground mb-6">了解周周赢的运作机制和收益流程</p>
           </div>
 
@@ -425,7 +425,7 @@ export default function WeeklyWinAnalysis() {
         {/* 历史收益案例 */}
         <section id="cases" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">交易账户快照</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-2">交易账户快照</h2>
             <p className="text-muted-foreground mb-6">数百位投资者已获得丰厚收益，以下是上个月的真实案例</p>
           </div>
 
@@ -454,7 +454,7 @@ export default function WeeklyWinAnalysis() {
         {/* 安全保障 */}
         <section id="safety" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">安全保障体系</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-2">安全保障体系</h2>
             <p className="text-muted-foreground mb-6">多重保护机制确保您的投资安全</p>
           </div>
 
@@ -532,7 +532,7 @@ export default function WeeklyWinAnalysis() {
         {/* 常见问题 FAQ */}
         <section id="faq" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">常见问题</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-2">常见问题</h2>
             <p className="text-muted-foreground mb-6">关于周周赢产品的常见问题解答</p>
           </div>
 
@@ -596,7 +596,7 @@ export default function WeeklyWinAnalysis() {
           <Card className="border-none shadow-md overflow-hidden bg-gradient-to-r from-primary/10 to-primary/5">
             <CardContent className="pt-8">
               <div className="text-center space-y-4">
-                <h3 className="text-2xl font-bold">准备开始投资？</h3>
+                <h3 className="text-lg font-bold">准备开始投资？</h3>
                 <p className="text-muted-foreground">加入数百位投资者，开始您的周周赢之旅</p>
                 <div className="flex justify-center gap-4 flex-wrap">
                   <InvestmentApplicationForm 
