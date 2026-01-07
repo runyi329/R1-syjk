@@ -7,51 +7,51 @@ import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, T
 const assetData = {
   bull: [ // 牛市 70%仓位
     { symbol: "BTC", name: "比特币", allocation: 30, color: "#f7931a" },
-    { symbol: "ETH", name: "以太坊", allocation: 22, color: "#627eea" },
+    { symbol: "ETH", name: "以太坊", allocation: 22, color: "#00d4ff" },
     { symbol: "SOL", name: "Solana", allocation: 8, color: "#14f195" },
-    { symbol: "XRP", name: "瑞波币", allocation: 6, color: "#3498db" },
+    { symbol: "XRP", name: "瑞波币", allocation: 6, color: "#00bfff" },
     { symbol: "BNB", name: "币安币", allocation: 5, color: "#f3ba2f" },
-    { symbol: "AAVE", name: "Aave", allocation: 4, color: "#b6509e" },
-    { symbol: "LINK", name: "Chainlink", allocation: 4, color: "#2a5ade" },
-    { symbol: "OKB", name: "OKB", allocation: 3, color: "#3d5afe" },
-    { symbol: "SUI", name: "Sui", allocation: 3, color: "#6fbcee" },
+    { symbol: "AAVE", name: "Aave", allocation: 4, color: "#dda0dd" },
+    { symbol: "LINK", name: "Chainlink", allocation: 4, color: "#87ceeb" },
+    { symbol: "OKB", name: "OKB", allocation: 3, color: "#9370db" },
+    { symbol: "SUI", name: "Sui", allocation: 3, color: "#87cefa" },
     { symbol: "HBAE", name: "HBAE", allocation: 2, color: "#ff6b6b" },
-    { symbol: "ENA", name: "Ethena", allocation: 2, color: "#4ecdc4" },
-    { symbol: "APT", name: "Aptos", allocation: 2, color: "#000000" },
-    { symbol: "ONDO", name: "Ondo", allocation: 1, color: "#6366f1" },
-    { symbol: "ASTER", name: "Aster", allocation: 1, color: "#ec4899" }
+    { symbol: "ENA", name: "Ethena", allocation: 2, color: "#20b2aa" },
+    { symbol: "APT", name: "Aptos", allocation: 2, color: "#ffd700" },
+    { symbol: "ONDO", name: "Ondo", allocation: 1, color: "#9370db" },
+    { symbol: "ASTER", name: "Aster", allocation: 1, color: "#ff69b4" }
   ],
   bear: [ // 熊市 30%仓位
     { symbol: "BTC", name: "比特币", allocation: 20, color: "#f7931a" },
-    { symbol: "ETH", name: "以太坊", allocation: 15, color: "#627eea" },
+    { symbol: "ETH", name: "以太坊", allocation: 15, color: "#00d4ff" },
     { symbol: "SOL", name: "Solana", allocation: 3, color: "#14f195" },
-    { symbol: "XRP", name: "瑞波币", allocation: 2, color: "#3498db" },
+    { symbol: "XRP", name: "瑞波币", allocation: 2, color: "#00bfff" },
     { symbol: "BNB", name: "币安币", allocation: 2, color: "#f3ba2f" },
-    { symbol: "AAVE", name: "Aave", allocation: 1, color: "#b6509e" },
-    { symbol: "LINK", name: "Chainlink", allocation: 1, color: "#2a5ade" },
-    { symbol: "OKB", name: "OKB", allocation: 1, color: "#3d5afe" },
-    { symbol: "SUI", name: "Sui", allocation: 1, color: "#6fbcee" },
+    { symbol: "AAVE", name: "Aave", allocation: 1, color: "#dda0dd" },
+    { symbol: "LINK", name: "Chainlink", allocation: 1, color: "#87ceeb" },
+    { symbol: "OKB", name: "OKB", allocation: 1, color: "#9370db" },
+    { symbol: "SUI", name: "Sui", allocation: 1, color: "#87cefa" },
     { symbol: "HBAE", name: "HBAE", allocation: 0.5, color: "#ff6b6b" },
-    { symbol: "ENA", name: "Ethena", allocation: 0.5, color: "#4ecdc4" },
-    { symbol: "APT", name: "Aptos", allocation: 0.5, color: "#000000" },
-    { symbol: "ONDO", name: "Ondo", allocation: 0.5, color: "#6366f1" },
-    { symbol: "ASTER", name: "Aster", allocation: 0.5, color: "#ec4899" }
+    { symbol: "ENA", name: "Ethena", allocation: 0.5, color: "#20b2aa" },
+    { symbol: "APT", name: "Aptos", allocation: 0.5, color: "#ffd700" },
+    { symbol: "ONDO", name: "Ondo", allocation: 0.5, color: "#9370db" },
+    { symbol: "ASTER", name: "Aster", allocation: 0.5, color: "#ff69b4" }
   ],
   range: [ // 震荡 50%仓位
     { symbol: "BTC", name: "比特币", allocation: 25, color: "#f7931a" },
-    { symbol: "ETH", name: "以太坊", allocation: 18, color: "#627eea" },
+    { symbol: "ETH", name: "以太坊", allocation: 18, color: "#00d4ff" },
     { symbol: "SOL", name: "Solana", allocation: 5, color: "#14f195" },
-    { symbol: "XRP", name: "瑞波币", allocation: 4, color: "#3498db" },
+    { symbol: "XRP", name: "瑞波币", allocation: 4, color: "#00bfff" },
     { symbol: "BNB", name: "币安币", allocation: 3, color: "#f3ba2f" },
-    { symbol: "AAVE", name: "Aave", allocation: 2, color: "#b6509e" },
-    { symbol: "LINK", name: "Chainlink", allocation: 2, color: "#2a5ade" },
-    { symbol: "OKB", name: "OKB", allocation: 2, color: "#3d5afe" },
-    { symbol: "SUI", name: "Sui", allocation: 2, color: "#6fbcee" },
+    { symbol: "AAVE", name: "Aave", allocation: 2, color: "#dda0dd" },
+    { symbol: "LINK", name: "Chainlink", allocation: 2, color: "#87ceeb" },
+    { symbol: "OKB", name: "OKB", allocation: 2, color: "#9370db" },
+    { symbol: "SUI", name: "Sui", allocation: 2, color: "#87cefa" },
     { symbol: "HBAE", name: "HBAE", allocation: 1, color: "#ff6b6b" },
-    { symbol: "ENA", name: "Ethena", allocation: 1, color: "#4ecdc4" },
-    { symbol: "APT", name: "Aptos", allocation: 1, color: "#000000" },
-    { symbol: "ONDO", name: "Ondo", allocation: 0.5, color: "#6366f1" },
-    { symbol: "ASTER", name: "Aster", allocation: 0.5, color: "#ec4899" }
+    { symbol: "ENA", name: "Ethena", allocation: 1, color: "#20b2aa" },
+    { symbol: "APT", name: "Aptos", allocation: 1, color: "#ffd700" },
+    { symbol: "ONDO", name: "Ondo", allocation: 0.5, color: "#9370db" },
+    { symbol: "ASTER", name: "Aster", allocation: 0.5, color: "#ff69b4" }
   ]
 };
 
@@ -101,7 +101,8 @@ export default function AssetAllocationSection() {
   
   // 准备饼图数据
   const pieData = currentData.map(item => ({
-    name: `${item.symbol} ${item.allocation}%`,
+    name: item.name,
+    symbol: item.symbol,
     value: item.allocation,
     color: item.color
   }));
@@ -169,52 +170,69 @@ export default function AssetAllocationSection() {
           <CardTitle className="text-lg">配置分布</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="w-full h-[280px] sm:h-[320px] md:h-[380px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsPieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ value }) => {
-                    // 仅为比例大于等于5%的项目显示标签，其他项目仅在hover时显示
-                    return value >= 5 ? `${value}%` : '';
-                  }}
-                  outerRadius={70}
-                  fill="#8884d8"
-                  dataKey="value"
-
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.color}
+          <div className="w-full flex flex-col md:flex-row gap-6">
+            {/* 饼图部分 */}
+            <div className="w-full md:w-1/2 h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ value }) => {
+                      // 仅为比例大于等于5%的项目显示标签，其他项目仅在hover时显示
+                      return value >= 5 ? `${value}%` : '';
+                    }}
+                    outerRadius={70}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color}
+                      />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip 
+                    formatter={(value) => `${value}%`}
+                    contentStyle={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: '#fff',
+                      fontSize: '12px'
+                    }}
+                  />
+                </RechartsPieChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* 图例部分 - 改为表格显示 */}
+            <div className="w-full md:w-1/2 overflow-y-auto max-h-[280px]">
+              <div className="space-y-2">
+                {pieData.map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50">
+                    <div 
+                      className="w-4 h-4 rounded-full flex-shrink-0" 
+                      style={{ backgroundColor: item.color }}
                     />
-                  ))}
-                </Pie>
-                <RechartsTooltip 
-                  formatter={(value) => `${value}%`}
-                  contentStyle={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: '#fff',
-                    fontSize: '12px'
-                  }}
-                />
-                <Legend 
-                  layout="vertical" 
-                  align="right" 
-                  verticalAlign="middle"
-                  wrapperStyle={{
-                    paddingLeft: '8px',
-                    fontSize: '11px',
-                    lineHeight: '1.4'
-                  }}
-                />
-              </RechartsPieChart>
-            </ResponsiveContainer>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-foreground truncate">
+                        {item.symbol}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {item.name}
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-foreground flex-shrink-0">
+                      {item.value}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
