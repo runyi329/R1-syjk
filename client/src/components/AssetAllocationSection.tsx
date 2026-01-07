@@ -194,21 +194,21 @@ export default function AssetAllocationSection() {
         <Button
           onClick={() => setMarketMode("bull")}
           variant={marketMode === "bull" ? "default" : "outline"}
-          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto"
+          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto transition-all duration-300 ease-in-out"
         >
           🐂 牛市行情
         </Button>
         <Button
           onClick={() => setMarketMode("bear")}
           variant={marketMode === "bear" ? "default" : "outline"}
-          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto"
+          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto transition-all duration-300 ease-in-out"
         >
           🐻 熊市行情
         </Button>
         <Button
           onClick={() => setMarketMode("range")}
           variant={marketMode === "range" ? "default" : "outline"}
-          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto"
+          className="px-1 sm:px-3 py-0.5 text-xs sm:text-sm whitespace-nowrap h-auto transition-all duration-300 ease-in-out"
         >
           📊 震荡行情
         </Button>
@@ -224,13 +224,13 @@ export default function AssetAllocationSection() {
               <p className="text-xs text-muted-foreground leading-tight">总仓位</p>
               <p className="text-xs font-bold text-primary transition-all duration-300 leading-tight"><AnimatedNumber value={expectedAllocation} decimals={0} />%</p>
             </div>
-            <div className="bg-amber-500/5 rounded p-0.5">
+            <div className="bg-amber-500/5 rounded p-0.5 transition-all duration-300">
               <p className="text-xs text-muted-foreground leading-tight">主流币占比</p>
-              <p className="text-xs font-bold text-amber-600 leading-tight"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
+              <p className="text-xs font-bold text-amber-600 transition-all duration-300 leading-tight"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
             </div>
-            <div className="bg-emerald-500/5 rounded p-0.5">
+            <div className="bg-emerald-500/5 rounded p-0.5 transition-all duration-300">
               <p className="text-xs text-muted-foreground leading-tight">币种范围</p>
-              <p className="text-xs font-bold text-emerald-600 leading-tight"><AnimatedNumber value={currentData.length} decimals={0} /></p>
+              <p className="text-xs font-bold text-emerald-600 transition-all duration-300 leading-tight"><AnimatedNumber value={currentData.length} decimals={0} /></p>
             </div>
           </div>
         </CardHeader>
@@ -256,6 +256,9 @@ export default function AssetAllocationSection() {
                     outerRadius={55}
                     fill="#8884d8"
                     dataKey="value"
+                    isAnimationActive={true}
+                    animationDuration={600}
+                    animationEasing="ease-in-out"
                   >
                     {pieData.map((entry, index) => (
                       <Cell 
