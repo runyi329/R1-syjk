@@ -22,8 +22,10 @@ export default function WeeklyWinAnalysis() {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      // 转换为北京时间（UTC+8）
-      const beijingTime = new Date(now.getTime() + (8 - now.getTimezoneOffset() / 60) * 60 * 60 * 1000);
+      // 获取当前时区偏移（分钟）
+      const localOffset = now.getTimezoneOffset(); // 返回分钟数
+      // 北京时间是UTC+8，所以需要加上 (8*60 + localOffset) 分钟
+      const beijingTime = new Date(now.getTime() + (8 * 60 + localOffset) * 60 * 1000);
       const formatted = beijingTime.toLocaleString('zh-CN', {
         year: 'numeric',
         month: '2-digit',
