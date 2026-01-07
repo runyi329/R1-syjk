@@ -424,7 +424,7 @@ export default function WeeklyWinAnalysis() {
         {/* 历史收益案例 */}
         <section id="cases" className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">真实收益案例</h2>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">交易账户快照</h2>
             <p className="text-muted-foreground mb-6">数百位投资者已获得丰厚收益，以下是上个月的真实案例</p>
           </div>
 
