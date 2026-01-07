@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
 
 // 资产配置数据
 const assetData = {
@@ -55,9 +55,39 @@ const assetData = {
   ]
 };
 
+// 动画数字组件
+function AnimatedNumber({ value, decimals = 0 }: { value: number; decimals?: number }) {
+  const [displayValue, setDisplayValue] = useState(value);
+  
+  useEffect(() => {
+    let animationFrame: number;
+    let currentValue = displayValue;
+    const targetValue = value;
+    const duration = 600;
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeOutQuad = 1 - Math.pow(1 - progress, 2);
+      currentValue = displayValue + (targetValue - displayValue) * easeOutQuad;
+      
+      setDisplayValue(parseFloat(currentValue.toFixed(decimals)));
+      
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+    
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [value, displayValue, decimals]);
+  
+  return <>{decimals > 0 ? displayValue.toFixed(decimals) : Math.round(displayValue)}</>;
+}
+
 export default function AssetAllocationSection() {
   const [marketMode, setMarketMode] = useState<"bull" | "bear" | "range">("bull");
-  const [displayAllocation, setDisplayAllocation] = useState(70);
   
   const currentData = assetData[marketMode];
   const totalAllocation = currentData.reduce((sum, item) => sum + item.allocation, 0);
@@ -71,34 +101,6 @@ export default function AssetAllocationSection() {
     range: 50
   }[marketMode];
   
-  // 动画效果：当仓位变化时，平滑过渡显示数字
-  useEffect(() => {
-    let animationFrame: number;
-    let currentValue = displayAllocation;
-    const targetValue = expectedAllocation;
-    const duration = 600; // 动画持续时间（毫秒）
-    const startTime = Date.now();
-    
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // 使用缓动函数实现平滑过渡
-      const easeOutQuad = 1 - Math.pow(1 - progress, 2);
-      currentValue = displayAllocation + (targetValue - displayAllocation) * easeOutQuad;
-      
-      setDisplayAllocation(Math.round(currentValue * 10) / 10);
-      
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-    
-    animationFrame = requestAnimationFrame(animate);
-    
-    return () => cancelAnimationFrame(animationFrame);
-  }, [expectedAllocation]);
-  
   // 准备饼图数据
   const pieData = currentData.map(item => ({
     name: item.name,
@@ -108,10 +110,10 @@ export default function AssetAllocationSection() {
   }));
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-4">
       <div>
         <h2 className="text-2xl font-bold tracking-tight mb-2">资产配置比例</h2>
-        <p className="text-muted-foreground mb-6">根据市场行情灵活调整投资组合配置</p>
+        <p className="text-muted-foreground mb-4">根据市场行情灵活调整投资组合配置</p>
       </div>
 
       {/* 市场模式切换 - 手机版本3列布局 */}
@@ -139,40 +141,37 @@ export default function AssetAllocationSection() {
         </Button>
       </div>
 
-
-
-      {/* 配置表格和饼图 */}
-      {/* 配置详情卡片 */}
+      {/* 配置详情卡片 - 紧凑布局 */}
       <Card className="border-none shadow-md">
-        <CardHeader>
-          <CardTitle className="text-lg">配置详情</CardTitle>
-          {/* 统计信息 - 表格上方横扙3列 */}
-          <div className="grid grid-cols-3 gap-2 mt-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">配置详情</CardTitle>
+          {/* 统计信息 - 紧凑3列 */}
+          <div className="grid grid-cols-3 gap-2 mt-2">
             <div className="bg-primary/5 rounded p-2 transition-all duration-300">
               <p className="text-xs text-muted-foreground">总仓位</p>
-              <p className="text-lg font-bold text-primary transition-all duration-300 opacity-100">{Math.round(displayAllocation)}%</p>
+              <p className="text-base font-bold text-primary transition-all duration-300"><AnimatedNumber value={expectedAllocation} decimals={0} />%</p>
             </div>
             <div className="bg-amber-500/5 rounded p-2">
               <p className="text-xs text-muted-foreground">主流币占比</p>
-              <p className="text-lg font-bold text-amber-600">{btcEthTotal.toFixed(1)}%</p>
+              <p className="text-base font-bold text-amber-600"><AnimatedNumber value={btcEthTotal} decimals={1} />%</p>
             </div>
             <div className="bg-emerald-500/5 rounded p-2">
               <p className="text-xs text-muted-foreground">币种范围</p>
-              <p className="text-lg font-bold text-emerald-600">{currentData.length}</p>
+              <p className="text-base font-bold text-emerald-600"><AnimatedNumber value={currentData.length} decimals={0} /></p>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      {/* 配置分布饮图 - 全幅显示 */}
+      {/* 配置分布饼图 - 简化显示 */}
       <Card className="border-none shadow-md">
-        <CardHeader>
-          <CardTitle className="text-lg">配置分布</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">配置分布</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="w-full flex flex-col md:flex-row gap-6">
-            {/* 饼图部分 */}
-            <div className="w-full md:w-1/2 h-[280px]">
+          <div className="w-full flex flex-col md:flex-row gap-4">
+            {/* 饼图部分 - BTC和ETH标签在内部 */}
+            <div className="w-full md:w-1/2 h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
@@ -180,9 +179,12 @@ export default function AssetAllocationSection() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ value }) => {
-                      // 仅为比例大于等于5%的项目显示标签，其他项目仅在hover时显示
-                      return value >= 5 ? `${value}%` : '';
+                    label={({ symbol, value }) => {
+                      // 仅显示BTC和ETH的标签在饼图内部
+                      if (symbol === "BTC" || symbol === "ETH") {
+                        return symbol;
+                      }
+                      return '';
                     }}
                     outerRadius={70}
                     fill="#8884d8"
@@ -209,73 +211,20 @@ export default function AssetAllocationSection() {
               </ResponsiveContainer>
             </div>
             
-            {/* 图例部分 - 改为表格显示 */}
-            <div className="w-full md:w-1/2 overflow-y-auto max-h-[280px]">
-              <div className="space-y-2">
-                {pieData.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50">
+            {/* 图例部分 - 仅显示其他币种代码 */}
+            <div className="w-full md:w-1/2 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 flex items-center">
+              <div className="grid grid-cols-2 gap-3 w-full">
+                {pieData.filter(item => item.symbol !== "BTC" && item.symbol !== "ETH").map((item, index) => (
+                  <div key={index} className="flex items-center gap-2">
                     <div 
-                      className="w-4 h-4 rounded-full flex-shrink-0" 
+                      className="w-3 h-3 rounded-full flex-shrink-0" 
                       style={{ backgroundColor: item.color }}
                     />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-foreground truncate">
-                        {item.symbol}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {item.name}
-                      </div>
-                    </div>
-                    <div className="text-sm font-semibold text-foreground flex-shrink-0">
-                      {item.value}%
-                    </div>
+                    <span className="text-sm font-medium text-foreground">{item.symbol}</span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-
-      {/* 配置说明 */}
-      <Card className="border-none shadow-md border-l-4 border-l-primary">
-        <CardHeader>
-          <CardTitle className="text-lg">配置说明</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <img src="/bull-icon.png" alt="牛市行情" className="w-6 h-6" />
-              <p className="font-semibold">牛市模式 (70%仓位)</p>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              在市场看好时，采用较高的仓位配置，重点配置BTC和ETH（合计52%），同时增加SOL等高成长性币种的配置。
-            </p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <img src="/bear-icon.png" alt="熊市行情" className="w-6 h-6" />
-              <p className="font-semibold">熊市模式 (30%仓位)</p>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              在市场不确定时，降低整体仓位，保持BTC和ETH的配置（合计35%），减少高风险币种的配置，保护本金。
-            </p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <img src="/consolidation-icon.png" alt="震荡行情" className="w-6 h-6" />
-              <p className="font-semibold">震荡模式 (50%仓位)</p>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              在市场波动较大时，采用中等仓位配置，平衡BTC和ETH的配置（合计43%），适度配置其他币种，实现风险与收益的平衡。
-            </p>
-          </div>
-          <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-            <p className="text-sm font-semibold text-blue-900">💡 风险提示</p>
-            <p className="text-sm text-blue-800 mt-2">
-              BTC和ETH的持仓合计始终不低于40%，确保投资组合的稳定性和风险可控。所有配置比例仅供参考，实际配置会根据市场情况动态调整。
-            </p>
           </div>
         </CardContent>
       </Card>
