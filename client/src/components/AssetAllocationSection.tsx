@@ -63,6 +63,13 @@ export default function AssetAllocationSection() {
   const btcEthTotal = currentData.filter(item => item.symbol === "BTC" || item.symbol === "ETH")
     .reduce((sum, item) => sum + item.allocation, 0);
   
+  // 根据行情模式设置预期仓位
+  const expectedAllocation = {
+    bull: 70,
+    bear: 30,
+    range: 50
+  }[marketMode];
+  
   // 准备饼图数据
   const pieData = currentData.map(item => ({
     name: `${item.symbol} ${item.allocation}%`,
@@ -114,7 +121,7 @@ export default function AssetAllocationSection() {
             <div className="grid grid-cols-3 gap-2 mt-4">
               <div className="bg-primary/5 rounded p-2">
                 <p className="text-xs text-muted-foreground">总仓位</p>
-                <p className="text-lg font-bold text-primary">{totalAllocation.toFixed(1)}%</p>
+                <p className="text-lg font-bold text-primary">{expectedAllocation}%</p>
               </div>
               <div className="bg-amber-500/5 rounded p-2">
                 <p className="text-xs text-muted-foreground">主流币占比</p>
