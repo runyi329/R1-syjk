@@ -138,9 +138,9 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
   return (
     <div className={className}>
       <p className="text-sm text-muted-foreground mb-2">累计收益</p>
-      <div className="relative overflow-hidden py-2">
-        <div className="flex items-center justify-start gap-0.5">
-          <div className="flex gap-0 font-mono" style={{ perspective: '1000px' }}>
+      <div className="relative py-2">
+        <div className="flex items-center justify-start gap-0.5 min-w-0">
+          <div className="flex gap-0 font-mono flex-shrink-0" style={{ perspective: '1000px' }}>
             {displayText.split('').map((char, index) => {
               const transform = digitTransformsRef.current[index] || 0;
               const digitHeight = 2.25; // rem
@@ -149,17 +149,19 @@ export default function ScrollingProfit({ totalInvestment, className = '' }: Scr
               return (
                 <div
                   key={index}
-                  className="relative w-6 h-9 overflow-hidden"
+                  className="relative w-8 h-9 overflow-visible flex-shrink-0"
                   style={{
                     transformStyle: 'preserve-3d',
                   }}
                 >
                   <div
-                    className="text-4xl font-bold text-red-500 font-mono tracking-wider tabular-nums leading-none transition-transform"
+                    className="text-4xl font-bold text-red-500 font-mono tracking-wider tabular-nums leading-none transition-transform block"
                     style={{
                       transform: `translateY(${offsetY}rem)`,
                       transitionDuration: '600ms',
                       transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                      width: '100%',
+                      textAlign: 'center',
                     }}
                   >
                     {char}
