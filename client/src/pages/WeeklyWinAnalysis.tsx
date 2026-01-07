@@ -605,12 +605,12 @@ export default function WeeklyWinAnalysis() {
               return (
                 <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden">
                   <CardHeader 
-                    className="cursor-pointer py-2 px-3 hover:bg-muted/50 transition-colors" 
+                    className="cursor-pointer p-0 hover:bg-muted/50 transition-colors" 
                     onClick={() => {
                       setExpandedFAQIndex(isExpanded ? null : index);
                     }}
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start justify-between gap-3 py-2 px-3">
                       <CardTitle className="text-xs sm:text-sm font-medium text-left leading-tight">{faq.question}</CardTitle>
                       <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                     </div>
