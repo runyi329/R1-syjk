@@ -270,7 +270,8 @@ export default function WeeklyWinAnalysis() {
           </div>
         </section>
 
-
+        {/* 资产配置比例 */}
+        <AssetAllocationSection />
 
         {/* 业务模型 */}
         <section id="model" className="space-y-6">
@@ -330,9 +331,6 @@ export default function WeeklyWinAnalysis() {
             </CardContent>
           </Card>
         </section>
-
-        {/* 资产配置比例 */}
-        <AssetAllocationSection />
 
         {/* 收益计算器 */}
         <section id="calculator" className="space-y-6">
