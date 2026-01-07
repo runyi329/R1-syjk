@@ -172,9 +172,9 @@ export default function AssetAllocationSection() {
           <CardTitle className="text-base">配置分布</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="w-full flex flex-col lg:flex-row gap-4">
+          <div className="w-full flex flex-row gap-4">
             {/* 饼图部分 - 靠左 */}
-            <div className="w-full lg:w-2/5 flex-shrink-0 h-[240px]">
+            <div className="w-2/5 flex-shrink-0 h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
@@ -215,7 +215,7 @@ export default function AssetAllocationSection() {
             </div>
             
             {/* 小币种列表 - 靠右，每行2个，7-8行 */}
-            <div className="w-full lg:w-3/5 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 max-h-[240px] overflow-y-auto">
+            <div className="w-3/5 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 max-h-[240px] overflow-y-auto">
               <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 {otherCoins.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
