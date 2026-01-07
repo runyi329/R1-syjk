@@ -273,65 +273,6 @@ export default function WeeklyWinAnalysis() {
         {/* 资产配置比例 */}
         <AssetAllocationSection />
 
-        {/* 业务模型 */}
-        <section id="model" className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">业务模型</h2>
-            <p className="text-muted-foreground mb-6">了解周周赢的运作机制和收益流程</p>
-          </div>
-
-          <Card className="border-none shadow-md overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-              <CardTitle>完整的托管交易流程</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-8">
-              <div className="space-y-6">
-                {/* 流程步骤 */}
-                {[
-                  {
-                    step: 1,
-                    title: "投入资金",
-                    description: "您投入初始资金（最低1,000 USDT），系统自动分配80%到您的交易账户，20%到公司保证金账户"
-                  },
-                  {
-                    step: 2,
-                    title: "全权委托",
-                    description: "数金研投专业交易团队接管您的账户，使用成熟的交易策略进行数字货币交易"
-                  },
-                  {
-                    step: 3,
-                    title: "产生利润",
-                    description: "每周交易产生利润，利润完全属于您，公司不收取任何交易手续费"
-                  },
-                  {
-                    step: 4,
-                    title: "每周提现",
-                    description: "您可以从产生的利润中每周提现本金的1%，剩余99%的利润继续在账户中增长"
-                  },
-                  {
-                    step: 5,
-                    title: "复利增长",
-                    description: "保留的利润与本金一起继续交易，实现复利效应，财富加速增长"
-                  }
-                ].map((item, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                        {item.step}
-                      </div>
-                      {index < 4 && <div className="w-0.5 h-12 bg-border mt-2"></div>}
-                    </div>
-                    <div className="pb-6">
-                      <p className="font-semibold text-lg">{item.title}</p>
-                      <p className="text-muted-foreground text-sm mt-1">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
         {/* 收益计算器 */}
         <section id="calculator" className="space-y-6">
           <div>
@@ -417,6 +358,67 @@ export default function WeeklyWinAnalysis() {
           </Card>
 
 
+        </section>
+
+        
+
+        {/* 业务模型 */}
+        <section id="model" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">业务模型</h2>
+            <p className="text-muted-foreground mb-6">了解周周赢的运作机制和收益流程</p>
+          </div>
+
+          <Card className="border-none shadow-md overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+              <CardTitle>完整的托管交易流程</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-8">
+              <div className="space-y-6">
+                {/* 流程步骤 */}
+                {[
+                  {
+                    step: 1,
+                    title: "投入资金",
+                    description: "您投入初始资金（最低1,000 USDT），系统自动分配80%到您的交易账户，20%到公司保证金账户"
+                  },
+                  {
+                    step: 2,
+                    title: "全权委托",
+                    description: "数金研投专业交易团队接管您的账户，使用成熟的交易策略进行数字货币交易"
+                  },
+                  {
+                    step: 3,
+                    title: "产生利润",
+                    description: "每周交易产生利润，利润完全属于您，公司不收取任何交易手续费"
+                  },
+                  {
+                    step: 4,
+                    title: "每周提现",
+                    description: "您可以从产生的利润中每周提现本金的1%，剩余99%的利润继续在账户中增长"
+                  },
+                  {
+                    step: 5,
+                    title: "复利增长",
+                    description: "保留的利润与本金一起继续交易，实现复利效应，财富加速增长"
+                  }
+                ].map((item, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                        {item.step}
+                      </div>
+                      {index < 4 && <div className="w-0.5 h-12 bg-border mt-2"></div>}
+                    </div>
+                    <div className="pb-6">
+                      <p className="font-semibold text-lg">{item.title}</p>
+                      <p className="text-muted-foreground text-sm mt-1">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* 历史收益案例 */}
