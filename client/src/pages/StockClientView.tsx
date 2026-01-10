@@ -255,11 +255,11 @@ export default function StockClientView() {
                 </CardContent>
               </Card>
 
-              {/* 第4格: 累计盈亏 */}
-              <Card className="bg-black/50 border-white/10">
+              {/* 第4格: 累计盈亏（整合收益率） */}
+              <Card className="bg-black/50 border-white/10 col-span-3">
                 <CardContent className="py-1.5 px-2">
                   <p className="text-[10px] text-white/60 leading-none mb-1">累计盈亏</p>
-                  <div className="flex items-center gap-0.5">
+                  <div className="flex items-center gap-0.5 mb-1">
                     {stockUserStats.totalProfit >= 0 ? (
                       <TrendingUp className="w-3 h-3 text-red-500" />
                     ) : (
@@ -269,25 +269,8 @@ export default function StockClientView() {
                       {formatCurrency(Math.abs(stockUserStats.totalProfit))}
                     </p>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* 第5格: 收益率 */}
-              <Card className="bg-black/50 border-white/10">
-                <CardContent className="py-1.5 px-2">
-                  <p className="text-[10px] text-white/60 leading-none mb-1">收益率</p>
-                  <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                  <p className={`text-[10px] leading-none ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500/80' : 'text-green-500/80'}`}>
                     {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* 第6格: 空白预留 */}
-              <Card className="bg-black/50 border-white/10">
-                <CardContent className="py-1.5 px-2">
-                  <p className="text-[10px] text-white/60 leading-none mb-1">&nbsp;</p>
-                  <p className="text-xs font-bold text-white leading-none">
-                    &nbsp;
                   </p>
                 </CardContent>
               </Card>

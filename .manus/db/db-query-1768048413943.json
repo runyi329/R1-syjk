@@ -1,0 +1,9 @@
+{
+  "query": "-- 获取股票用户ID\nSET @stock_user_id = (SELECT id FROM stockUsers WHERE name = '客户A' ORDER BY id DESC LIMIT 1);\n\n-- 为客户A添加每日余额数据\nINSERT INTO stockBalances (stockUserId, date, balance) VALUES \n(@stock_user_id, '2026-01-04', '510000.00'),\n(@stock_user_id, '2026-01-05', '512000.00'),\n(@stock_user_id, '2026-01-06', '515000.00'),\n(@stock_user_id, '2026-01-07', '513000.00'),\n(@stock_user_id, '2026-01-08', '518000.00'),\n(@stock_user_id, '2026-01-09', '519802.52'),\n(@stock_user_id, '2026-01-10', '522000.00');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute -- 获取股票用户ID\nSET @stock_user_id = (SELECT id FROM stockUsers WHERE name = '客户A' ORDER BY id DESC LIMIT 1);\n\n-- 为客户A添加每日余额数据\nINSERT INTO stockBalances (stockUserId, date, balance) VALUES \n(@stock_user_id, '2026-01-04', '510000.00'),\n(@stock_user_id, '2026-01-05', '512000.00'),\n(@stock_user_id, '2026-01-06', '515000.00'),\n(@stock_user_id, '2026-01-07', '513000.00'),\n(@stock_user_id, '2026-01-08', '518000.00'),\n(@stock_user_id, '2026-01-09', '519802.52'),\n(@stock_user_id, '2026-01-10', '522000.00');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 460
+}
