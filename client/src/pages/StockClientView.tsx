@@ -218,7 +218,7 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-2 md:gap-4">
+            <div className="grid grid-cols-2 gap-2 md:gap-4">
               <Card className="bg-black/50 border-white/10">
                 <CardHeader className="pb-1 md:pb-3">
                   <CardDescription className="text-xs md:text-sm text-white/60">初始金额</CardDescription>
