@@ -224,30 +224,8 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            <div className="space-y-1">
-              {/* 第1格: 累计盈亏+收益率（长卡片，4行内容） */}
-              <Card className="bg-black/50 border-white/10">
-                <CardContent className="py-1.5 px-2">
-                  <p className="text-[10px] text-white/60 leading-none mb-1">累计盈亏</p>
-                  <div className="flex items-center gap-0.5 mb-1">
-                    {stockUserStats.totalProfit >= 0 ? (
-                      <TrendingUp className="w-3 h-3 text-red-500" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3 text-green-500" />
-                    )}
-                    <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                      {formatCurrency(Math.abs(stockUserStats.totalProfit))}
-                    </p>
-                  </div>
-                  <p className="text-[10px] text-white/60 leading-none mb-1">收益率</p>
-                  <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                    {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* 下面2×2共4个卡片 */}
-              <div className="grid grid-cols-2 gap-1">
+            {/* 2×2共4个卡片 */}
+            <div className="grid grid-cols-2 gap-1">
                 {/* 初始资金 */}
                 <Card className="bg-black/50 border-white/10">
                   <CardContent className="py-1.5 px-2">
@@ -278,17 +256,27 @@ export default function StockClientView() {
                   </CardContent>
                 </Card>
 
-                {/* 预留空白格子 */}
+                {/* 累计盈亏+收益率 */}
                 <Card className="bg-black/50 border-white/10">
                   <CardContent className="py-1.5 px-2">
-                    <p className="text-[10px] text-white/60 leading-none mb-1">-</p>
-                    <p className="text-xs font-bold text-white/40 leading-none">
-                      -
+                    <p className="text-[10px] text-white/60 leading-none mb-1">累计盈亏</p>
+                    <div className="flex items-center gap-0.5 mb-1">
+                      {stockUserStats.totalProfit >= 0 ? (
+                        <TrendingUp className="w-3 h-3 text-red-500" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3 text-green-500" />
+                      )}
+                      <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        {formatCurrency(Math.abs(stockUserStats.totalProfit))}
+                      </p>
+                    </div>
+                    <p className="text-[10px] text-white/60 leading-none mb-1">收益率</p>
+                    <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
                     </p>
                   </CardContent>
                 </Card>
               </div>
-            </div>
 
             {/* 视图切换和图表 */}
             <Card className="bg-black/50 border-white/10">
