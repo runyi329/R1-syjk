@@ -281,11 +281,13 @@ export const stocksRouter = router({
       const initialBalance = parseFloat(user.initialBalance);
       
       // 计算每日盈亏
+      // 第一条记录：每日盈亏 = 当日余额 - 初始值
+      // 后续记录：每日盈亏 = 当日余额 - 上一个登记交易日的余额
       const dailyProfits = balances.map((b: StockBalance, index: number) => {
         const currentBalance = parseFloat(b.balance);
         const previousBalance = index === 0 
-          ? initialBalance 
-          : parseFloat(balances[index - 1].balance);
+          ? initialBalance  // 第一条记录：与初始值比较
+          : parseFloat(balances[index - 1].balance);  // 后续记录：与上一个登记交易日比较
         const dailyProfit = currentBalance - previousBalance;
         const totalProfit = currentBalance - initialBalance;
         const profitRate = ((totalProfit / initialBalance) * 100).toFixed(2);
