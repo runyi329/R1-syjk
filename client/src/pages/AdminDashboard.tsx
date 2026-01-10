@@ -52,6 +52,7 @@ export default function AdminDashboard() {
   const [editingUserName, setEditingUserName] = useState("");
   const [editingUserVipLevel, setEditingUserVipLevel] = useState("0");
   const [editingUserStatus, setEditingUserStatus] = useState<"active" | "frozen">("active");
+  const [editingUserNotes, setEditingUserNotes] = useState("");
   const [isEditingUser, setIsEditingUser] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
@@ -136,6 +137,16 @@ export default function AdminDashboard() {
   const updateUserNameMutation = trpc.users.updateUserName.useMutation({
     onSuccess: () => {
       toast.success("用户名已更新");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setEditingUserId(null);
+    },
+    onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
+  const updateUserNotesMutation = trpc.users.updateUserNotes.useMutation({
+    onSuccess: () => {
+      toast.success("备注已更新");
       refetchUsers();
       setIsEditUserOpen(false);
       setEditingUserId(null);
@@ -363,6 +374,9 @@ export default function AdminDashboard() {
                           <div>
                             <div className="text-white font-medium text-sm sm:text-base">{user.name || "未设置昵称"}</div>
                             <div className="text-xs sm:text-sm text-white/60">ID: {user.id}</div>
+                            {(user as any).notes && (
+                              <div className="text-xs text-white/50 mt-1">{(user as any).notes}</div>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 sm:gap-4">
                             <div className="text-right">
@@ -389,6 +403,7 @@ export default function AdminDashboard() {
                               setEditingUserName(user.name || "");
                               setEditingUserVipLevel((user as any).vipLevel?.toString() || "0");
                               setEditingUserStatus(user.accountStatus);
+                              setEditingUserNotes((user as any).notes || "");
                             } else {
                               setIsEditUserOpen(false);
                               setEditingUserId(null);
@@ -450,6 +465,15 @@ export default function AdminDashboard() {
                                       <SelectItem value="frozen">冻结</SelectItem>
                                     </SelectContent>
                                   </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-white">备注</Label>
+                                  <Textarea
+                                    value={editingUserNotes}
+                                    onChange={(e) => setEditingUserNotes(e.target.value)}
+                                    placeholder="请输入备注信息（可选）"
+                                    className="bg-white/5 border-white/10 text-white min-h-[80px]"
+                                  />
                                 </div>
                               </div>
                               <DialogFooter className="flex-col sm:flex-row gap-2">
@@ -528,6 +552,10 @@ export default function AdminDashboard() {
                                         updateUserStatusMutation.mutateAsync({
                                           userId: user.id,
                                           status: editingUserStatus,
+                                        }),
+                                        updateUserNotesMutation.mutateAsync({
+                                          userId: user.id,
+                                          notes: editingUserNotes || undefined,
                                         }),
                                       ]).finally(() => setIsEditingUser(false));
                                     }}

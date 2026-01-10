@@ -32,6 +32,8 @@ export const users = mysqlTable("users", {
   accountStatus: mysqlEnum("accountStatus", ["active", "frozen"]).default("active").notNull(),
   /** VIP等级：0-普通用户，1-VIP1，2-VIP2，3-VIP3，4-VIP4，5-VIP5 */
   vipLevel: int("vipLevel").default(0).notNull(),
+  /** 备注信息 - 管理员可以为用户添加备注 */
+  notes: text("notes"),
 });
 
 export type User = typeof users.$inferSelect;
