@@ -9,9 +9,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
-import { Loader2, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, TrendingUp, TrendingDown, User } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, TrendingUp, TrendingDown, User, Shield } from "lucide-react";
 import { toast } from "sonner";
 import FundsCurveChart from "./FundsCurveChart";
+import StockPermissionsManager from "./StockPermissionsManager";
 
 interface StockUser {
   id: number;
@@ -352,6 +353,9 @@ export default function StocksManagement() {
           <TabsTrigger value="calendar" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
             余额管理
           </TabsTrigger>
+          <TabsTrigger value="permissions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+            权限管理
+          </TabsTrigger>
         </TabsList>
         
         {/* 用户管理标签页 */}
@@ -363,12 +367,21 @@ export default function StocksManagement() {
                 <CardDescription className="text-white/60">管理A股账户用户</CardDescription>
               </div>
               <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-[#D4AF37] text-black hover:bg-[#E5C158]">
-                    <Plus className="w-4 h-4 mr-2" />
-                    添加用户
+                <div className="flex gap-2">
+                  <DialogTrigger asChild>
+                    <Button className="bg-[#D4AF37] text-black hover:bg-[#E5C158]">
+                      <Plus className="w-4 h-4 mr-2" />
+                      添加用户
+                    </Button>
+                  </DialogTrigger>
+                  <Button 
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    onClick={() => setActiveTab("permissions")}
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    客户权限设置
                   </Button>
-                </DialogTrigger>
+                </div>
                 <DialogContent className="bg-[#1a1a1a] border-white/10 text-white">
                   <DialogHeader>
                     <DialogTitle>添加股票用户</DialogTitle>
@@ -1029,6 +1042,21 @@ export default function StocksManagement() {
               )}
             </div>
           )}
+        </TabsContent>
+
+        {/* 权限管理标签页 */}
+        <TabsContent value="permissions" className="mt-4">
+          <Card className="bg-black/50 border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white">客户权限设置</CardTitle>
+              <CardDescription className="text-white/60">
+                管理哪些网站用户可以查看哪些股票客户的数据
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StockPermissionsManager />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

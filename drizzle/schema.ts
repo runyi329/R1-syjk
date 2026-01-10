@@ -1,4 +1,4 @@
-import { boolean, decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar, unique, index } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -334,3 +334,25 @@ export const stockBalances = mysqlTable("stockBalances", {
 
 export type StockBalance = typeof stockBalances.$inferSelect;
 export type InsertStockBalance = typeof stockBalances.$inferInsert;
+
+/**
+ * 股票用户权限表 - 控制哪些网站用户可以查看哪些股票客户的数据
+ */
+export const stockUserPermissions = mysqlTable("stockUserPermissions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 关联股票用户ID（股票客户） */
+  stockUserId: int("stockUserId").notNull(),
+  /** 关联网站用户ID（可以查看该股票客户数据的网站注册用户） */
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  // 唯一约束：一个股票用户和一个网站用户的组合只能有一条记录
+  uniquePermission: unique("unique_permission").on(table.stockUserId, table.userId),
+  // 索引优化查询性能
+  stockUserIdIdx: index("stockUserId_idx").on(table.stockUserId),
+  userIdIdx: index("userId_idx").on(table.userId),
+}));
+
+export type StockUserPermission = typeof stockUserPermissions.$inferSelect;
+export type InsertStockUserPermission = typeof stockUserPermissions.$inferInsert;

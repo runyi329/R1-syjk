@@ -33,6 +33,7 @@ import DerivativesFuturesAnalysis from "./pages/DerivativesFuturesAnalysis";
 import DerivativesOptionsAnalysis from "./pages/DerivativesOptionsAnalysis";
 import FixedIncomeBondsAnalysis from "./pages/FixedIncomeBondsAnalysis";
 import FixedIncomePublicAnalysis from "./pages/FixedIncomePublicAnalysis";
+import StockClientView from "./pages/StockClientView";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -45,11 +46,13 @@ function Router() {
         <Route path="/crypto" component={CryptoAnalysis} />
         <Route path="/weekly-win" component={WeeklyWinAnalysis} />
         <Route path="/lottery" component={Lottery} />
-        {/* \u80a1\u7968\u5206\u6790 */}
+               {/* 股票分析 */}
         <Route path="/stocks-a" component={StocksAAnalysis} />
         <Route path="/stocks-hk" component={StocksHKAnalysis} />
         <Route path="/stocks-us" component={StocksUSAnalysis} />
-        {/* \u5916\u6c47\u5206\u6790 */}
+        {/* 客户端股票数据查看 */}
+        <Route path="/stock-client-view" component={StockClientView} />
+        {/* 外汇分析 */}
         <Route path="/forex" component={ForexAnalysis} />
         {/* \u5546\u54c1\u80fd\u6e90\u5206\u6790 */}
         <Route path="/commodities-gold" component={CommoditiesGoldAnalysis} />

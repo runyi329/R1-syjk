@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { adminProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { stockUsers, stockBalances, type StockBalance, type StockUser } from "../../drizzle/schema";
+import { stockUsers, stockBalances, stockUserPermissions, users, type StockBalance, type StockUser } from "../../drizzle/schema";
 import { eq, desc, and, asc } from "drizzle-orm";
 
 export const stocksRouter = router({
@@ -357,4 +357,141 @@ export const stocksRouter = router({
     
     return stats;
   }),
+
+  // ==================== 权限管理 ====================
+
+  // 获取股票客户的已授权用户列表
+  getStockUserPermissions: adminProcedure
+    .input(z.object({ stockUserId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      // stockUserPermissions and users already imported at top
+      
+      // 查询该股票客户的所有授权记录
+      const permissions = await db
+        .select({
+          id: stockUserPermissions.id,
+          stockUserId: stockUserPermissions.stockUserId,
+          userId: stockUserPermissions.userId,
+          createdAt: stockUserPermissions.createdAt,
+          username: users.username,
+          email: users.email,
+        })
+        .from(stockUserPermissions)
+        .leftJoin(users, eq(stockUserPermissions.userId, users.id))
+        .where(eq(stockUserPermissions.stockUserId, input.stockUserId));
+      
+      return permissions;
+    }),
+
+  // 添加授权（允许某个网站用户查看某个股票客户的数据）
+  addStockUserPermission: adminProcedure
+    .input(z.object({
+      stockUserId: z.number(),
+      userId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      // stockUserPermissions already imported at top
+      
+      // 检查是否已存在该授权
+      const [existing] = await db
+        .select()
+        .from(stockUserPermissions)
+        .where(
+          and(
+            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(stockUserPermissions.userId, input.userId)
+          )
+        );
+      
+      if (existing) {
+        return { success: true, message: "授权已存在" };
+      }
+      
+      // 创建授权记录
+      await db
+        .insert(stockUserPermissions)
+        .values({
+          stockUserId: input.stockUserId,
+          userId: input.userId,
+        });
+      
+      return { success: true, message: "授权成功" };
+    }),
+
+  // 删除授权
+  removeStockUserPermission: adminProcedure
+    .input(z.object({
+      stockUserId: z.number(),
+      userId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      // stockUserPermissions already imported at top
+      
+      await db
+        .delete(stockUserPermissions)
+        .where(
+          and(
+            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(stockUserPermissions.userId, input.userId)
+          )
+        );
+      
+      return { success: true, message: "取消授权成功" };
+    }),
+
+  // 获取所有网站注册用户（用于权限设置时选择）
+  getAllWebsiteUsers: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+      // users already imported at top
+    
+    const allUsers = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        role: users.role,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt));
+    
+    return allUsers;
+  }),
+
+  // 获取用户可查看的股票客户列表（普通用户API）
+  getMyAccessibleStockUsers: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      // stockUserPermissions already imported at top
+      
+      // 查询该用户有权限查看的所有股票客户
+      const accessibleUsers = await db
+        .select({
+          id: stockUsers.id,
+          name: stockUsers.name,
+          initialBalance: stockUsers.initialBalance,
+          status: stockUsers.status,
+          createdAt: stockUsers.createdAt,
+        })
+        .from(stockUserPermissions)
+        .innerJoin(stockUsers, eq(stockUserPermissions.stockUserId, stockUsers.id))
+        .where(
+          and(
+            eq(stockUserPermissions.userId, input.userId),
+            eq(stockUsers.status, "active")
+          )
+        )
+        .orderBy(desc(stockUsers.createdAt));
+      
+      return accessibleUsers;
+    }),
 });
