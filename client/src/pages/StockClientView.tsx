@@ -378,11 +378,13 @@ export default function StockClientView() {
             {/* 日历视图 */}
             <Card className="bg-black/50 border-white/10">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-3 mb-4">
+                  {/* 日期显示行 */}
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-6 w-6"
                       onClick={() => {
                         if (currentMonth === 1) {
                           setCurrentMonth(12);
@@ -392,14 +394,15 @@ export default function StockClientView() {
                         }
                       }}
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="w-4 h-4" />
                     </Button>
-                    <div className="text-lg font-medium text-white">
+                    <div className="text-sm font-medium text-white whitespace-nowrap">
                       {currentYear}年{currentMonth}月
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-6 w-6"
                       onClick={() => {
                         if (currentMonth === 12) {
                           setCurrentMonth(1);
@@ -409,15 +412,16 @@ export default function StockClientView() {
                         }
                       }}
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+                  {/* 按钮行 */}
+                  <div className="flex items-center gap-1">
                     <Button
                       variant={viewMode === "balance" ? "default" : "outline"}
                       size="sm"
                       onClick={() => setViewMode("balance")}
-                      className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "balance" ? "bg-[#D4AF37] text-black" : ""}`}
+                      className={`text-[10px] md:text-xs px-1.5 md:px-2 h-7 ${viewMode === "balance" ? "bg-[#D4AF37] text-black" : ""}`}
                     >
                       余额
                     </Button>
@@ -425,7 +429,7 @@ export default function StockClientView() {
                       variant={viewMode === "profit" && profitPeriod === "day" ? "default" : "outline"}
                       size="sm"
                       onClick={() => { setViewMode("profit"); setProfitPeriod("day"); }}
-                      className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "profit" && profitPeriod === "day" ? "bg-[#D4AF37] text-black" : ""}`}
+                      className={`text-[10px] md:text-xs px-1.5 md:px-2 h-7 ${viewMode === "profit" && profitPeriod === "day" ? "bg-[#D4AF37] text-black" : ""}`}
                     >
                       日盈亏
                     </Button>
@@ -433,7 +437,7 @@ export default function StockClientView() {
                       variant={viewMode === "profit" && profitPeriod === "month" ? "default" : "outline"}
                       size="sm"
                       onClick={() => { setViewMode("profit"); setProfitPeriod("month"); }}
-                      className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "profit" && profitPeriod === "month" ? "bg-[#D4AF37] text-black" : ""}`}
+                      className={`text-[10px] md:text-xs px-1.5 md:px-2 h-7 ${viewMode === "profit" && profitPeriod === "month" ? "bg-[#D4AF37] text-black" : ""}`}
                     >
                       月盈亏
                     </Button>
@@ -441,7 +445,7 @@ export default function StockClientView() {
                       variant={viewMode === "profit" && profitPeriod === "year" ? "default" : "outline"}
                       size="sm"
                       onClick={() => { setViewMode("profit"); setProfitPeriod("year"); }}
-                      className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "profit" && profitPeriod === "year" ? "bg-[#D4AF37] text-black" : ""}`}
+                      className={`text-[10px] md:text-xs px-1.5 md:px-2 h-7 ${viewMode === "profit" && profitPeriod === "year" ? "bg-[#D4AF37] text-black" : ""}`}
                     >
                       年盈亏
                     </Button>
