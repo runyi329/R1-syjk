@@ -248,33 +248,11 @@ export default function StocksManagement() {
     return num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
   
-  // 紧凑格式化金额（用于日历格子显示）
+  // 紧凑格式化金额（用于日历格子显示）- 显示精确到元的完整数字
   const formatCompactAmount = (amount: number | string) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    const absNum = Math.abs(num);
-    
-    if (absNum >= 100000000) {
-      // 亿
-      return (num / 100000000).toFixed(1) + '亿';
-    } else if (absNum >= 10000000) {
-      // 千万
-      return (num / 10000).toFixed(0) + '万';
-    } else if (absNum >= 1000000) {
-      // 百万
-      return (num / 10000).toFixed(0) + '万';
-    } else if (absNum >= 100000) {
-      // 十万
-      return (num / 10000).toFixed(1) + '万';
-    } else if (absNum >= 10000) {
-      // 万
-      return (num / 10000).toFixed(1) + '万';
-    } else if (absNum >= 1000) {
-      // 千
-      return Math.round(num).toLocaleString('zh-CN');
-    } else {
-      // 小于1000
-      return num.toFixed(0);
-    }
+    // 直接显示完整数字，精确到元，使用千分位分隔
+    return Math.round(num).toLocaleString('zh-CN');
   };
   
   const calendarDays = generateCalendarDays();
@@ -731,19 +709,19 @@ export default function StocksManagement() {
                   {(viewMode === "balance" || (viewMode === "profit" && profitPeriod === "day")) && (
                     <>
                       {/* 星期标题 */}
-                      <div className="grid grid-cols-7 gap-px md:gap-1 mb-1">
+                      <div className="grid grid-cols-7 gap-[2px] mb-1">
                         {weekDays.map((day) => (
-                          <div key={day} className="text-center text-xs text-white/60 py-1">
+                          <div key={day} className="text-center text-[10px] text-white/60 py-1">
                             {day}
                           </div>
                         ))}
                       </div>
                       
-                      {/* 日历格子 - 参考同花顺App布局，使用固定高度矩形 */}
-                      <div className="grid grid-cols-7 gap-px md:gap-1">
+                      {/* 日历格子 - 优化版：更大容器、更小字体、分散对齐 */}
+                      <div className="grid grid-cols-7 gap-[2px]">
                         {calendarDays.map((day, index) => {
                           if (day === null) {
-                            return <div key={`empty-${index}`} className="h-[52px] md:h-16" />;
+                            return <div key={`empty-${index}`} className="h-[60px] md:h-[72px]" />;
                           }
                           
                           const balance = getBalanceForDate(day);
@@ -761,7 +739,7 @@ export default function StocksManagement() {
                             <div
                               key={day}
                               onClick={() => handleDateClick(day)}
-                              className={`h-[52px] md:h-16 p-1 rounded md:rounded-lg border cursor-pointer transition-colors flex flex-col justify-between ${
+                              className={`h-[60px] md:h-[72px] px-[2px] py-1 rounded border cursor-pointer transition-colors flex flex-col justify-between ${
                                 isSelected
                                   ? 'border-[#D4AF37] bg-[#D4AF37]/20'
                                   : isToday
@@ -775,14 +753,14 @@ export default function StocksManagement() {
                                   : 'border-white/10 hover:border-white/30'
                               }`}
                             >
-                              <div className="text-xs text-white/60 text-center">{day}</div>
+                              <div className="text-[10px] text-white/60 text-center">{day}</div>
                               {viewMode === "balance" && balance && (
-                                <div className="text-[11px] md:text-xs font-medium text-white text-center leading-tight">
+                                <div className="text-[9px] md:text-[10px] font-medium text-white text-center leading-tight whitespace-nowrap overflow-hidden">
                                   {formatCompactAmount(balance.balance)}
                                 </div>
                               )}
                               {viewMode === "profit" && profitPeriod === "day" && profit && (
-                                <div className={`text-[11px] md:text-xs font-medium text-center leading-tight ${
+                                <div className={`text-[9px] md:text-[10px] font-medium text-center leading-tight whitespace-nowrap overflow-hidden ${
                                   profit.dailyProfit >= 0 ? 'text-green-400' : 'text-red-400'
                                 }`}>
                                   {profit.dailyProfit >= 0 ? '+' : ''}{formatCompactAmount(profit.dailyProfit)}
