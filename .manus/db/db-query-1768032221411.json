@@ -1,0 +1,18 @@
+{
+  "query": "\n-- 查找张三的用户信息\nSELECT id, username, email FROM users WHERE username = '张三';\n\n-- 查找张三的授权记录\nSELECT sp.*, su.name as stock_user_name \nFROM stockUserPermissions sp\nJOIN users u ON sp.userId = u.id\nJOIN stockUsers su ON sp.stockUserId = su.id\nWHERE u.username = '张三';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查找张三的用户信息\nSELECT id, username, email FROM users WHERE username = '张三';\n\n-- 查找张三的授权记录\nSELECT sp.*, su.name as stock_user_name \nFROM stockUserPermissions sp\nJOIN users u ON sp.userId = u.id\nJOIN stockUsers su ON sp.stockUserId = su.id\nWHERE u.username = '张三';\n",
+  "rows": [
+    {
+      "id": "330085",
+      "username": "张三",
+      "email": "NULL"
+    }
+  ],
+  "messages": [
+    "id\tstockUserId\tuserId\tcreatedAt\tupdatedAt\tstock_user_name",
+    "30003\t1\t330085\t2026-01-10 08:01:45\t2026-01-10 08:01:45\t2262Li"
+  ],
+  "stdout": "id\tusername\temail\n330085\t张三\tNULL\nid\tstockUserId\tuserId\tcreatedAt\tupdatedAt\tstock_user_name\n30003\t1\t330085\t2026-01-10 08:01:45\t2026-01-10 08:01:45\t2262Li\n",
+  "stderr": "",
+  "execution_time_ms": 447
+}

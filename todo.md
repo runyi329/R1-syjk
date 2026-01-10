@@ -1251,3 +1251,12 @@
 - [x] 有授权的用户访问A股分析时，自动跳转到股票客户数据页面
 - [x] 未登录或无授权的用户访问A股分析时，显示通用市场分析页面
 - [x] 测试不同用户的访问效果
+
+## 修复张三登录后A股分析页面不跳转问题
+- [x] 检查张三的用户ID和授权记录
+- [x] 检查StocksAAnalysis页面的权限检查逻辑是否正确执行
+- [x] 测试getMyAccessibleStockUsers API是否正确返回数据
+- [x] 检查useEffect依赖和跳转逻辑
+- [x] 创建普通用户可访问的getMyStockUserStats API
+- [x] 修改StockClientView使用新API
+- [x] 测试张三登录后的完整流程

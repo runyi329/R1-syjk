@@ -38,9 +38,12 @@ export default function StockClientView() {
   );
 
   // 获取选中股票客户的统计数据
-  const { data: stockUserStats, isLoading: isLoadingStats } = trpc.stocks.getStockUserStats.useQuery(
-    { stockUserId: parseInt(selectedStockUserId) || 0 },
-    { enabled: !!selectedStockUserId }
+  const { data: stockUserStats, isLoading: isLoadingStats } = trpc.stocks.getMyStockUserStats.useQuery(
+    { 
+      userId: user?.id || 0,
+      stockUserId: parseInt(selectedStockUserId) || 0 
+    },
+    { enabled: !!user?.id && !!selectedStockUserId }
   );
 
   // 自动选择第一个股票客户

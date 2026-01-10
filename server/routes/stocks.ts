@@ -498,4 +498,90 @@ export const stocksRouter = router({
       
       return accessibleUsers;
     }),
+
+  // 获取用户有权限查看的股票客户统计数据（普通用户API）
+  getMyStockUserStats: protectedProcedure
+    .input(z.object({ 
+      userId: z.number(),
+      stockUserId: z.number() 
+    }))
+    .query(async ({ input, ctx }) => {
+      // 确保用户只能查询自己的数据
+      if (ctx.user.id !== input.userId) {
+        throw new Error("Unauthorized: You can only query your own data");
+      }
+      
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      // 验证用户是否有权限查看该股票客户
+      const [permission] = await db
+        .select()
+        .from(stockUserPermissions)
+        .where(
+          and(
+            eq(stockUserPermissions.userId, input.userId),
+            eq(stockUserPermissions.stockUserId, input.stockUserId)
+          )
+        );
+      
+      if (!permission) {
+        throw new Error("Unauthorized: You don't have permission to view this stock user");
+      }
+      
+      // 获取用户信息
+      const [user] = await db
+        .select()
+        .from(stockUsers)
+        .where(eq(stockUsers.id, input.stockUserId));
+      
+      if (!user) {
+        return null;
+      }
+      
+      // 获取所有余额记录
+      const balances = await db
+        .select()
+        .from(stockBalances)
+        .where(eq(stockBalances.stockUserId, input.stockUserId))
+        .orderBy(asc(stockBalances.date));
+      
+      const initialBalance = parseFloat(user.initialBalance);
+      
+      // 计算每日盈亏
+      const dailyProfits = balances.map((b: StockBalance, index: number) => {
+        const currentBalance = parseFloat(b.balance);
+        const previousBalance = index === 0 
+          ? initialBalance
+          : parseFloat(balances[index - 1].balance);
+        const dailyProfit = currentBalance - previousBalance;
+        const totalProfit = currentBalance - initialBalance;
+        const profitRate = ((totalProfit / initialBalance) * 100).toFixed(2);
+        
+        return {
+          date: b.date,
+          balance: currentBalance,
+          dailyProfit,
+          totalProfit,
+          profitRate: parseFloat(profitRate),
+        };
+      });
+      
+      // 计算总体统计
+      const latestBalance = balances.length > 0 
+        ? parseFloat(balances[balances.length - 1].balance) 
+        : initialBalance;
+      const totalProfit = latestBalance - initialBalance;
+      const totalProfitRate = ((totalProfit / initialBalance) * 100).toFixed(2);
+      
+      return {
+        user,
+        initialBalance,
+        latestBalance,
+        totalProfit,
+        totalProfitRate: parseFloat(totalProfitRate),
+        dailyProfits,
+        recordCount: balances.length,
+      };
+    }),
 });
