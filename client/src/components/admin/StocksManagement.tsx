@@ -62,6 +62,9 @@ export default function StocksManagement() {
   // 视图模式：balance（余额）或 profit（盈亏）
   const [viewMode, setViewMode] = useState<"balance" | "profit">("balance");
   
+  // 盈亏时间维度：day（日）、month（月）、year（年）
+  const [profitPeriod, setProfitPeriod] = useState<"day" | "month" | "year">("day");
+  
   // 获取所有股票用户
   const { data: stockUsers, refetch: refetchUsers, isLoading: isLoadingUsers } = trpc.stocks.getAllStockUsers.useQuery();
   
@@ -276,6 +279,89 @@ export default function StocksManagement() {
   
   const calendarDays = generateCalendarDays();
   const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+  
+  // 计算月收益数据
+  const getMonthlyProfits = () => {
+    if (!userStats?.dailyProfits || userStats.dailyProfits.length === 0) return [];
+    
+    const monthlyData: { month: string; year: number; monthNum: number; profit: number; profitRate: number }[] = [];
+    const groupedByMonth: { [key: string]: DailyProfit[] } = {};
+    
+    // 按月份分组
+    userStats.dailyProfits.forEach((p: DailyProfit) => {
+      const [year, month] = p.date.split('-');
+      const key = `${year}-${month}`;
+      if (!groupedByMonth[key]) {
+        groupedByMonth[key] = [];
+      }
+      groupedByMonth[key].push(p);
+    });
+    
+    // 计算每月的总收益
+    Object.keys(groupedByMonth).sort().forEach(key => {
+      const profits = groupedByMonth[key];
+      const totalProfit = profits.reduce((sum, p) => sum + p.dailyProfit, 0);
+      const [year, month] = key.split('-');
+      const initialBalance = parseFloat(selectedUser?.initialBalance || '0');
+      const profitRate = initialBalance > 0 ? (totalProfit / initialBalance) * 100 : 0;
+      
+      monthlyData.push({
+        month: key,
+        year: parseInt(year),
+        monthNum: parseInt(month),
+        profit: totalProfit,
+        profitRate: parseFloat(profitRate.toFixed(2))
+      });
+    });
+    
+    return monthlyData;
+  };
+  
+  // 计算年收益数据
+  const getYearlyProfits = () => {
+    if (!userStats?.dailyProfits || userStats.dailyProfits.length === 0) return [];
+    
+    const yearlyData: { year: number; profit: number; profitRate: number }[] = [];
+    const groupedByYear: { [key: string]: DailyProfit[] } = {};
+    
+    // 按年份分组
+    userStats.dailyProfits.forEach((p: DailyProfit) => {
+      const year = p.date.split('-')[0];
+      if (!groupedByYear[year]) {
+        groupedByYear[year] = [];
+      }
+      groupedByYear[year].push(p);
+    });
+    
+    // 计算每年的总收益
+    Object.keys(groupedByYear).sort().forEach(year => {
+      const profits = groupedByYear[year];
+      const totalProfit = profits.reduce((sum, p) => sum + p.dailyProfit, 0);
+      const initialBalance = parseFloat(selectedUser?.initialBalance || '0');
+      const profitRate = initialBalance > 0 ? (totalProfit / initialBalance) * 100 : 0;
+      
+      yearlyData.push({
+        year: parseInt(year),
+        profit: totalProfit,
+        profitRate: parseFloat(profitRate.toFixed(2))
+      });
+    });
+    
+    return yearlyData;
+  };
+  
+  // 获取当前月的收益
+  const getCurrentMonthProfit = () => {
+    const monthlyProfits = getMonthlyProfits();
+    const key = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+    return monthlyProfits.find(m => m.month === key);
+  };
+  
+  // 获取当前年的收益
+  const getCurrentYearProfit = () => {
+    const yearlyProfits = getYearlyProfits();
+    return yearlyProfits.find(y => y.year === currentYear);
+  };
   
   return (
     <div className="space-y-6">
@@ -604,89 +690,260 @@ export default function StocksManagement() {
                         <ChevronRight className="w-5 h-5" />
                       </Button>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 md:gap-2 flex-wrap">
                       <Button
                         variant={viewMode === "balance" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setViewMode("balance")}
-                        className={viewMode === "balance" ? "bg-[#D4AF37] text-black" : ""}
+                        className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "balance" ? "bg-[#D4AF37] text-black" : ""}`}
                       >
                         余额
                       </Button>
                       <Button
-                        variant={viewMode === "profit" ? "default" : "outline"}
+                        variant={viewMode === "profit" && profitPeriod === "day" ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setViewMode("profit")}
-                        className={viewMode === "profit" ? "bg-[#D4AF37] text-black" : ""}
+                        onClick={() => { setViewMode("profit"); setProfitPeriod("day"); }}
+                        className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "profit" && profitPeriod === "day" ? "bg-[#D4AF37] text-black" : ""}`}
                       >
-                        盈亏
+                        日盈亏
+                      </Button>
+                      <Button
+                        variant={viewMode === "profit" && profitPeriod === "month" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => { setViewMode("profit"); setProfitPeriod("month"); }}
+                        className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "profit" && profitPeriod === "month" ? "bg-[#D4AF37] text-black" : ""}`}
+                      >
+                        月盈亏
+                      </Button>
+                      <Button
+                        variant={viewMode === "profit" && profitPeriod === "year" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => { setViewMode("profit"); setProfitPeriod("year"); }}
+                        className={`text-xs md:text-sm px-2 md:px-3 ${viewMode === "profit" && profitPeriod === "year" ? "bg-[#D4AF37] text-black" : ""}`}
+                      >
+                        年盈亏
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* 星期标题 */}
-                  <div className="grid grid-cols-7 gap-px md:gap-1 mb-1">
-                    {weekDays.map((day) => (
-                      <div key={day} className="text-center text-xs text-white/60 py-1">
-                        {day}
+                  {/* 日盈亏视角：显示日历格子 */}
+                  {(viewMode === "balance" || (viewMode === "profit" && profitPeriod === "day")) && (
+                    <>
+                      {/* 星期标题 */}
+                      <div className="grid grid-cols-7 gap-px md:gap-1 mb-1">
+                        {weekDays.map((day) => (
+                          <div key={day} className="text-center text-xs text-white/60 py-1">
+                            {day}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                      
+                      {/* 日历格子 - 参考同花顺App布局，使用固定高度矩形 */}
+                      <div className="grid grid-cols-7 gap-px md:gap-1">
+                        {calendarDays.map((day, index) => {
+                          if (day === null) {
+                            return <div key={`empty-${index}`} className="h-[52px] md:h-16" />;
+                          }
+                          
+                          const balance = getBalanceForDate(day);
+                          const profit = getProfitForDate(day);
+                          const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                          const isSelected = selectedDate === dateStr;
+                          const isToday = new Date().toISOString().split('T')[0] === dateStr;
+                          
+                          // 根据盈亏状态决定背景色
+                          const hasData = viewMode === "balance" ? balance : profit;
+                          const isProfit = viewMode === "profit" && profit ? profit.dailyProfit >= 0 : false;
+                          const isLoss = viewMode === "profit" && profit ? profit.dailyProfit < 0 : false;
+                          
+                          return (
+                            <div
+                              key={day}
+                              onClick={() => handleDateClick(day)}
+                              className={`h-[52px] md:h-16 p-1 rounded md:rounded-lg border cursor-pointer transition-colors flex flex-col justify-between ${
+                                isSelected
+                                  ? 'border-[#D4AF37] bg-[#D4AF37]/20'
+                                  : isToday
+                                  ? 'border-[#D4AF37]/50 bg-[#D4AF37]/10'
+                                  : isProfit
+                                  ? 'border-green-500/30 bg-green-500/20'
+                                  : isLoss
+                                  ? 'border-red-500/30 bg-red-500/20'
+                                  : hasData
+                                  ? 'border-white/20 bg-white/5'
+                                  : 'border-white/10 hover:border-white/30'
+                              }`}
+                            >
+                              <div className="text-xs text-white/60 text-center">{day}</div>
+                              {viewMode === "balance" && balance && (
+                                <div className="text-[11px] md:text-xs font-medium text-white text-center leading-tight">
+                                  {formatCompactAmount(balance.balance)}
+                                </div>
+                              )}
+                              {viewMode === "profit" && profitPeriod === "day" && profit && (
+                                <div className={`text-[11px] md:text-xs font-medium text-center leading-tight ${
+                                  profit.dailyProfit >= 0 ? 'text-green-400' : 'text-red-400'
+                                }`}>
+                                  {profit.dailyProfit >= 0 ? '+' : ''}{formatCompactAmount(profit.dailyProfit)}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                   
-                  {/* 日历格子 - 参考同花顺App布局，使用固定高度矩形 */}
-                  <div className="grid grid-cols-7 gap-px md:gap-1">
-                    {calendarDays.map((day, index) => {
-                      if (day === null) {
-                        return <div key={`empty-${index}`} className="h-[52px] md:h-16" />;
-                      }
-                      
-                      const balance = getBalanceForDate(day);
-                      const profit = getProfitForDate(day);
-                      const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                      const isSelected = selectedDate === dateStr;
-                      const isToday = new Date().toISOString().split('T')[0] === dateStr;
-                      
-                      // 根据盈亏状态决定背景色
-                      const hasData = viewMode === "balance" ? balance : profit;
-                      const isProfit = viewMode === "profit" && profit ? profit.dailyProfit >= 0 : false;
-                      const isLoss = viewMode === "profit" && profit ? profit.dailyProfit < 0 : false;
-                      
-                      return (
-                        <div
-                          key={day}
-                          onClick={() => handleDateClick(day)}
-                          className={`h-[52px] md:h-16 p-1 rounded md:rounded-lg border cursor-pointer transition-colors flex flex-col justify-between ${
-                            isSelected
-                              ? 'border-[#D4AF37] bg-[#D4AF37]/20'
-                              : isToday
-                              ? 'border-[#D4AF37]/50 bg-[#D4AF37]/10'
-                              : isProfit
-                              ? 'border-green-500/30 bg-green-500/20'
-                              : isLoss
-                              ? 'border-red-500/30 bg-red-500/20'
-                              : hasData
-                              ? 'border-white/20 bg-white/5'
-                              : 'border-white/10 hover:border-white/30'
-                          }`}
-                        >
-                          <div className="text-xs text-white/60 text-center">{day}</div>
-                          {viewMode === "balance" && balance && (
-                            <div className="text-[11px] md:text-xs font-medium text-white text-center leading-tight">
-                              {formatCompactAmount(balance.balance)}
-                            </div>
-                          )}
-                          {viewMode === "profit" && profit && (
-                            <div className={`text-[11px] md:text-xs font-medium text-center leading-tight ${
-                              profit.dailyProfit >= 0 ? 'text-green-400' : 'text-red-400'
+                  {/* 月盈亏视角：显示12个月的收益 */}
+                  {viewMode === "profit" && profitPeriod === "month" && (
+                    <div className="space-y-4">
+                      {/* 当前月收益概览 */}
+                      {(() => {
+                        const currentMonthData = getCurrentMonthProfit();
+                        return currentMonthData ? (
+                          <div className="p-4 rounded-lg bg-black/30 border border-white/10">
+                            <div className="text-sm text-white/60 mb-2">{currentYear}年{currentMonth}月 月收益</div>
+                            <div className={`text-2xl font-bold ${
+                              currentMonthData.profit >= 0 ? 'text-green-400' : 'text-red-400'
                             }`}>
-                              {profit.dailyProfit >= 0 ? '+' : ''}{formatCompactAmount(profit.dailyProfit)}
+                              {currentMonthData.profit >= 0 ? '+' : ''}¥{formatAmount(currentMonthData.profit)}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                            <div className={`text-sm ${
+                              currentMonthData.profitRate >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              收益率: {currentMonthData.profitRate >= 0 ? '+' : ''}{currentMonthData.profitRate}%
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-4 rounded-lg bg-black/30 border border-white/10 text-center text-white/60">
+                            {currentYear}年{currentMonth}月 暂无数据
+                          </div>
+                        );
+                      })()}
+                      
+                      {/* 12个月日历格子 */}
+                      <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
+                          const monthKey = `${currentYear}-${String(month).padStart(2, '0')}`;
+                          const monthData = getMonthlyProfits().find(m => m.month === monthKey);
+                          const isCurrentMonth = month === currentMonth;
+                          
+                          return (
+                            <div
+                              key={month}
+                              onClick={() => setCurrentMonth(month)}
+                              className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                                isCurrentMonth
+                                  ? 'border-[#D4AF37] bg-[#D4AF37]/20'
+                                  : monthData
+                                  ? monthData.profit >= 0
+                                    ? 'border-green-500/30 bg-green-500/10 hover:bg-green-500/20'
+                                    : 'border-red-500/30 bg-red-500/10 hover:bg-red-500/20'
+                                  : 'border-white/10 hover:border-white/30'
+                              }`}
+                            >
+                              <div className="text-sm text-white/60 text-center mb-1">{month}月</div>
+                              {monthData ? (
+                                <div className={`text-sm font-medium text-center ${
+                                  monthData.profit >= 0 ? 'text-green-400' : 'text-red-400'
+                                }`}>
+                                  {monthData.profit >= 0 ? '+' : ''}{formatCompactAmount(monthData.profit)}
+                                </div>
+                              ) : (
+                                <div className="text-sm text-white/40 text-center">-</div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* 年盈亏视角：显示所有年份的收益 */}
+                  {viewMode === "profit" && profitPeriod === "year" && (
+                    <div className="space-y-4">
+                      {/* 当前年收益概览 */}
+                      {(() => {
+                        const currentYearData = getCurrentYearProfit();
+                        return currentYearData ? (
+                          <div className="p-4 rounded-lg bg-black/30 border border-white/10">
+                            <div className="text-sm text-white/60 mb-2">{currentYear}年 年收益</div>
+                            <div className={`text-2xl font-bold ${
+                              currentYearData.profit >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              {currentYearData.profit >= 0 ? '+' : ''}¥{formatAmount(currentYearData.profit)}
+                            </div>
+                            <div className={`text-sm ${
+                              currentYearData.profitRate >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}>
+                              收益率: {currentYearData.profitRate >= 0 ? '+' : ''}{currentYearData.profitRate}%
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-4 rounded-lg bg-black/30 border border-white/10 text-center text-white/60">
+                            {currentYear}年 暂无数据
+                          </div>
+                        );
+                      })()}
+                      
+                      {/* 年份列表 */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {(() => {
+                          const yearlyProfits = getYearlyProfits();
+                          // 生成最近几年的列表（包括有数据的年份和当前年前后几年）
+                          const years: number[] = [];
+                          const minYear = yearlyProfits.length > 0 
+                            ? Math.min(...yearlyProfits.map(y => y.year), currentYear - 2)
+                            : currentYear - 2;
+                          const maxYear = Math.max(currentYear + 1, ...yearlyProfits.map(y => y.year));
+                          
+                          for (let y = minYear; y <= maxYear; y++) {
+                            years.push(y);
+                          }
+                          
+                          return years.map((year) => {
+                            const yearData = yearlyProfits.find(y => y.year === year);
+                            const isCurrentYear = year === currentYear;
+                            
+                            return (
+                              <div
+                                key={year}
+                                onClick={() => setCurrentYear(year)}
+                                className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                                  isCurrentYear
+                                    ? 'border-[#D4AF37] bg-[#D4AF37]/20'
+                                    : yearData
+                                    ? yearData.profit >= 0
+                                      ? 'border-green-500/30 bg-green-500/10 hover:bg-green-500/20'
+                                      : 'border-red-500/30 bg-red-500/10 hover:bg-red-500/20'
+                                    : 'border-white/10 hover:border-white/30'
+                                }`}
+                              >
+                                <div className="text-lg font-medium text-white text-center mb-2">{year}年</div>
+                                {yearData ? (
+                                  <>
+                                    <div className={`text-lg font-bold text-center ${
+                                      yearData.profit >= 0 ? 'text-green-400' : 'text-red-400'
+                                    }`}>
+                                      {yearData.profit >= 0 ? '+' : ''}{formatCompactAmount(yearData.profit)}
+                                    </div>
+                                    <div className={`text-xs text-center ${
+                                      yearData.profitRate >= 0 ? 'text-green-400' : 'text-red-400'
+                                    }`}>
+                                      {yearData.profitRate >= 0 ? '+' : ''}{yearData.profitRate}%
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="text-sm text-white/40 text-center">暂无数据</div>
+                                )}
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
               
