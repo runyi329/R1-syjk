@@ -220,10 +220,10 @@ export default function StockClientView() {
 
             <div className="grid grid-cols-2 gap-2 md:gap-3">
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1.5 px-3">
+                <CardHeader className="py-0.5 px-3">
                   <CardDescription className="text-xs text-white/60">初始金额</CardDescription>
                 </CardHeader>
-                <CardContent className="py-1.5 px-3">
+                <CardContent className="py-0.5 px-3">
                   <p className="text-base font-bold text-white">
                     {formatCurrency(stockUserStats.initialBalance)}
                   </p>
@@ -231,10 +231,10 @@ export default function StockClientView() {
               </Card>
               
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1.5 px-3">
+                <CardHeader className="py-0.5 px-3">
                   <CardDescription className="text-xs text-white/60">开始金额</CardDescription>
                 </CardHeader>
-                <CardContent className="py-1.5 px-3">
+                <CardContent className="py-0.5 px-3">
                   <p className="text-base font-bold text-[#D4AF37]">
                     {formatCurrency(stockUserStats.startAmount)}
                   </p>
@@ -242,10 +242,10 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1.5 px-3">
+                <CardHeader className="py-0.5 px-3">
                   <CardDescription className="text-xs text-white/60">最新余额</CardDescription>
                 </CardHeader>
-                <CardContent className="py-1.5 px-3">
+                <CardContent className="py-0.5 px-3">
                   <p className="text-base font-bold text-white">
                     {formatCurrency(stockUserStats.latestBalance)}
                   </p>
@@ -253,10 +253,10 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1.5 px-3">
+                <CardHeader className="py-0.5 px-3">
                   <CardDescription className="text-xs text-white/60">累计盈亏</CardDescription>
                 </CardHeader>
-                <CardContent className="py-1.5 px-3">
+                <CardContent className="py-0.5 px-3">
                   <div className="flex items-center gap-1">
                     {stockUserStats.totalProfit >= 0 ? (
                       <TrendingUp className="w-4 h-4 text-red-500" />
@@ -271,10 +271,10 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1.5 px-3">
+                <CardHeader className="py-0.5 px-3">
                   <CardDescription className="text-xs text-white/60">收益率</CardDescription>
                 </CardHeader>
-                <CardContent className="py-1.5 px-3">
+                <CardContent className="py-0.5 px-3">
                   <p className={`text-base font-bold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                     {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
                   </p>
