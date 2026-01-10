@@ -344,6 +344,10 @@ export const stockUserPermissions = mysqlTable("stockUserPermissions", {
   stockUserId: int("stockUserId").notNull(),
   /** 关联网站用户ID（可以查看该股票客户数据的网站注册用户） */
   userId: int("userId").notNull(),
+  /** 开始金额（用户关注的起始金额节点） */
+  startAmount: decimal("startAmount", { precision: 15, scale: 2 }).notNull().default("0"),
+  /** 分成百分比（1-100） */
+  profitPercentage: int("profitPercentage").notNull().default(1),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

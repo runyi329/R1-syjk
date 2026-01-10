@@ -1274,3 +1274,13 @@
 - [x] 确认手机端用户名是否有hidden类限制
 - [x] 修复手机端用户名显示逻辑（优化布局、调整字体大小、添加whitespace-nowrap）
 - [x] 测试手机版本显示效果
+
+## 股票客户授权管理优化 - 添加开始金额和分成百分比
+- [x] 更新stockUserPermissions表schema，添加startAmount和profitPercentage字段
+- [x] 执行数据库迁移（pnpm db:push）
+- [x] 修改后端API：addStockUserPermission添加startAmount和profitPercentage参数
+- [x] 修改后端API：getMyStockUserStats返回初始金额、开始金额和基于开始金额的盈亏
+- [x] 更新管理员授权界面：添加开始金额和分成百分比输入框
+- [x] 修改用户查看页面：显示初始金额、开始金额、最新余额
+- [x] 修改盈亏计算逻辑：基于开始金额计算盈亏和收益率
+- [x] 测试完整流程：管理员授权 -> 用户查看数据

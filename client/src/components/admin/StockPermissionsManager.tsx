@@ -34,6 +34,8 @@ export default function StockPermissionsManager() {
   const [selectedStockUser, setSelectedStockUser] = useState<StockUser | null>(null);
   const [isAddPermissionOpen, setIsAddPermissionOpen] = useState(false);
   const [selectedWebsiteUserId, setSelectedWebsiteUserId] = useState<string>("");
+  const [startAmount, setStartAmount] = useState<string>("");
+  const [profitPercentage, setProfitPercentage] = useState<string>("1");
 
   // 获取所有股票用户
   const { data: stockUsers, isLoading: isLoadingStockUsers } = trpc.stocks.getAllStockUsers.useQuery();
@@ -54,6 +56,8 @@ export default function StockPermissionsManager() {
       refetchPermissions();
       setIsAddPermissionOpen(false);
       setSelectedWebsiteUserId("");
+      setStartAmount("");
+      setProfitPercentage("1");
     },
     onError: (error) => toast.error(`授权失败：${error.message}`),
   });
@@ -72,10 +76,23 @@ export default function StockPermissionsManager() {
       toast.error("请选择网站用户");
       return;
     }
+    
+    if (!startAmount || parseFloat(startAmount) < 0) {
+      toast.error("请输入有效的开始金额");
+      return;
+    }
+    
+    const percentage = parseInt(profitPercentage);
+    if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+      toast.error("请输入有效的分成百分比（1-100）");
+      return;
+    }
 
     addPermissionMutation.mutate({
       stockUserId: selectedStockUser.id,
       userId: parseInt(selectedWebsiteUserId),
+      startAmount: startAmount,
+      profitPercentage: percentage,
     });
   };
 
@@ -198,6 +215,34 @@ export default function StockPermissionsManager() {
                         )}
                       </SelectContent>
                     </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm text-white/80">开始金额（元）</label>
+                    <input
+                      type="number"
+                      value={startAmount}
+                      onChange={(e) => setStartAmount(e.target.value)}
+                      placeholder="请输入开始金额"
+                      className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                      step="0.01"
+                      min="0"
+                    />
+                    <p className="text-xs text-white/50">该用户关注的起始金额节点</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm text-white/80">分成百分比（%）</label>
+                    <input
+                      type="number"
+                      value={profitPercentage}
+                      onChange={(e) => setProfitPercentage(e.target.value)}
+                      placeholder="请输入分成百分比"
+                      className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                      min="1"
+                      max="100"
+                    />
+                    <p className="text-xs text-white/50">范围：1%-100%</p>
                   </div>
                 </div>
                 <DialogFooter>

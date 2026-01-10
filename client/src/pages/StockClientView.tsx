@@ -182,14 +182,25 @@ export default function StockClientView() {
         {/* 统计数据 */}
         {selectedStockUserId && stockUserStats && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card className="bg-black/50 border-white/10">
                 <CardHeader className="pb-3">
-                  <CardDescription className="text-white/60">初始资金</CardDescription>
+                  <CardDescription className="text-white/60">初始金额</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold text-white">
                     {formatCurrency(stockUserStats.initialBalance)}
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-black/50 border-white/10">
+                <CardHeader className="pb-3">
+                  <CardDescription className="text-white/60">开始金额</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-[#D4AF37]">
+                    {formatCurrency(stockUserStats.startAmount)}
                   </p>
                 </CardContent>
               </Card>

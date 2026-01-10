@@ -390,6 +390,8 @@ export const stocksRouter = router({
     .input(z.object({
       stockUserId: z.number(),
       userId: z.number(),
+      startAmount: z.string(),
+      profitPercentage: z.number().min(1).max(100),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -417,6 +419,8 @@ export const stocksRouter = router({
         .values({
           stockUserId: input.stockUserId,
           userId: input.userId,
+          startAmount: input.startAmount,
+          profitPercentage: input.profitPercentage,
         });
       
       return { success: true, message: "授权成功" };
@@ -529,6 +533,10 @@ export const stocksRouter = router({
         throw new Error("Unauthorized: You don't have permission to view this stock user");
       }
       
+      // 获取开始金额和分成百分比
+      const startAmount = parseFloat(permission.startAmount);
+      const profitPercentage = permission.profitPercentage;
+      
       // 获取用户信息
       const [user] = await db
         .select()
@@ -548,15 +556,16 @@ export const stocksRouter = router({
       
       const initialBalance = parseFloat(user.initialBalance);
       
-      // 计算每日盈亏
+      // 计算每日盈亏（基于开始金额）
       const dailyProfits = balances.map((b: StockBalance, index: number) => {
         const currentBalance = parseFloat(b.balance);
         const previousBalance = index === 0 
           ? initialBalance
           : parseFloat(balances[index - 1].balance);
         const dailyProfit = currentBalance - previousBalance;
-        const totalProfit = currentBalance - initialBalance;
-        const profitRate = ((totalProfit / initialBalance) * 100).toFixed(2);
+        // 基于开始金额计算盈亏
+        const totalProfit = currentBalance - startAmount;
+        const profitRate = startAmount > 0 ? ((totalProfit / startAmount) * 100).toFixed(2) : "0.00";
         
         return {
           date: b.date,
@@ -567,16 +576,18 @@ export const stocksRouter = router({
         };
       });
       
-      // 计算总体统计
+      // 计算总体统计（基于开始金额）
       const latestBalance = balances.length > 0 
         ? parseFloat(balances[balances.length - 1].balance) 
         : initialBalance;
-      const totalProfit = latestBalance - initialBalance;
-      const totalProfitRate = ((totalProfit / initialBalance) * 100).toFixed(2);
+      const totalProfit = latestBalance - startAmount;
+      const totalProfitRate = startAmount > 0 ? ((totalProfit / startAmount) * 100).toFixed(2) : "0.00";
       
       return {
         user,
         initialBalance,
+        startAmount,
+        profitPercentage,
         latestBalance,
         totalProfit,
         totalProfitRate: parseFloat(totalProfitRate),

@@ -1,0 +1,24 @@
+{
+  "query": "SELECT u.id, u.username, p.stockUserId, p.startAmount, p.profitPercentage \nFROM users u \nLEFT JOIN stockUserPermissions p ON u.id = p.userId \nWHERE u.username = '张三';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT u.id, u.username, p.stockUserId, p.startAmount, p.profitPercentage \nFROM users u \nLEFT JOIN stockUserPermissions p ON u.id = p.userId \nWHERE u.username = '张三';",
+  "rows": [
+    {
+      "id": "330085",
+      "username": "张三",
+      "stockUserId": "1",
+      "startAmount": "0.00",
+      "profitPercentage": "1"
+    },
+    {
+      "id": "330085",
+      "username": "张三",
+      "stockUserId": "90001",
+      "startAmount": "950000.00",
+      "profitPercentage": "10"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tstockUserId\tstartAmount\tprofitPercentage\n330085\t张三\t1\t0.00\t1\n330085\t张三\t90001\t950000.00\t10\n",
+  "stderr": "",
+  "execution_time_ms": 398
+}

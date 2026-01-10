@@ -71,6 +71,13 @@
       "when": 1768027468785,
       "tag": "0009_fast_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1768034577283,
+      "tag": "0010_daily_loa",
+      "breakpoints": true
     }
   ]
 }
