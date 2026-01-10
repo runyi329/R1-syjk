@@ -1425,3 +1425,10 @@
 - [x] 将CardHeader和CardContent的padding改为最小值（py-0）
 - [x] 检查Card组件本身的默认padding
 - [x] 测试手机端显示效果，确保文字上下空白最小化
+
+
+## 股票客户数据页面 - 修复文字到容器边框的空白距离
+- [x] 检查StockClientView页面代码，定位文字到容器边框的padding问题
+- [x] 修改CardContent的padding，让文字上下边缘紧贴容器边框
+- [x] 测试手机端显示效果，验证红线标注区域的空白是否缩小
+- [x] 确保所有4个统计卡片的空白距离一致

@@ -228,7 +228,7 @@ export default function StockClientView() {
             <div className="grid grid-cols-2 gap-1">
                 {/* 初始资金 */}
                 <Card className="bg-black/50 border-white/10">
-                  <CardContent className="py-0 px-2">
+                  <CardContent className="p-0.5">
                     <p className="text-[10px] text-white/60 leading-none mb-0">初始资金</p>
                     <p className="text-xs font-bold text-white leading-none">
                       {formatCurrency(stockUserStats.initialBalance)}
@@ -238,7 +238,7 @@ export default function StockClientView() {
                 
                 {/* 开始金额 */}
                 <Card className="bg-black/50 border-white/10">
-                  <CardContent className="py-0 px-2">
+                  <CardContent className="p-0.5">
                     <p className="text-[10px] text-white/60 leading-none mb-0">开始金额</p>
                     <p className="text-xs font-bold text-[#D4AF37] leading-none">
                       {formatCurrency(stockUserStats.startAmount)}
@@ -248,7 +248,7 @@ export default function StockClientView() {
 
                 {/* 最新余额 */}
                 <Card className="bg-black/50 border-white/10">
-                  <CardContent className="py-0 px-2">
+                  <CardContent className="p-0.5">
                     <p className="text-[10px] text-white/60 leading-none mb-0">最新余额</p>
                     <p className="text-xs font-bold text-white leading-none">
                       {formatCurrency(stockUserStats.latestBalance)}
@@ -258,7 +258,7 @@ export default function StockClientView() {
 
                 {/* 累计盈亏+收益率 */}
                 <Card className="bg-black/50 border-white/10">
-                  <CardContent className="py-0 px-2">
+                  <CardContent className="p-0.5">
                     <p className="text-[10px] text-white/60 leading-none mb-0">累计盈亏</p>
                     <div className="flex items-center gap-0.5 mb-0">
                       {stockUserStats.totalProfit >= 0 ? (
