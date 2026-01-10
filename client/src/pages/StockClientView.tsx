@@ -465,7 +465,7 @@ export default function StockClientView() {
                     <div className="grid grid-cols-7 gap-[2px]">
                       {generateCalendarDays().map((day, index) => {
                         if (day === null) {
-                          return <div key={`empty-${index}`} className="h-[60px] md:h-[72px]" />;
+                          return <div key={`empty-${index}`} className="h-[32px]" />;
                         }
                         
                         const profit = getProfitForDate(day);
@@ -486,7 +486,7 @@ export default function StockClientView() {
                         return (
                           <div
                             key={day}
-                            className={`h-[60px] md:h-[72px] px-[2px] py-1 rounded border transition-colors flex flex-col justify-between ${
+                            className={`h-[32px] px-[2px] py-1 rounded border transition-colors flex flex-col justify-between ${
                               isToday
                                 ? 'border-[#D4AF37]/50 bg-[#D4AF37]/10'
                                 : isProfit
