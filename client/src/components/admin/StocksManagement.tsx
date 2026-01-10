@@ -13,6 +13,7 @@ import { Loader2, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, Trend
 import { toast } from "sonner";
 import FundsCurveChart from "./FundsCurveChart";
 import StockPermissionsManager from "./StockPermissionsManager";
+import MemberPermissionsView from "./MemberPermissionsView";
 
 interface StockUser {
   id: number;
@@ -355,6 +356,9 @@ export default function StocksManagement() {
           </TabsTrigger>
           <TabsTrigger value="permissions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
             权限管理
+          </TabsTrigger>
+          <TabsTrigger value="members" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+            会员管理
           </TabsTrigger>
         </TabsList>
         
@@ -1055,6 +1059,21 @@ export default function StocksManagement() {
             </CardHeader>
             <CardContent>
               <StockPermissionsManager />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 会员管理标签页 */}
+        <TabsContent value="members" className="mt-4">
+          <Card className="bg-black/50 border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white">会员授权查看</CardTitle>
+              <CardDescription className="text-white/60">
+                从网站会员的角度查看每个会员被授权了哪些股票用户
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MemberPermissionsView />
             </CardContent>
           </Card>
         </TabsContent>

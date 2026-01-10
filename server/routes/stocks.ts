@@ -360,6 +360,72 @@ export const stocksRouter = router({
 
   // ==================== 权限管理 ====================
 
+  // 获取所有会员及其被授权的股票用户列表（会员管理视角）
+  getMemberPermissions: adminProcedure
+    .query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      // 查询所有授权记录，按用户分组
+      const permissions = await db
+        .select({
+          userId: stockUserPermissions.userId,
+          username: users.username,
+          email: users.email,
+          stockUserId: stockUserPermissions.stockUserId,
+          stockUserName: stockUsers.name,
+          startAmount: stockUserPermissions.startAmount,
+          profitPercentage: stockUserPermissions.profitPercentage,
+          authorizationDate: stockUserPermissions.authorizationDate,
+          deposit: stockUserPermissions.deposit,
+          createdAt: stockUserPermissions.createdAt,
+        })
+        .from(stockUserPermissions)
+        .leftJoin(users, eq(stockUserPermissions.userId, users.id))
+        .leftJoin(stockUsers, eq(stockUserPermissions.stockUserId, stockUsers.id))
+        .orderBy(asc(users.username), desc(stockUserPermissions.createdAt));
+      
+      // 按用户分组整理数据
+      const memberMap = new Map<number, {
+        userId: number;
+        username: string | null;
+        email: string | null;
+        authorizedStockUsers: Array<{
+          stockUserId: number;
+          stockUserName: string | null;
+          startAmount: string;
+          profitPercentage: number;
+          authorizationDate: Date | null;
+          deposit: string;
+          createdAt: Date;
+        }>;
+      }>();
+      
+      for (const perm of permissions) {
+        if (!memberMap.has(perm.userId)) {
+          memberMap.set(perm.userId, {
+            userId: perm.userId,
+            username: perm.username,
+            email: perm.email,
+            authorizedStockUsers: [],
+          });
+        }
+        
+        const member = memberMap.get(perm.userId)!;
+        member.authorizedStockUsers.push({
+          stockUserId: perm.stockUserId,
+          stockUserName: perm.stockUserName,
+          startAmount: perm.startAmount,
+          profitPercentage: perm.profitPercentage,
+          authorizationDate: perm.authorizationDate,
+          deposit: perm.deposit,
+          createdAt: perm.createdAt,
+        });
+      }
+      
+      return Array.from(memberMap.values());
+    }),
+
   // 获取股票客户的已授权用户列表
   getStockUserPermissions: adminProcedure
     .input(z.object({ stockUserId: z.number() }))
