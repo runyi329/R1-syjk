@@ -385,6 +385,18 @@ export default function AdminDashboard() {
                           <div>
                             <div className="text-white font-medium text-sm sm:text-base">{user.name || "未设置昵称"}</div>
                             <div className="text-xs sm:text-sm text-white/60">ID: {user.id}</div>
+                            <div className="text-xs sm:text-sm mt-1">
+                              <Badge
+                                variant="outline"
+                                className={
+                                  user.role === "admin"
+                                    ? "bg-purple-500/20 text-purple-400 border-purple-500/50 text-xs"
+                                    : "bg-blue-500/20 text-blue-400 border-blue-500/50 text-xs"
+                                }
+                              >
+                                {user.role === "admin" ? "超级管理员" : "普通用户"}
+                              </Badge>
+                            </div>
                             {(user as any).notes && (
                               <div className="text-xs text-white/50 mt-1">{(user as any).notes}</div>
                             )}
