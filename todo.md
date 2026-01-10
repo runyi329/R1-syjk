@@ -1419,3 +1419,9 @@
 - [x] 让容器高度刚好能容纳字体高度
 - [x] 去除多余的空白距离
 - [x] 测试手机端显示效果
+
+## 股票客户数据页面 - 彻底优化统计卡片padding
+- [x] 检查StockClientView页面代码，找出padding问题
+- [x] 将CardHeader和CardContent的padding改为最小值（py-0）
+- [x] 检查Card组件本身的默认padding
+- [x] 测试手机端显示效果，确保文字上下空白最小化
