@@ -218,12 +218,12 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-2 gap-2 md:gap-4">
+            <div className="grid grid-cols-2 gap-1 md:gap-2">
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-1 md:pb-3">
+                <CardHeader className="pb-0 md:pb-1">
                   <CardDescription className="text-xs md:text-sm text-white/60">初始金额</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-1 md:pt-2">
+                <CardContent className="pt-0 md:pt-1">
                   <p className="text-base md:text-2xl font-bold text-white">
                     {formatCurrency(stockUserStats.initialBalance)}
                   </p>
@@ -231,10 +231,10 @@ export default function StockClientView() {
               </Card>
               
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-1 md:pb-3">
+                <CardHeader className="pb-0 md:pb-1">
                   <CardDescription className="text-xs md:text-sm text-white/60">开始金额</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-1 md:pt-2">
+                <CardContent className="pt-0 md:pt-1">
                   <p className="text-base md:text-2xl font-bold text-[#D4AF37]">
                     {formatCurrency(stockUserStats.startAmount)}
                   </p>
@@ -242,10 +242,10 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-1 md:pb-3">
+                <CardHeader className="pb-0 md:pb-1">
                   <CardDescription className="text-xs md:text-sm text-white/60">最新余额</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-1 md:pt-2">
+                <CardContent className="pt-0 md:pt-1">
                   <p className="text-base md:text-2xl font-bold text-white">
                     {formatCurrency(stockUserStats.latestBalance)}
                   </p>
@@ -253,10 +253,10 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-1 md:pb-3">
+                <CardHeader className="pb-0 md:pb-1">
                   <CardDescription className="text-xs md:text-sm text-white/60">累计盈亏</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-1 md:pt-2">
+                <CardContent className="pt-0 md:pt-1">
                   <div className="flex items-center gap-1 md:gap-2">
                     {stockUserStats.totalProfit >= 0 ? (
                       <TrendingUp className="w-3 h-3 md:w-5 md:h-5 text-red-500" />
@@ -271,10 +271,10 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-1 md:pb-3">
+                <CardHeader className="pb-0 md:pb-1">
                   <CardDescription className="text-xs md:text-sm text-white/60">收益率</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-1 md:pt-2">
+                <CardContent className="pt-0 md:pt-1">
                   <p className={`text-base md:text-2xl font-bold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                     {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
                   </p>
