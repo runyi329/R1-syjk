@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Calendar, Shield, Lock, Wallet } from "lucide-react";
+import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Calendar, Shield, Lock, Wallet, Percent } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -138,7 +138,7 @@ export default function StockClientView() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Shield className="w-5 h-5 text-[#D4AF37]" />
-              选择股票客户
+              选择股票ID
             </CardTitle>
             <CardDescription className="text-white/60">
               选择您有权限查看的股票客户
@@ -188,7 +188,7 @@ export default function StockClientView() {
                 <div className="flex items-center justify-between gap-1">
                   <div className="flex items-center gap-1">
                     <div className="w-6 h-6 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
-                      <Shield className="w-3 h-3 text-[#D4AF37]" />
+                      <Percent className="w-3 h-3 text-[#D4AF37]" />
                     </div>
                     <p className="text-sm font-bold text-[#D4AF37]">
                       {stockUserStats.profitPercentage}%
