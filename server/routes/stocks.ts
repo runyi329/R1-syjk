@@ -380,6 +380,7 @@ export const stocksRouter = router({
           startAmount: stockUserPermissions.startAmount,
           profitPercentage: stockUserPermissions.profitPercentage,
           authorizationDate: stockUserPermissions.authorizationDate,
+          deposit: stockUserPermissions.deposit,
         })
         .from(stockUserPermissions)
         .leftJoin(users, eq(stockUserPermissions.userId, users.id))
@@ -396,6 +397,7 @@ export const stocksRouter = router({
       startAmount: z.string(),
       profitPercentage: z.number().min(1).max(100),
       authorizationDate: z.string().optional(),
+      deposit: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -426,6 +428,7 @@ export const stocksRouter = router({
           startAmount: input.startAmount,
           profitPercentage: input.profitPercentage,
           authorizationDate: input.authorizationDate ? new Date(input.authorizationDate) : null,
+          deposit: input.deposit || "0",
         });
       
       return { success: true, message: "授权成功" };
@@ -439,6 +442,7 @@ export const stocksRouter = router({
       startAmount: z.string(),
       profitPercentage: z.number().min(1).max(100),
       authorizationDate: z.string().optional(),
+      deposit: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -450,6 +454,7 @@ export const stocksRouter = router({
           startAmount: input.startAmount,
           profitPercentage: input.profitPercentage,
           authorizationDate: input.authorizationDate ? new Date(input.authorizationDate) : null,
+          deposit: input.deposit || "0",
           updatedAt: new Date(),
         })
         .where(
@@ -625,6 +630,7 @@ export const stocksRouter = router({
         startAmount,
         profitPercentage,
         authorizationDate: permission.authorizationDate,
+        deposit: permission.deposit,
         latestBalance,
         totalProfit,
         totalProfitRate: parseFloat(totalProfitRate),

@@ -1,0 +1,1 @@
+ALTER TABLE `stockUserPermissions` ADD `deposit` decimal(15,2) DEFAULT '0' NOT NULL;

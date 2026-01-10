@@ -31,6 +31,7 @@ interface Permission {
   startAmount: string;
   profitPercentage: number;
   authorizationDate: Date | null;
+  deposit: string;
 }
 
 export default function StockPermissionsManager() {
@@ -40,6 +41,7 @@ export default function StockPermissionsManager() {
   const [startAmount, setStartAmount] = useState<string>("");
   const [profitPercentage, setProfitPercentage] = useState<string>("1");
   const [authorizationDate, setAuthorizationDate] = useState<string>("");
+  const [deposit, setDeposit] = useState<string>("");
   
   // 编辑授权信息的状态
   const [isEditPermissionOpen, setIsEditPermissionOpen] = useState(false);
@@ -47,6 +49,7 @@ export default function StockPermissionsManager() {
   const [editStartAmount, setEditStartAmount] = useState<string>("");
   const [editProfitPercentage, setEditProfitPercentage] = useState<string>("1");
   const [editAuthorizationDate, setEditAuthorizationDate] = useState<string>("");
+  const [editDeposit, setEditDeposit] = useState<string>("");
 
   // 获取所有股票用户
   const { data: stockUsers, isLoading: isLoadingStockUsers } = trpc.stocks.getAllStockUsers.useQuery();
@@ -117,6 +120,7 @@ export default function StockPermissionsManager() {
       startAmount: startAmount,
       profitPercentage: percentage,
       authorizationDate: authorizationDate || undefined,
+      deposit: deposit || "0",
     });
   };
 
@@ -129,6 +133,7 @@ export default function StockPermissionsManager() {
         ? new Date(permission.authorizationDate).toISOString().split('T')[0] 
         : ""
     );
+    setEditDeposit(permission.deposit || "0");
     setIsEditPermissionOpen(true);
   };
 
@@ -152,6 +157,7 @@ export default function StockPermissionsManager() {
       startAmount: editStartAmount,
       profitPercentage: percentage,
       authorizationDate: editAuthorizationDate || undefined,
+      deposit: editDeposit || "0",
     });
   };
 
@@ -314,6 +320,20 @@ export default function StockPermissionsManager() {
                     />
                     <p className="text-xs text-white/50">授权生效的日期，用于记录和展示</p>
                   </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm text-white/80">保证金（元）</label>
+                    <input
+                      type="number"
+                      value={deposit}
+                      onChange={(e) => setDeposit(e.target.value)}
+                      placeholder="请输入保证金金额"
+                      className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                      step="0.01"
+                      min="0"
+                    />
+                    <p className="text-xs text-white/50">该用户的保证金金额</p>
+                  </div>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsAddPermissionOpen(false)}>
@@ -462,6 +482,20 @@ export default function StockPermissionsManager() {
                 className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               />
               <p className="text-xs text-white/50">授权生效的日期，用于记录和展示</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-white/80">保证金（元）</label>
+              <input
+                type="number"
+                value={editDeposit}
+                onChange={(e) => setEditDeposit(e.target.value)}
+                placeholder="请输入保证金金额"
+                className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                step="0.01"
+                min="0"
+              />
+              <p className="text-xs text-white/50">该用户的保证金金额</p>
             </div>
           </div>
           <DialogFooter>

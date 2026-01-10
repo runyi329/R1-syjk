@@ -194,6 +194,15 @@ export default function StockClientView() {
                       {stockUserStats.profitPercentage}%
                     </p>
                   </div>
+                  
+                  {stockUserStats.deposit && parseFloat(stockUserStats.deposit) > 0 && (
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs font-semibold text-green-400">
+                        保证金: ¥{parseFloat(stockUserStats.deposit).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  )}
+                  
                   {stockUserStats.authorizationDate && (
                     <div className="flex items-center gap-1">
                       <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
@@ -212,65 +221,70 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-3 gap-1">
+              {/* 第1格: 初始资金 */}
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1 px-2 pb-0">
-                  <CardDescription className="text-[10px] text-white/60 leading-tight">初始金额</CardDescription>
-                </CardHeader>
-                <CardContent className="py-1 px-2 pt-0">
-                  <p className="text-xs font-bold text-white leading-tight">
+                <CardContent className="py-1.5 px-2">
+                  <p className="text-[10px] text-white/60 leading-none mb-1">初始资金</p>
+                  <p className="text-xs font-bold text-white leading-none">
                     {formatCurrency(stockUserStats.initialBalance)}
                   </p>
                 </CardContent>
               </Card>
               
+              {/* 第2格: 开始金额 */}
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1 px-2 pb-0">
-                  <CardDescription className="text-[10px] text-white/60 leading-tight">开始金额</CardDescription>
-                </CardHeader>
-                <CardContent className="py-1 px-2 pt-0">
-                  <p className="text-xs font-bold text-[#D4AF37] leading-tight">
+                <CardContent className="py-1.5 px-2">
+                  <p className="text-[10px] text-white/60 leading-none mb-1">开始金额</p>
+                  <p className="text-xs font-bold text-[#D4AF37] leading-none">
                     {formatCurrency(stockUserStats.startAmount)}
                   </p>
                 </CardContent>
               </Card>
 
+              {/* 第3格: 最新余额 */}
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1 px-2 pb-0">
-                  <CardDescription className="text-[10px] text-white/60 leading-tight">最新余额</CardDescription>
-                </CardHeader>
-                <CardContent className="py-1 px-2 pt-0">
-                  <p className="text-xs font-bold text-white leading-tight">
+                <CardContent className="py-1.5 px-2">
+                  <p className="text-[10px] text-white/60 leading-none mb-1">最新余额</p>
+                  <p className="text-xs font-bold text-white leading-none">
                     {formatCurrency(stockUserStats.latestBalance)}
                   </p>
                 </CardContent>
               </Card>
 
+              {/* 第4格: 累计盈亏 */}
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1 px-2 pb-0">
-                  <CardDescription className="text-[10px] text-white/60 leading-tight">累计盈亏</CardDescription>
-                </CardHeader>
-                <CardContent className="py-1 px-2 pt-0">
+                <CardContent className="py-1.5 px-2">
+                  <p className="text-[10px] text-white/60 leading-none mb-1">累计盈亏</p>
                   <div className="flex items-center gap-0.5">
                     {stockUserStats.totalProfit >= 0 ? (
                       <TrendingUp className="w-3 h-3 text-red-500" />
                     ) : (
                       <TrendingDown className="w-3 h-3 text-green-500" />
                     )}
-                    <p className={`text-xs font-bold leading-tight ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                       {formatCurrency(Math.abs(stockUserStats.totalProfit))}
                     </p>
                   </div>
                 </CardContent>
               </Card>
 
+              {/* 第5格: 收益率 */}
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-1 px-2 pb-0">
-                  <CardDescription className="text-[10px] text-white/60 leading-tight">收益率</CardDescription>
-                </CardHeader>
-                <CardContent className="py-1 px-2 pt-0">
-                  <p className={`text-xs font-bold leading-tight ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                <CardContent className="py-1.5 px-2">
+                  <p className="text-[10px] text-white/60 leading-none mb-1">收益率</p>
+                  <p className={`text-xs font-bold leading-none ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                     {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* 第6格: 空白预留 */}
+              <Card className="bg-black/50 border-white/10">
+                <CardContent className="py-1.5 px-2">
+                  <p className="text-[10px] text-white/60 leading-none mb-1">&nbsp;</p>
+                  <p className="text-xs font-bold text-white leading-none">
+                    &nbsp;
                   </p>
                 </CardContent>
               </Card>
