@@ -132,11 +132,10 @@ export default function Home() {
 
             {authData ? (
               <div className="flex gap-2 items-center">
-                {/* 用户信息显示 */}
+                {/* 用户信息显示 - 在所有设备上都可见 */}
                 {userData && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground hidden sm:flex">
-                    <span className="font-medium text-foreground">{userData.name}</span>
-                    <span>│</span>
+                  <div className="flex items-center gap-1 text-xs">
+                    <span className="font-medium text-primary">{userData.name}</span>
                     <Badge 
                       variant="outline" 
                       className={`text-xs font-semibold ${
@@ -162,7 +161,7 @@ export default function Home() {
                   onClick={handleLogout}
                 >
                   <LogOut className="w-3 h-3" />
-                  {language === 'en' ? 'Logout' : '登出'}
+                  <span className="hidden sm:inline">{language === 'en' ? 'Logout' : '登出'}</span>
                 </Button>
               </div>
             ) : (
