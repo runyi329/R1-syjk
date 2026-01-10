@@ -245,6 +245,35 @@ export default function StocksManagement() {
     return num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
   
+  // 紧凑格式化金额（用于日历格子显示）
+  const formatCompactAmount = (amount: number | string) => {
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    const absNum = Math.abs(num);
+    
+    if (absNum >= 100000000) {
+      // 亿
+      return (num / 100000000).toFixed(1) + '亿';
+    } else if (absNum >= 10000000) {
+      // 千万
+      return (num / 10000).toFixed(0) + '万';
+    } else if (absNum >= 1000000) {
+      // 百万
+      return (num / 10000).toFixed(0) + '万';
+    } else if (absNum >= 100000) {
+      // 十万
+      return (num / 10000).toFixed(1) + '万';
+    } else if (absNum >= 10000) {
+      // 万
+      return (num / 10000).toFixed(1) + '万';
+    } else if (absNum >= 1000) {
+      // 千
+      return Math.round(num).toLocaleString('zh-CN');
+    } else {
+      // 小于1000
+      return num.toFixed(0);
+    }
+  };
+  
   const calendarDays = generateCalendarDays();
   const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
   
@@ -597,19 +626,19 @@ export default function StocksManagement() {
                 </CardHeader>
                 <CardContent>
                   {/* 星期标题 */}
-                  <div className="grid grid-cols-7 gap-1 mb-2">
+                  <div className="grid grid-cols-7 gap-px md:gap-1 mb-1">
                     {weekDays.map((day) => (
-                      <div key={day} className="text-center text-sm text-white/60 py-2">
+                      <div key={day} className="text-center text-xs text-white/60 py-1">
                         {day}
                       </div>
                     ))}
                   </div>
                   
-                  {/* 日历格子 */}
-                  <div className="grid grid-cols-7 gap-1">
+                  {/* 日历格子 - 参考同花顺App布局，使用固定高度矩形 */}
+                  <div className="grid grid-cols-7 gap-px md:gap-1">
                     {calendarDays.map((day, index) => {
                       if (day === null) {
-                        return <div key={`empty-${index}`} className="aspect-square" />;
+                        return <div key={`empty-${index}`} className="h-[52px] md:h-16" />;
                       }
                       
                       const balance = getBalanceForDate(day);
@@ -618,36 +647,40 @@ export default function StocksManagement() {
                       const isSelected = selectedDate === dateStr;
                       const isToday = new Date().toISOString().split('T')[0] === dateStr;
                       
+                      // 根据盈亏状态决定背景色
+                      const hasData = viewMode === "balance" ? balance : profit;
+                      const isProfit = viewMode === "profit" && profit ? profit.dailyProfit >= 0 : false;
+                      const isLoss = viewMode === "profit" && profit ? profit.dailyProfit < 0 : false;
+                      
                       return (
                         <div
                           key={day}
                           onClick={() => handleDateClick(day)}
-                          className={`aspect-square p-1 rounded-lg border cursor-pointer transition-colors ${
+                          className={`h-[52px] md:h-16 p-1 rounded md:rounded-lg border cursor-pointer transition-colors flex flex-col justify-between ${
                             isSelected
                               ? 'border-[#D4AF37] bg-[#D4AF37]/20'
                               : isToday
                               ? 'border-[#D4AF37]/50 bg-[#D4AF37]/10'
-                              : balance
+                              : isProfit
+                              ? 'border-green-500/30 bg-green-500/20'
+                              : isLoss
+                              ? 'border-red-500/30 bg-red-500/20'
+                              : hasData
                               ? 'border-white/20 bg-white/5'
                               : 'border-white/10 hover:border-white/30'
                           }`}
                         >
-                          <div className="text-xs text-white/60">{day}</div>
+                          <div className="text-xs text-white/60 text-center">{day}</div>
                           {viewMode === "balance" && balance && (
-                            <div className="text-xs font-medium text-white truncate mt-1">
-                              ¥{formatAmount(balance.balance)}
+                            <div className="text-[11px] md:text-xs font-medium text-white text-center leading-tight">
+                              {formatCompactAmount(balance.balance)}
                             </div>
                           )}
                           {viewMode === "profit" && profit && (
-                            <div className={`text-xs font-medium truncate mt-1 flex items-center gap-0.5 ${
-                              profit.dailyProfit >= 0 ? 'text-red-500' : 'text-green-500'
+                            <div className={`text-[11px] md:text-xs font-medium text-center leading-tight ${
+                              profit.dailyProfit >= 0 ? 'text-green-400' : 'text-red-400'
                             }`}>
-                              {profit.dailyProfit >= 0 ? (
-                                <TrendingUp className="w-3 h-3" />
-                              ) : (
-                                <TrendingDown className="w-3 h-3" />
-                              )}
-                              {profit.dailyProfit >= 0 ? '+' : ''}{formatAmount(profit.dailyProfit)}
+                              {profit.dailyProfit >= 0 ? '+' : ''}{formatCompactAmount(profit.dailyProfit)}
                             </div>
                           )}
                         </div>
