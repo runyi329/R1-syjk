@@ -316,6 +316,14 @@ export const usersRouter = router({
       return { success: true };
     }),
 
+  // 管理员：修改用户角色
+  updateUserRole: adminProcedure
+    .input(z.object({ userId: z.number(), role: z.enum(['user', 'admin']) }))
+    .mutation(async ({ input }) => {
+      await db.updateUserRole(input.userId, input.role);
+      return { success: true };
+    }),
+
   // 管理员：以客户身份登录
   loginAsUser: adminProcedure
     .input(z.object({ userId: z.number() }))

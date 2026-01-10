@@ -52,6 +52,7 @@ export default function AdminDashboard() {
   const [editingUserName, setEditingUserName] = useState("");
   const [editingUserVipLevel, setEditingUserVipLevel] = useState("0");
   const [editingUserStatus, setEditingUserStatus] = useState<"active" | "frozen">("active");
+  const [editingUserRole, setEditingUserRole] = useState<"user" | "admin">("user");
   const [editingUserNotes, setEditingUserNotes] = useState("");
   const [isEditingUser, setIsEditingUser] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -147,6 +148,16 @@ export default function AdminDashboard() {
   const updateUserNotesMutation = trpc.users.updateUserNotes.useMutation({
     onSuccess: () => {
       toast.success("备注已更新");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setEditingUserId(null);
+    },
+    onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
+  const updateUserRoleMutation = trpc.users.updateUserRole.useMutation({
+    onSuccess: () => {
+      toast.success("用户角色已更新");
       refetchUsers();
       setIsEditUserOpen(false);
       setEditingUserId(null);
@@ -403,6 +414,7 @@ export default function AdminDashboard() {
                               setEditingUserName(user.name || "");
                               setEditingUserVipLevel((user as any).vipLevel?.toString() || "0");
                               setEditingUserStatus(user.accountStatus);
+                              setEditingUserRole(user.role);
                               setEditingUserNotes((user as any).notes || "");
                             } else {
                               setIsEditUserOpen(false);
@@ -463,6 +475,18 @@ export default function AdminDashboard() {
                                     <SelectContent className="bg-black border-white/10">
                                       <SelectItem value="active">正常</SelectItem>
                                       <SelectItem value="frozen">冻结</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-white">用户角色</Label>
+                                  <Select value={editingUserRole} onValueChange={(value) => setEditingUserRole(value as "user" | "admin")}>
+                                    <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-black border-white/10">
+                                      <SelectItem value="user">普通用户</SelectItem>
+                                      <SelectItem value="admin">超级管理员</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -556,6 +580,10 @@ export default function AdminDashboard() {
                                         updateUserNotesMutation.mutateAsync({
                                           userId: user.id,
                                           notes: editingUserNotes || undefined,
+                                        }),
+                                        updateUserRoleMutation.mutateAsync({
+                                          userId: user.id,
+                                          role: editingUserRole,
                                         }),
                                       ]).finally(() => setIsEditingUser(false));
                                     }}
