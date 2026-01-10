@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock, Key } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock, Key, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import DepositsManagement from "@/components/admin/DepositsManagement";
 import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
@@ -152,6 +152,17 @@ export default function AdminDashboard() {
       setEditingUserId(null);
     },
     onError: (error: any) => toast.error(`删除失败：${error.message}`),
+  });
+
+  const loginAsUserMutation = trpc.users.loginAsUser.useMutation({
+    onSuccess: (data) => {
+      toast.success(`已以 "${data.user.name || data.user.id}" 的身份登录`);
+      // 延迟1秒后跳转到首页，让用户看到提示
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+    },
+    onError: (error: any) => toast.error(`登录失败：${error.message}`),
   });
 
   const changePasswordMutation = trpc.users.changePassword.useMutation({
@@ -680,6 +691,22 @@ export default function AdminDashboard() {
                               <span className="sm:hidden">解冻</span>
                             </Button>
                           )}
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-purple-500/50 text-purple-400 text-xs"
+                            onClick={() => {
+                              if (window.confirm(`确定要以 "${user.name || user.id}" 的身份登录吗？`)) {
+                                loginAsUserMutation.mutate({ userId: user.id });
+                              }
+                            }}
+                            disabled={loginAsUserMutation.isPending}
+                          >
+                            <LogIn className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                            <span className="hidden sm:inline">登录</span>
+                            <span className="sm:hidden">登</span>
+                          </Button>
                         </div>
                       </div>
                     ))}

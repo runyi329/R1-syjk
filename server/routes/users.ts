@@ -307,4 +307,32 @@ export const usersRouter = router({
       await db.deleteUser(input.userId);
       return { success: true };
     }),
+
+  // 管理员：以客户身份登录
+  loginAsUser: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      // 获取目标用户信息
+      const targetUser = await db.getUserById(input.userId);
+      if (!targetUser) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: '用户不存在',
+        });
+      }
+
+      // 创建session - 使用sdk创建session token
+      const sessionToken = await sdk.createSessionToken(targetUser.openId, {
+        name: targetUser.name || "",
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      return {
+        success: true,
+        user: targetUser,
+      };
+    }),
 });
