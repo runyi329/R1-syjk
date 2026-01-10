@@ -1,0 +1,10 @@
+{
+  "query": "\n-- 查询当前用户ID\nSELECT id, username, email FROM users WHERE email = 'runyimacau@gmail.com';\n\n-- 创建测试股票客户\nINSERT INTO stock_users (name, initial_balance, status, created_at, updated_at)\nVALUES ('2262Li (初始: ¥1,000,000)', '1000000.00', 'active', datetime('now'), datetime('now'));\n\n-- 获取刚创建的股票客户ID\nSELECT id FROM stock_users WHERE name = '2262Li (初始: ¥1,000,000)' LIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询当前用户ID\nSELECT id, username, email FROM users WHERE email = 'runyimacau@gmail.com';\n\n-- 创建测试股票客户\nINSERT INTO stock_users (name, initial_balance, status, created_at, updated_at)\nVALUES ('2262Li (初始: ¥1,000,000)', '1000000.00', 'active', datetime('now'), datetime('now'));\n\n-- 获取刚创建的股票客户ID\nSELECT id FROM stock_users WHERE name = '2262Li (初始: ¥1,000,000)' LIMIT 1;\n",
+  "returncode": 1,
+  "logs": [
+    "id\tusername\temail",
+    "1\tNULL\trunyimacau@gmail.com",
+    "ERROR 1064 (42000) at line 6: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 2 column 74 near \"('now'), datetime('now'))\""
+  ]
+}

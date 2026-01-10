@@ -132,7 +132,7 @@ export default function StockClientView() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 space-y-6">
+      <div className="container mx-auto px-4 py-4 md:py-8 space-y-3 md:space-y-6">
         {/* 股票客户选择 */}
         <Card className="bg-black/50 border-white/10">
           <CardHeader>
@@ -184,27 +184,27 @@ export default function StockClientView() {
           <>
             {/* 分成百分比和授权日期 */}
             <Card className="bg-black/50 border-white/10">
-              <CardContent className="py-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-[#D4AF37]" />
+              <CardContent className="py-2 md:py-4">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
+                      <Shield className="w-4 h-4 md:w-6 md:h-6 text-[#D4AF37]" />
                     </div>
                     <div>
                       <p className="text-white/60 text-sm"></p>
-                      <p className="text-2xl font-bold text-[#D4AF37]">
+                      <p className="text-xl md:text-2xl font-bold text-[#D4AF37]">
                         {stockUserStats.profitPercentage}%
                       </p>
                     </div>
                   </div>
                   {stockUserStats.authorizationDate && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-blue-400" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 md:w-6 md:h-6 text-blue-400" />
                       </div>
                       <div>
                         <p className="text-white/60 text-sm"></p>
-                        <p className="text-lg font-semibold text-white">
+                        <p className="text-base md:text-lg font-semibold text-white">
                           {new Date(stockUserStats.authorizationDate).toLocaleDateString('zh-CN', {
                             year: 'numeric',
                             month: 'long',
@@ -218,52 +218,52 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-2 md:gap-4">
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-3">
-                  <CardDescription className="text-white/60">初始金额</CardDescription>
+                <CardHeader className="pb-1 md:pb-3">
+                  <CardDescription className="text-xs md:text-sm text-white/60">初始金额</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-white">
+                <CardContent className="pt-1 md:pt-2">
+                  <p className="text-base md:text-2xl font-bold text-white">
                     {formatCurrency(stockUserStats.initialBalance)}
                   </p>
                 </CardContent>
               </Card>
               
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-3">
-                  <CardDescription className="text-white/60">开始金额</CardDescription>
+                <CardHeader className="pb-1 md:pb-3">
+                  <CardDescription className="text-xs md:text-sm text-white/60">开始金额</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-[#D4AF37]">
+                <CardContent className="pt-1 md:pt-2">
+                  <p className="text-base md:text-2xl font-bold text-[#D4AF37]">
                     {formatCurrency(stockUserStats.startAmount)}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-3">
-                  <CardDescription className="text-white/60">最新余额</CardDescription>
+                <CardHeader className="pb-1 md:pb-3">
+                  <CardDescription className="text-xs md:text-sm text-white/60">最新余额</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-white">
+                <CardContent className="pt-1 md:pt-2">
+                  <p className="text-base md:text-2xl font-bold text-white">
                     {formatCurrency(stockUserStats.latestBalance)}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-3">
-                  <CardDescription className="text-white/60">累计盈亏</CardDescription>
+                <CardHeader className="pb-1 md:pb-3">
+                  <CardDescription className="text-xs md:text-sm text-white/60">累计盈亏</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
+                <CardContent className="pt-1 md:pt-2">
+                  <div className="flex items-center gap-1 md:gap-2">
                     {stockUserStats.totalProfit >= 0 ? (
-                      <TrendingUp className="w-5 h-5 text-red-500" />
+                      <TrendingUp className="w-3 h-3 md:w-5 md:h-5 text-red-500" />
                     ) : (
-                      <TrendingDown className="w-5 h-5 text-green-500" />
+                      <TrendingDown className="w-3 h-3 md:w-5 md:h-5 text-green-500" />
                     )}
-                    <p className={`text-2xl font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    <p className={`text-base md:text-2xl font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                       {formatCurrency(Math.abs(stockUserStats.totalProfit))}
                     </p>
                   </div>
@@ -271,11 +271,11 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="pb-3">
-                  <CardDescription className="text-white/60">收益率</CardDescription>
+                <CardHeader className="pb-1 md:pb-3">
+                  <CardDescription className="text-xs md:text-sm text-white/60">收益率</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className={`text-2xl font-bold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                <CardContent className="pt-1 md:pt-2">
+                  <p className={`text-base md:text-2xl font-bold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                     {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
                   </p>
                 </CardContent>
@@ -318,7 +318,7 @@ export default function StockClientView() {
                     <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                   </div>
                 ) : (
-                  <div className="h-[400px]">
+                  <div className="h-[250px] md:h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={getChartData()}>
                         <defs>
