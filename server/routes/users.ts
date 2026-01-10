@@ -93,82 +93,24 @@ export const usersRouter = router({
     .input(z.object({
       username: z.string(),
       password: z.string(),
-      captchaToken: z.string().optional(),
-      captchaAnswer: z.string().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const ipAddress = ctx.req.headers['x-forwarded-for']?.toString().split(',')[0] || ctx.req.socket.remoteAddress || '0.0.0.0';
-
-      // 检查账户是否被锁定
-      const isLocked = await db.isAccountLocked(input.username);
-      if (isLocked) {
-        await db.recordLoginAttempt(input.username, ipAddress, false, '账户已锁定');
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: '账户已被锁定，请联系管理员解锁',
-        });
-      }
-
-      // 检查登录失败次数
-      const failureCount = await db.getLoginFailureCount(input.username, ipAddress);
-      const remainingAttempts = Math.max(0, 10 - failureCount);
-
-      // 如果失败次数超过3，需要验证码
-      if (failureCount >= 3) {
-        if (!input.captchaToken || !input.captchaAnswer) {
-          throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: '需要验证码',
-            cause: { requiresCaptcha: true, remainingAttempts },
-          });
-        }
-
-        // 验证验证码
-        const isValidCaptcha = await db.verifyCaptcha(input.captchaToken, input.captchaAnswer);
-        if (!isValidCaptcha) {
-          await db.recordLoginAttempt(input.username, ipAddress, false, '验证码错误');
-          throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: '验证码错误',
-            cause: { requiresCaptcha: true, remainingAttempts },
-          });
-        }
-      }
-
       // 查找用户
       const user = await db.getUserByUsername(input.username);
       if (!user) {
-        await db.recordLoginAttempt(input.username, ipAddress, false, '用户名或密码错误');
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: '用户名或密码错误',
-          cause: { requiresCaptcha: failureCount >= 3, remainingAttempts },
         });
       }
 
       // 验证密码
       if (!user.passwordHash || !db.verifyPassword(input.password, user.passwordHash)) {
-        const newFailureCount = failureCount + 1;
-        await db.recordLoginAttempt(input.username, ipAddress, false, '用户名或密码错误');
-
-        // 检查是否超过10次失败，如果是则锁定账户
-        if (newFailureCount >= 10) {
-          await db.lockAccount(input.username);
-          throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: '登录尝试次数过多，账户已锁定',
-          });
-        }
-
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: '用户名或密码错误',
-          cause: { requiresCaptcha: newFailureCount >= 3, remainingAttempts: Math.max(0, 10 - newFailureCount) },
         });
       }
-
-      // 登录成功，记录成功的登录尝试
-      await db.recordLoginAttempt(input.username, ipAddress, true);
 
       // 创建session - 使用sdk创建session token
       const sessionToken = await sdk.createSessionToken(user.openId, {
