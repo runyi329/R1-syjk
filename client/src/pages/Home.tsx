@@ -101,7 +101,7 @@ export default function Home() {
     <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground flex flex-col">
       {/* 头部导航 */}
       <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
-        <div className="container mx-auto py-4 flex justify-between items-center">
+        <div className="container mx-auto py-3 px-2 sm:px-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
             <div className="flex flex-col">
@@ -112,7 +112,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center gap-2">
@@ -131,20 +131,20 @@ export default function Home() {
             
 
             {authData ? (
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-1 sm:gap-2 items-center">
                 {/* 用户信息显示 - 在所有设备上都可见 */}
                 {userData && (
-                  <div className="flex items-center gap-1 text-xs">
-                    <span className="font-medium text-primary">{userData.name}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs">
+                    <span className="font-semibold text-primary whitespace-nowrap leading-tight">{userData.name}</span>
                     <Badge 
                       variant="outline" 
-                      className={`text-xs font-semibold ${
+                      className={`text-[9px] sm:text-xs font-semibold whitespace-nowrap px-1 py-0 h-4 sm:h-5 ${
                         vipInfo.level > 0 
                           ? "bg-primary/20 text-primary border-primary/50" 
                           : "text-muted-foreground border-border"
                       }`}
                     >
-                      {vipInfo.level > 0 && <Crown className="h-3 w-3 mr-0.5 inline" />}
+                      {vipInfo.level > 0 && <Crown className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 inline" />}
                       {vipInfo.label}
                     </Badge>
                   </div>
