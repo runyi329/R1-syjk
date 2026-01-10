@@ -377,6 +377,9 @@ export const stocksRouter = router({
           createdAt: stockUserPermissions.createdAt,
           username: users.username,
           email: users.email,
+          startAmount: stockUserPermissions.startAmount,
+          profitPercentage: stockUserPermissions.profitPercentage,
+          authorizationDate: stockUserPermissions.authorizationDate,
         })
         .from(stockUserPermissions)
         .leftJoin(users, eq(stockUserPermissions.userId, users.id))
@@ -426,6 +429,37 @@ export const stocksRouter = router({
         });
       
       return { success: true, message: "授权成功" };
+    }),
+
+  // 更新授权信息
+  updateStockUserPermission: adminProcedure
+    .input(z.object({
+      stockUserId: z.number(),
+      userId: z.number(),
+      startAmount: z.string(),
+      profitPercentage: z.number().min(1).max(100),
+      authorizationDate: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      await db
+        .update(stockUserPermissions)
+        .set({
+          startAmount: input.startAmount,
+          profitPercentage: input.profitPercentage,
+          authorizationDate: input.authorizationDate ? new Date(input.authorizationDate) : null,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(stockUserPermissions.userId, input.userId)
+          )
+        );
+      
+      return { success: true, message: "更新授权信息成功" };
     }),
 
   // 删除授权

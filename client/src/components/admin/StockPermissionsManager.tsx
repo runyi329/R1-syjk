@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Loader2, UserPlus, X, Shield } from "lucide-react";
+import { Loader2, UserPlus, X, Shield, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 interface StockUser {
@@ -28,6 +28,9 @@ interface Permission {
   userId: number;
   username: string | null;
   email: string | null;
+  startAmount: string;
+  profitPercentage: number;
+  authorizationDate: Date | null;
 }
 
 export default function StockPermissionsManager() {
@@ -37,6 +40,13 @@ export default function StockPermissionsManager() {
   const [startAmount, setStartAmount] = useState<string>("");
   const [profitPercentage, setProfitPercentage] = useState<string>("1");
   const [authorizationDate, setAuthorizationDate] = useState<string>("");
+  
+  // 编辑授权信息的状态
+  const [isEditPermissionOpen, setIsEditPermissionOpen] = useState(false);
+  const [editingPermission, setEditingPermission] = useState<Permission | null>(null);
+  const [editStartAmount, setEditStartAmount] = useState<string>("");
+  const [editProfitPercentage, setEditProfitPercentage] = useState<string>("1");
+  const [editAuthorizationDate, setEditAuthorizationDate] = useState<string>("");
 
   // 获取所有股票用户
   const { data: stockUsers, isLoading: isLoadingStockUsers } = trpc.stocks.getAllStockUsers.useQuery();
@@ -62,6 +72,17 @@ export default function StockPermissionsManager() {
       setAuthorizationDate("");
     },
     onError: (error) => toast.error(`授权失败：${error.message}`),
+  });
+
+  // 更新权限
+  const updatePermissionMutation = trpc.stocks.updateStockUserPermission.useMutation({
+    onSuccess: () => {
+      toast.success("更新授权信息成功");
+      refetchPermissions();
+      setIsEditPermissionOpen(false);
+      setEditingPermission(null);
+    },
+    onError: (error) => toast.error(`更新授权信息失败：${error.message}`),
   });
 
   // 删除权限
@@ -96,6 +117,41 @@ export default function StockPermissionsManager() {
       startAmount: startAmount,
       profitPercentage: percentage,
       authorizationDate: authorizationDate || undefined,
+    });
+  };
+
+  const handleEditPermission = (permission: Permission) => {
+    setEditingPermission(permission);
+    setEditStartAmount(permission.startAmount);
+    setEditProfitPercentage(permission.profitPercentage.toString());
+    setEditAuthorizationDate(
+      permission.authorizationDate 
+        ? new Date(permission.authorizationDate).toISOString().split('T')[0] 
+        : ""
+    );
+    setIsEditPermissionOpen(true);
+  };
+
+  const handleUpdatePermission = () => {
+    if (!selectedStockUser || !editingPermission) return;
+    
+    if (!editStartAmount || parseFloat(editStartAmount) < 0) {
+      toast.error("请输入有效的开始金额");
+      return;
+    }
+    
+    const percentage = parseInt(editProfitPercentage);
+    if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+      toast.error("请输入有效的分成百分比（1-100）");
+      return;
+    }
+
+    updatePermissionMutation.mutate({
+      stockUserId: selectedStockUser.id,
+      userId: editingPermission.userId,
+      startAmount: editStartAmount,
+      profitPercentage: percentage,
+      authorizationDate: editAuthorizationDate || undefined,
     });
   };
 
@@ -286,37 +342,52 @@ export default function StockPermissionsManager() {
                     key={permission.id}
                     className="flex items-center justify-between p-4 bg-black/30 border border-white/10 rounded-lg"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
                       <div className="w-10 h-10 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
                         <span className="text-[#D4AF37] font-semibold">
                           {(permission.username || permission.email || "U")[0].toUpperCase()}
                         </span>
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="text-white font-medium">
                           {permission.username || permission.email || `用户${permission.userId}`}
                         </p>
-                        {permission.email && permission.username && (
-                          <p className="text-white/60 text-sm">{permission.email}</p>
-                        )}
+                        <div className="flex flex-wrap gap-3 mt-1 text-sm text-white/60">
+                          <span>开始金额: ¥{parseFloat(permission.startAmount).toLocaleString()}</span>
+                          <span>分成: {permission.profitPercentage}%</span>
+                          {permission.authorizationDate && (
+                            <span>授权日期: {new Date(permission.authorizationDate).toLocaleDateString('zh-CN')}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemovePermission(permission.userId)}
-                      disabled={removePermissionMutation.isPending}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
-                    >
-                      {removePermissionMutation.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <X className="w-4 h-4 mr-1" />
-                          取消授权
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditPermission(permission)}
+                        className="text-[#D4AF37] hover:text-[#E5C158] hover:bg-[#D4AF37]/10"
+                      >
+                        <Pencil className="w-4 h-4 mr-1" />
+                        编辑
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemovePermission(permission.userId)}
+                        disabled={removePermissionMutation.isPending}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                      >
+                        {removePermissionMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <X className="w-4 h-4 mr-1" />
+                            取消授权
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -343,6 +414,74 @@ export default function StockPermissionsManager() {
           </CardContent>
         </Card>
       )}
+
+      {/* 编辑授权信息对话框 */}
+      <Dialog open={isEditPermissionOpen} onOpenChange={setIsEditPermissionOpen}>
+        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>编辑授权信息</DialogTitle>
+            <DialogDescription className="text-white/60">
+              修改 {editingPermission?.username || editingPermission?.email || `用户${editingPermission?.userId}`} 的授权信息
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm text-white/80">开始金额（元）</label>
+              <input
+                type="number"
+                value={editStartAmount}
+                onChange={(e) => setEditStartAmount(e.target.value)}
+                placeholder="请输入开始金额"
+                className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                step="0.01"
+                min="0"
+              />
+              <p className="text-xs text-white/50">该用户关注的起始金额节点</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-white/80">分成百分比（%）</label>
+              <input
+                type="number"
+                value={editProfitPercentage}
+                onChange={(e) => setEditProfitPercentage(e.target.value)}
+                placeholder="请输入分成百分比"
+                className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                min="1"
+                max="100"
+              />
+              <p className="text-xs text-white/50">范围：1%-100%</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-white/80">授权日期（可选）</label>
+              <input
+                type="date"
+                value={editAuthorizationDate}
+                onChange={(e) => setEditAuthorizationDate(e.target.value)}
+                className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              />
+              <p className="text-xs text-white/50">授权生效的日期，用于记录和展示</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditPermissionOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={handleUpdatePermission}
+              className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
+              disabled={updatePermissionMutation.isPending}
+            >
+              {updatePermissionMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "保存修改"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
