@@ -218,52 +218,52 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-2 gap-0.5 md:gap-1">
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-0.5 px-2">
-                  <CardDescription className="text-[8px] md:text-[10px] text-white/60">初始金额</CardDescription>
+                <CardHeader className="py-1.5 px-3">
+                  <CardDescription className="text-xs text-white/60">初始金额</CardDescription>
                 </CardHeader>
-                <CardContent className="py-0.5 px-2">
-                  <p className="text-[10px] md:text-sm font-bold text-white">
+                <CardContent className="py-1.5 px-3">
+                  <p className="text-base font-bold text-white">
                     {formatCurrency(stockUserStats.initialBalance)}
                   </p>
                 </CardContent>
               </Card>
               
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-0.5 px-2">
-                  <CardDescription className="text-[8px] md:text-[10px] text-white/60">开始金额</CardDescription>
+                <CardHeader className="py-1.5 px-3">
+                  <CardDescription className="text-xs text-white/60">开始金额</CardDescription>
                 </CardHeader>
-                <CardContent className="py-0.5 px-2">
-                  <p className="text-[10px] md:text-sm font-bold text-[#D4AF37]">
+                <CardContent className="py-1.5 px-3">
+                  <p className="text-base font-bold text-[#D4AF37]">
                     {formatCurrency(stockUserStats.startAmount)}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-0.5 px-2">
-                  <CardDescription className="text-[8px] md:text-[10px] text-white/60">最新余额</CardDescription>
+                <CardHeader className="py-1.5 px-3">
+                  <CardDescription className="text-xs text-white/60">最新余额</CardDescription>
                 </CardHeader>
-                <CardContent className="py-0.5 px-2">
-                  <p className="text-[10px] md:text-sm font-bold text-white">
+                <CardContent className="py-1.5 px-3">
+                  <p className="text-base font-bold text-white">
                     {formatCurrency(stockUserStats.latestBalance)}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-0.5 px-2">
-                  <CardDescription className="text-[8px] md:text-[10px] text-white/60">累计盈亏</CardDescription>
+                <CardHeader className="py-1.5 px-3">
+                  <CardDescription className="text-xs text-white/60">累计盈亏</CardDescription>
                 </CardHeader>
-                <CardContent className="py-0.5 px-2">
-                  <div className="flex items-center gap-0.5 md:gap-1">
+                <CardContent className="py-1.5 px-3">
+                  <div className="flex items-center gap-1">
                     {stockUserStats.totalProfit >= 0 ? (
-                      <TrendingUp className="w-2 h-2 md:w-3 md:h-3 text-red-500" />
+                      <TrendingUp className="w-4 h-4 text-red-500" />
                     ) : (
-                      <TrendingDown className="w-2 h-2 md:w-3 md:h-3 text-green-500" />
+                      <TrendingDown className="w-4 h-4 text-green-500" />
                     )}
-                    <p className={`text-[10px] md:text-sm font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    <p className={`text-base font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                       {formatCurrency(Math.abs(stockUserStats.totalProfit))}
                     </p>
                   </div>
@@ -271,11 +271,11 @@ export default function StockClientView() {
               </Card>
 
               <Card className="bg-black/50 border-white/10">
-                <CardHeader className="py-0.5 px-2">
-                  <CardDescription className="text-[8px] md:text-[10px] text-white/60">收益率</CardDescription>
+                <CardHeader className="py-1.5 px-3">
+                  <CardDescription className="text-xs text-white/60">收益率</CardDescription>
                 </CardHeader>
-                <CardContent className="py-0.5 px-2">
-                  <p className={`text-[10px] md:text-sm font-bold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                <CardContent className="py-1.5 px-3">
+                  <p className={`text-base font-bold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                     {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
                   </p>
                 </CardContent>
