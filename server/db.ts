@@ -129,7 +129,8 @@ export async function updateUserStatus(userId: number, status: "active" | "froze
 export async function updateUserName(userId: number, name: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(users).set({ name }).where(eq(users.id, userId));
+  // 同时更新 name（显示名称）和 username（登录用户名）
+  await db.update(users).set({ name, username: name }).where(eq(users.id, userId));
 }
 
 export async function updateUserPassword(userId: number, passwordHash: string) {

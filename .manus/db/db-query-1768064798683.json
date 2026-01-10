@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, username, name, email FROM users ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, username, name, email FROM users ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "330226",
+      "username": "Y123321",
+      "name": "Y123321",
+      "email": "NULL"
+    },
+    {
+      "id": "330137",
+      "username": "runyi",
+      "name": "runyi",
+      "email": "admin@runyi.com"
+    },
+    {
+      "id": "330085",
+      "username": "张三",
+      "name": "李四",
+      "email": "NULL"
+    },
+    {
+      "id": "330036",
+      "username": "lock_flow_1767703437966",
+      "name": "Lock Flow Test",
+      "email": "NULL"
+    },
+    {
+      "id": "330035",
+      "username": "locked_login_test_1767703436123",
+      "name": "Locked Login Test",
+      "email": "NULL"
+    },
+    {
+      "id": "330034",
+      "username": "unlock_test_1767703435658",
+      "name": "Unlock Test",
+      "email": "NULL"
+    },
+    {
+      "id": "330033",
+      "username": "lock_test_1767703435364",
+      "name": "Lock Test",
+      "email": "NULL"
+    },
+    {
+      "id": "330031",
+      "username": "testuser_1767703434173",
+      "name": "Test User",
+      "email": "NULL"
+    },
+    {
+      "id": "330030",
+      "username": "security_test_1767703434174",
+      "name": "Security Test User",
+      "email": "NULL"
+    },
+    {
+      "id": "300015",
+      "username": "lock_flow_1767701077016",
+      "name": "Lock Flow Test",
+      "email": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\temail\n330226\tY123321\tY123321\tNULL\n330137\trunyi\trunyi\tadmin@runyi.com\n330085\t张三\t李四\tNULL\n330036\tlock_flow_1767703437966\tLock Flow Test\tNULL\n330035\tlocked_login_test_1767703436123\tLocked Login Test\tNULL\n330034\tunlock_test_1767703435658\tUnlock Test\tNULL\n330033\tlock_test_1767703435364\tLock Test\tNULL\n330031\ttestuser_1767703434173\tTest User\tNULL\n330030\tsecurity_test_1767703434174\tSecurity Test User\tNULL\n300015\tlock_flow_1767701077016\tLock Flow Test\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 387
+}
