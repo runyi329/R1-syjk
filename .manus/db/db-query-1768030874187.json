@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 查看用户ID 330085的详细信息\nSELECT id, username, email, vipLevel, accountStatus FROM users WHERE id = 330085;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查看用户ID 330085的详细信息\nSELECT id, username, email, vipLevel, accountStatus FROM users WHERE id = 330085;\n",
+  "rows": [
+    {
+      "id": "330085",
+      "username": "张三",
+      "email": "NULL",
+      "vipLevel": "0",
+      "accountStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\temail\tvipLevel\taccountStatus\n330085\t张三\tNULL\t0\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 397
+}

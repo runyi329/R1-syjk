@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { adminProcedure, router } from "../_core/trpc";
+import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { stockUsers, stockBalances, stockUserPermissions, users, type StockBalance, type StockUser } from "../../drizzle/schema";
 import { eq, desc, and, asc } from "drizzle-orm";
@@ -466,9 +466,13 @@ export const stocksRouter = router({
   }),
 
   // 获取用户可查看的股票客户列表（普通用户API）
-  getMyAccessibleStockUsers: adminProcedure
+  getMyAccessibleStockUsers: protectedProcedure
     .input(z.object({ userId: z.number() }))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      // 确保用户只能查询自己的权限
+      if (ctx.user.id !== input.userId) {
+        throw new Error("Unauthorized: You can only query your own permissions");
+      }
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       // stockUserPermissions already imported at top

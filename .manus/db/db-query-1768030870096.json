@@ -1,0 +1,20 @@
+{
+  "query": "\n-- 查看张三用户的信息\nSELECT id, username, email FROM users WHERE username LIKE '%张三%' OR username LIKE '%zhangsan%';\n\n-- 查看所有股票客户\nSELECT id, name, initialBalance, status FROM stockUsers;\n\n-- 查看所有授权记录\nSELECT * FROM stockUserPermissions;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查看张三用户的信息\nSELECT id, username, email FROM users WHERE username LIKE '%张三%' OR username LIKE '%zhangsan%';\n\n-- 查看所有股票客户\nSELECT id, name, initialBalance, status FROM stockUsers;\n\n-- 查看所有授权记录\nSELECT * FROM stockUserPermissions;\n",
+  "rows": [
+    {
+      "id": "330085",
+      "username": "张三",
+      "email": "NULL"
+    }
+  ],
+  "messages": [
+    "id\tname\tinitialBalance\tstatus",
+    "1\t2262Li\t1000000.00\tactive",
+    "id\tstockUserId\tuserId\tcreatedAt\tupdatedAt",
+    "30001\t1\t330085\t2026-01-10 07:37:32\t2026-01-10 07:37:32"
+  ],
+  "stdout": "id\tusername\temail\n330085\t张三\tNULL\nid\tname\tinitialBalance\tstatus\n1\t2262Li\t1000000.00\tactive\nid\tstockUserId\tuserId\tcreatedAt\tupdatedAt\n30001\t1\t330085\t2026-01-10 07:37:32\t2026-01-10 07:37:32\n",
+  "stderr": "",
+  "execution_time_ms": 501
+}

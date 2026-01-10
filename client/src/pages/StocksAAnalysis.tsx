@@ -8,6 +8,9 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import ScrollToTop from "@/components/ScrollToTop";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
 import StockSimulation from "@/components/StockSimulation";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import { Loader2 } from "lucide-react";
 
 interface MarketData {
   name: string;
@@ -87,10 +90,40 @@ export default function StocksAAnalysis() {
   const [, setLocation] = useLocation();
   const [selectedMarket, setSelectedMarket] = useState<MarketData>(markets[0]);
   const [priceHistory, setPriceHistory] = useState<PriceHistory[]>([]);
+  const { user, loading: isAuthLoading } = useAuth();
+  const [isCheckingPermission, setIsCheckingPermission] = useState(true);
+
+  // 检查用户是否有股票客户查看权限
+  const { data: accessibleStockUsers, isLoading: isLoadingPermission } = trpc.stocks.getMyAccessibleStockUsers.useQuery(
+    { userId: user?.id || 0 },
+    { enabled: !!user?.id }
+  );
+
+  // 如果用户有权限，自动跳转到股票客户数据页面
+  useEffect(() => {
+    if (!isAuthLoading && !isLoadingPermission) {
+      if (user && accessibleStockUsers && accessibleStockUsers.length > 0) {
+        // 用户已登录且有授权，跳转到股票客户数据页面
+        setLocation('/stock-client-view');
+      } else {
+        // 用户未登录或无授权，显示通用市场分析页面
+        setIsCheckingPermission(false);
+      }
+    }
+  }, [user, accessibleStockUsers, isAuthLoading, isLoadingPermission, setLocation]);
 
   useEffect(() => {
     setPriceHistory(generateMockHistory(selectedMarket.price, selectedMarket.price * 0.05));
   }, [selectedMarket]);
+
+  // 权限检查中，显示加载状态
+  if (isCheckingPermission || isAuthLoading || (user && isLoadingPermission)) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-black via-[#0a0a0a] to-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
+      </div>
+    );
+  }
 
   const getRiskColor = (risk: string) => {
     switch (risk) {

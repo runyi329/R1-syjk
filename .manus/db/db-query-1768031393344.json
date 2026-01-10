@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 查看张三的用户ID和授权记录\nSELECT u.id as userId, u.username, sp.id as permissionId, sp.stockUserId, su.name as stockUserName\nFROM users u\nLEFT JOIN stockUserPermissions sp ON u.id = sp.userId\nLEFT JOIN stockUsers su ON sp.stockUserId = su.id\nWHERE u.username = '张三';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查看张三的用户ID和授权记录\nSELECT u.id as userId, u.username, sp.id as permissionId, sp.stockUserId, su.name as stockUserName\nFROM users u\nLEFT JOIN stockUserPermissions sp ON u.id = sp.userId\nLEFT JOIN stockUsers su ON sp.stockUserId = su.id\nWHERE u.username = '张三';\n",
+  "rows": [
+    {
+      "userId": "330085",
+      "username": "张三",
+      "permissionId": "30002",
+      "stockUserId": "1",
+      "stockUserName": "2262Li"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tusername\tpermissionId\tstockUserId\tstockUserName\n330085\t张三\t30002\t1\t2262Li\n",
+  "stderr": "",
+  "execution_time_ms": 391
+}

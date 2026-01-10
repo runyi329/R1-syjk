@@ -1,0 +1,18 @@
+{
+  "query": "\n-- 查找张三用户\nSELECT id, username, email, passwordHash, vipLevel, accountStatus \nFROM users \nWHERE username = '张三';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查找张三用户\nSELECT id, username, email, passwordHash, vipLevel, accountStatus \nFROM users \nWHERE username = '张三';\n",
+  "rows": [
+    {
+      "id": "330085",
+      "username": "张三",
+      "email": "NULL",
+      "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+      "vipLevel": "0",
+      "accountStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\temail\tpasswordHash\tvipLevel\taccountStatus\n330085\t张三\tNULL\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\t0\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 390
+}
