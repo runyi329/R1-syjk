@@ -16,6 +16,7 @@ import DepositsManagement from "@/components/admin/DepositsManagement";
 import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
 import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
+import StocksManagement from "@/components/admin/StocksManagement";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
@@ -267,7 +268,7 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
         <Tabs defaultValue="deposits" className="w-full">
-          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-6 w-full overflow-x-auto">
+          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-7 w-full overflow-x-auto">
             <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               充值
             </TabsTrigger>
@@ -285,6 +286,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               订单
+            </TabsTrigger>
+            <TabsTrigger value="stocks" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+              A股
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               设置
@@ -896,6 +900,11 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Stocks Management */}
+          <TabsContent value="stocks" className="mt-6">
+            <StocksManagement />
           </TabsContent>
 
           {/* Settings Tab */}

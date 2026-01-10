@@ -293,3 +293,44 @@ export const cumulativeProfit = mysqlTable("cumulativeProfit", {
 
 export type CumulativeProfit = typeof cumulativeProfit.$inferSelect;
 export type InsertCumulativeProfit = typeof cumulativeProfit.$inferInsert;
+
+
+/**
+ * 股票用户表 - A股管理功能，存储股票账户用户
+ */
+export const stockUsers = mysqlTable("stockUsers", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 用户名/客户名称 */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** 起始金额（初始资金） */
+  initialBalance: decimal("initialBalance", { precision: 20, scale: 2 }).notNull(),
+  /** 备注 */
+  notes: text("notes"),
+  /** 状态：active-活跃，inactive-停用 */
+  status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StockUser = typeof stockUsers.$inferSelect;
+export type InsertStockUser = typeof stockUsers.$inferInsert;
+
+/**
+ * 股票余额记录表 - 记录每日账户余额
+ */
+export const stockBalances = mysqlTable("stockBalances", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 关联股票用户ID */
+  stockUserId: int("stockUserId").notNull(),
+  /** 日期（格式：YYYY-MM-DD） */
+  date: varchar("date", { length: 10 }).notNull(),
+  /** 当日余额 */
+  balance: decimal("balance", { precision: 20, scale: 2 }).notNull(),
+  /** 备注 */
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StockBalance = typeof stockBalances.$inferSelect;
+export type InsertStockBalance = typeof stockBalances.$inferInsert;
