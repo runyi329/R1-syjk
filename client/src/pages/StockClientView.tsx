@@ -498,14 +498,14 @@ export default function StockClientView() {
                                 : 'border-white/10'
                             }`}
                           >
-                            <div className="text-[10px] text-white/60 text-center">{day}</div>
+                            <div className="text-[8px] text-white/60 text-center leading-none">{day}</div>
                             {viewMode === "balance" && profit && (
-                              <div className="text-[9px] md:text-[10px] font-medium text-white text-center leading-tight whitespace-nowrap overflow-hidden">
+                              <div className="text-[7px] md:text-[8px] font-medium text-white text-center leading-none whitespace-nowrap overflow-hidden">
                                 {formatCompactAmount(profit.balance)}
                               </div>
                             )}
                             {viewMode === "profit" && profitPeriod === "day" && profit && (
-                              <div className={`text-[9px] md:text-[10px] font-medium text-center leading-tight whitespace-nowrap overflow-hidden ${
+                              <div className={`text-[7px] md:text-[8px] font-medium text-center leading-none whitespace-nowrap overflow-hidden ${
                                 profit.dailyProfit >= 0 ? 'text-red-400' : 'text-green-400'
                               }`}>
                                 {profit.dailyProfit >= 0 ? '+' : ''}{formatCompactAmount(profit.dailyProfit)}
