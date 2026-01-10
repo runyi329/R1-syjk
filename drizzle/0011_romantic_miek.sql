@@ -1,0 +1,1 @@
+ALTER TABLE `stockUserPermissions` ADD `authorizationDate` timestamp;

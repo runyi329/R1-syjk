@@ -182,6 +182,42 @@ export default function StockClientView() {
         {/* 统计数据 */}
         {selectedStockUserId && stockUserStats && (
           <>
+            {/* 分成百分比和授权日期 */}
+            <Card className="bg-black/50 border-white/10">
+              <CardContent className="py-4">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-sm">分成比例</p>
+                      <p className="text-2xl font-bold text-[#D4AF37]">
+                        {stockUserStats.profitPercentage}%
+                      </p>
+                    </div>
+                  </div>
+                  {stockUserStats.authorizationDate && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <Calendar className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-white/60 text-sm">授权日期</p>
+                        <p className="text-lg font-semibold text-white">
+                          {new Date(stockUserStats.authorizationDate).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card className="bg-black/50 border-white/10">
                 <CardHeader className="pb-3">

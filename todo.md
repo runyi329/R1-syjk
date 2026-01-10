@@ -1284,3 +1284,11 @@
 - [x] 修改用户查看页面：显示初始金额、开始金额、最新余额
 - [x] 修改盈亏计算逻辑：基于开始金额计算盈亏和收益率
 - [x] 测试完整流程：管理员授权 -> 用户查看数据
+
+## 股票客户授权管理 - 添加授权日期功能
+- [x] 更新数据库schema：在stockUserPermissions表中添加authorizationDate字段
+- [x] 修改后端API：addStockUserPermission添加authorizationDate参数
+- [x] 修改后端API：getMyStockUserStats返回授权日期
+- [x] 更新管理员授权界面：添加授权日期输入框
+- [x] 更新客户端查看页面：显示分成百分比和授权日期
+- [x] 测试完整流程：管理员设置授权日期 -> 用户查看授权日期

@@ -348,6 +348,8 @@ export const stockUserPermissions = mysqlTable("stockUserPermissions", {
   startAmount: decimal("startAmount", { precision: 15, scale: 2 }).notNull().default("0"),
   /** 分成百分比（1-100） */
   profitPercentage: int("profitPercentage").notNull().default(1),
+  /** 授权日期（管理员设置的授权生效日期） */
+  authorizationDate: timestamp("authorizationDate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

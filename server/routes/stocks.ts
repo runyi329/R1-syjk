@@ -392,6 +392,7 @@ export const stocksRouter = router({
       userId: z.number(),
       startAmount: z.string(),
       profitPercentage: z.number().min(1).max(100),
+      authorizationDate: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -421,6 +422,7 @@ export const stocksRouter = router({
           userId: input.userId,
           startAmount: input.startAmount,
           profitPercentage: input.profitPercentage,
+          authorizationDate: input.authorizationDate ? new Date(input.authorizationDate) : null,
         });
       
       return { success: true, message: "授权成功" };
@@ -588,6 +590,7 @@ export const stocksRouter = router({
         initialBalance,
         startAmount,
         profitPercentage,
+        authorizationDate: permission.authorizationDate,
         latestBalance,
         totalProfit,
         totalProfitRate: parseFloat(totalProfitRate),

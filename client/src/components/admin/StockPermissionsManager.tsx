@@ -36,6 +36,7 @@ export default function StockPermissionsManager() {
   const [selectedWebsiteUserId, setSelectedWebsiteUserId] = useState<string>("");
   const [startAmount, setStartAmount] = useState<string>("");
   const [profitPercentage, setProfitPercentage] = useState<string>("1");
+  const [authorizationDate, setAuthorizationDate] = useState<string>("");
 
   // 获取所有股票用户
   const { data: stockUsers, isLoading: isLoadingStockUsers } = trpc.stocks.getAllStockUsers.useQuery();
@@ -58,6 +59,7 @@ export default function StockPermissionsManager() {
       setSelectedWebsiteUserId("");
       setStartAmount("");
       setProfitPercentage("1");
+      setAuthorizationDate("");
     },
     onError: (error) => toast.error(`授权失败：${error.message}`),
   });
@@ -93,6 +95,7 @@ export default function StockPermissionsManager() {
       userId: parseInt(selectedWebsiteUserId),
       startAmount: startAmount,
       profitPercentage: percentage,
+      authorizationDate: authorizationDate || undefined,
     });
   };
 
@@ -243,6 +246,17 @@ export default function StockPermissionsManager() {
                       max="100"
                     />
                     <p className="text-xs text-white/50">范围：1%-100%</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm text-white/80">授权日期（可选）</label>
+                    <input
+                      type="date"
+                      value={authorizationDate}
+                      onChange={(e) => setAuthorizationDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-black/50 border border-white/20 rounded-md text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                    />
+                    <p className="text-xs text-white/50">授权生效的日期，用于记录和展示</p>
                   </div>
                 </div>
                 <DialogFooter>
