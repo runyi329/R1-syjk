@@ -49,9 +49,12 @@ export default function AdminDashboard() {
   // User edit state
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [editingUserName, setEditingUserName] = useState("");
   const [editingUserVipLevel, setEditingUserVipLevel] = useState("0");
   const [editingUserStatus, setEditingUserStatus] = useState<"active" | "frozen">("active");
   const [isEditingUser, setIsEditingUser] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
 
   // Product management state
   const [productForm, setProductForm] = useState({
@@ -128,6 +131,27 @@ export default function AdminDashboard() {
       setEditingUserId(null);
     },
     onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
+  const updateUserNameMutation = trpc.users.updateUserName.useMutation({
+    onSuccess: () => {
+      toast.success("用户名已更新");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setEditingUserId(null);
+    },
+    onError: (error: any) => toast.error(`操作失败：${error.message}`),
+  });
+
+  const deleteUserMutation = trpc.users.deleteUser.useMutation({
+    onSuccess: () => {
+      toast.success("用户已删除");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setIsDeleteDialogOpen(false);
+      setEditingUserId(null);
+    },
+    onError: (error: any) => toast.error(`删除失败：${error.message}`),
   });
 
   const changePasswordMutation = trpc.users.changePassword.useMutation({
@@ -351,6 +375,7 @@ export default function AdminDashboard() {
                           <Dialog open={isEditUserOpen && editingUserId === user.id} onOpenChange={(open) => {
                             if (open) {
                               setEditingUserId(user.id);
+                              setEditingUserName(user.name || "");
                               setEditingUserVipLevel((user as any).vipLevel?.toString() || "0");
                               setEditingUserStatus(user.accountStatus);
                             } else {
@@ -374,10 +399,19 @@ export default function AdminDashboard() {
                               <DialogHeader>
                                 <DialogTitle className="text-white">编辑用户</DialogTitle>
                                 <DialogDescription className="text-white/60">
-                                  修改用户 {user.name || user.id} 的VIP等级和账户状态
+                                  修改用户 {user.name || user.id} 的信息
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-4">
+                                <div>
+                                  <Label className="text-white">用户名</Label>
+                                  <Input
+                                    value={editingUserName}
+                                    onChange={(e) => setEditingUserName(e.target.value)}
+                                    placeholder="请输入用户名"
+                                    className="bg-white/5 border-white/10 text-white"
+                                  />
+                                </div>
                                 <div>
                                   <Label className="text-white">VIP等级</Label>
                                   <Select value={editingUserVipLevel} onValueChange={setEditingUserVipLevel}>
@@ -407,41 +441,98 @@ export default function AdminDashboard() {
                                   </Select>
                                 </div>
                               </div>
-                              <DialogFooter>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setIsEditUserOpen(false)}
-                                  className="border-white/20 text-white hover:bg-white/10"
-                                  disabled={isEditingUser}
-                                >
-                                  取消
-                                </Button>
-                                <Button
-                                  onClick={() => {
-                                    setIsEditingUser(true);
-                                    Promise.all([
-                                      updateUserVipLevelMutation.mutateAsync({
-                                        userId: user.id,
-                                        vipLevel: parseInt(editingUserVipLevel),
-                                      }),
-                                      updateUserStatusMutation.mutateAsync({
-                                        userId: user.id,
-                                        status: editingUserStatus,
-                                      }),
-                                    ]).finally(() => setIsEditingUser(false));
-                                  }}
-                                  className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
-                                  disabled={isEditingUser}
-                                >
-                                  {isEditingUser ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                      保存中...
-                                    </>
-                                  ) : (
-                                    "确认保存"
-                                  )}
-                                </Button>
+                              <DialogFooter className="flex-col sm:flex-row gap-2">
+                                <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                                      disabled={isEditingUser}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      删除用户
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="bg-black border-white/10">
+                                    <DialogHeader>
+                                      <DialogTitle className="text-white">确认删除用户</DialogTitle>
+                                      <DialogDescription className="text-white/60">
+                                        您确定要删除用户 {user.name || user.id} 吗？此操作将永久删除用户及其所有相关数据，不可恢复！
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => setIsDeleteDialogOpen(false)}
+                                        className="border-white/20 text-white hover:bg-white/10"
+                                        disabled={isDeletingUser}
+                                      >
+                                        取消
+                                      </Button>
+                                      <Button
+                                        onClick={() => {
+                                          setIsDeletingUser(true);
+                                          deleteUserMutation.mutateAsync({ userId: user.id }).finally(() => setIsDeletingUser(false));
+                                        }}
+                                        className="bg-red-500 text-white hover:bg-red-600"
+                                        disabled={isDeletingUser}
+                                      >
+                                        {isDeletingUser ? (
+                                          <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            删除中...
+                                          </>
+                                        ) : (
+                                          "确认删除"
+                                        )}
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
+                                <div className="flex gap-2 flex-1 justify-end">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setIsEditUserOpen(false)}
+                                    className="border-white/20 text-white hover:bg-white/10"
+                                    disabled={isEditingUser}
+                                  >
+                                    取消
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      if (!editingUserName || editingUserName.length < 2) {
+                                        toast.error("用户名至少需要2个字符");
+                                        return;
+                                      }
+                                      setIsEditingUser(true);
+                                      Promise.all([
+                                        updateUserNameMutation.mutateAsync({
+                                          userId: user.id,
+                                          name: editingUserName,
+                                        }),
+                                        updateUserVipLevelMutation.mutateAsync({
+                                          userId: user.id,
+                                          vipLevel: parseInt(editingUserVipLevel),
+                                        }),
+                                        updateUserStatusMutation.mutateAsync({
+                                          userId: user.id,
+                                          status: editingUserStatus,
+                                        }),
+                                      ]).finally(() => setIsEditingUser(false));
+                                    }}
+                                    className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
+                                    disabled={isEditingUser}
+                                  >
+                                    {isEditingUser ? (
+                                      <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        保存中...
+                                      </>
+                                    ) : (
+                                      "确认保存"
+                                    )}
+                                  </Button>
+                                </div>
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>

@@ -144,6 +144,44 @@ export async function updateUserVipLevel(userId: number, vipLevel: number) {
   await db.update(users).set({ vipLevel }).where(eq(users.id, userId));
 }
 
+export async function deleteUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 删除用户相关的所有数据
+  // 1. 删除积分流水
+  await db.delete(pointTransactions).where(eq(pointTransactions.userId, userId));
+  
+  // 2. 删除订单
+  await db.delete(orders).where(eq(orders.userId, userId));
+  
+  // 3. 删除充值记录
+  const { deposits } = await import("../drizzle/schema");
+  await db.delete(deposits).where(eq(deposits.userId, userId));
+  
+  // 4. 删除提现记录
+  const { withdrawals } = await import("../drizzle/schema");
+  await db.delete(withdrawals).where(eq(withdrawals.userId, userId));
+  
+  // 5. 删除钱包地址
+  const { walletAddresses } = await import("../drizzle/schema");
+  await db.delete(walletAddresses).where(eq(walletAddresses.userId, userId));
+  
+  // 6. 删除登录尝试记录
+  const { loginAttempts } = await import("../drizzle/schema");
+  const user = await getUserById(userId);
+  if (user && user.username) {
+    await db.delete(loginAttempts).where(eq(loginAttempts.username, user.username));
+  }
+  
+  // 7. 删除密码重置记录
+  const { passwordResets } = await import("../drizzle/schema");
+  await db.delete(passwordResets).where(eq(passwordResets.userId, userId));
+  
+  // 8. 最后删除用户
+  await db.delete(users).where(eq(users.id, userId));
+}
+
 // ========== 用户名+密码注册 ==========
 
 export async function getUserByUsername(username: string) {

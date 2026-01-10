@@ -290,4 +290,21 @@ export const usersRouter = router({
       await db.updateUserStatus(input.userId, input.status);
       return { success: true };
     }),
+
+  // 管理员：修改用户名
+  updateUserName: adminProcedure
+    .input(z.object({ userId: z.number(), name: z.string().min(2).max(20) }))
+    .mutation(async ({ input }) => {
+      await db.updateUserName(input.userId, input.name);
+      return { success: true };
+    }),
+
+  // 管理员：删除用户
+  deleteUser: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ input }) => {
+      // 删除用户及相关数据
+      await db.deleteUser(input.userId);
+      return { success: true };
+    }),
 });
