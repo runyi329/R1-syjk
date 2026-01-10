@@ -1,0 +1,26 @@
+{
+  "query": "\n-- 检查授权记录\nSELECT sp.*, u.username, su.name as stock_user_name \nFROM stockUserPermissions sp\nLEFT JOIN users u ON sp.userId = u.id\nLEFT JOIN stockUsers su ON sp.stockUserId = su.id\nWHERE sp.userId = 2;\n\n-- 检查股票客户状态\nSELECT id, name, status FROM stockUsers WHERE id = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 检查授权记录\nSELECT sp.*, u.username, su.name as stock_user_name \nFROM stockUserPermissions sp\nLEFT JOIN users u ON sp.userId = u.id\nLEFT JOIN stockUsers su ON sp.stockUserId = su.id\nWHERE sp.userId = 2;\n\n-- 检查股票客户状态\nSELECT id, name, status FROM stockUsers WHERE id = 1;\n",
+  "rows": [
+    {
+      "id": "90001",
+      "stockUserId": "1",
+      "userId": "2",
+      "createdAt": "2026-01-10 15:57:59",
+      "updatedAt": "2026-01-10 15:57:59",
+      "startAmount": "950000.00",
+      "profitPercentage": "10",
+      "authorizationDate": "2026-01-06 00:00:00",
+      "deposit": "50000.00",
+      "username": "NULL",
+      "stock_user_name": "2262Li"
+    }
+  ],
+  "messages": [
+    "id\tname\tstatus",
+    "1\t2262Li\tactive"
+  ],
+  "stdout": "id\tstockUserId\tuserId\tcreatedAt\tupdatedAt\tstartAmount\tprofitPercentage\tauthorizationDate\tdeposit\tusername\tstock_user_name\n90001\t1\t2\t2026-01-10 15:57:59\t2026-01-10 15:57:59\t950000.00\t10\t2026-01-06 00:00:00\t50000.00\tNULL\t2262Li\nid\tname\tstatus\n1\t2262Li\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 452
+}

@@ -1,0 +1,15 @@
+{
+  "query": "\nSELECT id, username, email FROM users WHERE email = 'runyimacau@gmail.com' OR username = 'run';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \nSELECT id, username, email FROM users WHERE email = 'runyimacau@gmail.com' OR username = 'run';\n",
+  "rows": [
+    {
+      "id": "1",
+      "username": "NULL",
+      "email": "runyimacau@gmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\temail\n1\tNULL\trunyimacau@gmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 401
+}

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { stockUsers, stockBalances, stockUserPermissions, users, type StockBalance, type StockUser } from "../../drizzle/schema";
-import { eq, desc, and, asc } from "drizzle-orm";
+import { eq, desc, and, asc, gte } from "drizzle-orm";
 
 export const stocksRouter = router({
   // ==================== 股票用户管理 ====================
@@ -588,11 +588,20 @@ export const stocksRouter = router({
         return null;
       }
       
-      // 获取所有余额记录
+      // 获取所有余额记录（只获取授权日期当天及之后的记录）
+      const authDate = permission.authorizationDate;
+      // 将timestamp转换为YYYY-MM-DD格式的字符串
+      const authDateStr = authDate ? authDate.toISOString().split('T')[0] : null;
+      
       const balances = await db
         .select()
         .from(stockBalances)
-        .where(eq(stockBalances.stockUserId, input.stockUserId))
+        .where(
+          and(
+            eq(stockBalances.stockUserId, input.stockUserId),
+            authDateStr ? gte(stockBalances.date, authDateStr) : undefined
+          )
+        )
         .orderBy(asc(stockBalances.date));
       
       const initialBalance = parseFloat(user.initialBalance);

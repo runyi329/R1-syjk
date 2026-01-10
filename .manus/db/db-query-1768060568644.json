@@ -1,0 +1,20 @@
+{
+  "query": "\nSELECT id, userId, stockUserId, startAmount, profitPercentage, authorizationDate, deposit, createdAt FROM stockUserPermissions WHERE stockUserId = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \nSELECT id, userId, stockUserId, startAmount, profitPercentage, authorizationDate, deposit, createdAt FROM stockUserPermissions WHERE stockUserId = 1;\n",
+  "rows": [
+    {
+      "id": "60002",
+      "userId": "330085",
+      "stockUserId": "1",
+      "startAmount": "975951.89",
+      "profitPercentage": "5",
+      "authorizationDate": "2025-12-29 00:00:00",
+      "deposit": "5000.00",
+      "createdAt": "2026-01-10 10:22:21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstockUserId\tstartAmount\tprofitPercentage\tauthorizationDate\tdeposit\tcreatedAt\n60002\t330085\t1\t975951.89\t5\t2025-12-29 00:00:00\t5000.00\t2026-01-10 10:22:21\n",
+  "stderr": "",
+  "execution_time_ms": 389
+}
