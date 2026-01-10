@@ -191,7 +191,7 @@ export default function StockClientView() {
                       <Shield className="w-6 h-6 text-[#D4AF37]" />
                     </div>
                     <div>
-                      <p className="text-white/60 text-sm">分成比例</p>
+                      <p className="text-white/60 text-sm"></p>
                       <p className="text-2xl font-bold text-[#D4AF37]">
                         {stockUserStats.profitPercentage}%
                       </p>
@@ -203,7 +203,7 @@ export default function StockClientView() {
                         <Calendar className="w-6 h-6 text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-white/60 text-sm">授权日期</p>
+                        <p className="text-white/60 text-sm"></p>
                         <p className="text-lg font-semibold text-white">
                           {new Date(stockUserStats.authorizationDate).toLocaleDateString('zh-CN', {
                             year: 'numeric',
