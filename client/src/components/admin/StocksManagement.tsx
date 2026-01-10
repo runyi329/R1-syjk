@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { Loader2, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, TrendingUp, TrendingDown, User } from "lucide-react";
 import { toast } from "sonner";
+import FundsCurveChart from "./FundsCurveChart";
 
 interface StockUser {
   id: number;
@@ -705,6 +706,37 @@ export default function StocksManagement() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  {/* 资金曲线图 */}
+                  {userStats && userStats.dailyProfits && userStats.dailyProfits.length > 0 && (
+                    <div className="mb-6">
+                      <div className="mb-3">
+                        <h3 className="text-lg font-medium text-white mb-1">
+                          {viewMode === "balance" 
+                            ? "余额变化曲线" 
+                            : profitPeriod === "day" 
+                              ? "日盈亏曲线" 
+                              : profitPeriod === "month" 
+                                ? "月盈亏曲线" 
+                                : "年盈亏曲线"
+                          }
+                        </h3>
+                        <p className="text-sm text-white/60">
+                          {viewMode === "balance" 
+                            ? "展示账户余额随时间的变化趋势" 
+                            : "展示盈亏金额随时间的变化趋势"
+                          }
+                        </p>
+                      </div>
+                      <FundsCurveChart 
+                        data={userStats.dailyProfits}
+                        viewMode={viewMode}
+                        profitPeriod={profitPeriod}
+                        currentYear={currentYear}
+                        currentMonth={currentMonth}
+                      />
+                    </div>
+                  )}
+                  
                   {/* 日盈亏视角：显示日历格子 */}
                   {(viewMode === "balance" || (viewMode === "profit" && profitPeriod === "day")) && (
                     <>
