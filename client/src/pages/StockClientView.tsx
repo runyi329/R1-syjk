@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Calendar, Shield, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Calendar, Shield, Lock, Wallet } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -197,8 +197,11 @@ export default function StockClientView() {
                   
                   {stockUserStats.deposit && parseFloat(stockUserStats.deposit) > 0 && (
                     <div className="flex items-center gap-1">
+                      <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <Wallet className="w-3 h-3 text-green-400" />
+                      </div>
                       <p className="text-xs font-semibold text-green-400">
-                        保证金: ¥{parseFloat(stockUserStats.deposit).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ¥{parseFloat(stockUserStats.deposit).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     </div>
                   )}
