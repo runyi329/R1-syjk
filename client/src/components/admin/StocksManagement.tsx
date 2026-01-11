@@ -389,6 +389,13 @@ export default function StocksManagement() {
               <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
                 {authData?.role === "super_admin" && (
                   <div className="flex gap-2">
+                    <Button 
+                      className="bg-gray-700 text-white hover:bg-gray-600"
+                      onClick={() => setActiveTab("staff")}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      员工管理
+                    </Button>
                     <DialogTrigger asChild>
                       <Button className="bg-[#D4AF37] text-black hover:bg-[#E5C158]">
                         <Plus className="w-4 h-4 mr-2" />
