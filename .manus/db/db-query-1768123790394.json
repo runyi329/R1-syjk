@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, initialBalance, status, createdAt FROM stockUsers ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, name, initialBalance, status, createdAt FROM stockUsers ORDER BY id;",
+  "rows": [
+    {
+      "id": "210013",
+      "name": "2262Li",
+      "initialBalance": "1000000.00",
+      "status": "active",
+      "createdAt": "2026-01-11 07:34:26"
+    },
+    {
+      "id": "210014",
+      "name": "3999Qi",
+      "initialBalance": "1000000.00",
+      "status": "active",
+      "createdAt": "2026-01-11 07:34:32"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tinitialBalance\tstatus\tcreatedAt\n210013\t2262Li\t1000000.00\tactive\t2026-01-11 07:34:26\n210014\t3999Qi\t1000000.00\tactive\t2026-01-11 07:34:32\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

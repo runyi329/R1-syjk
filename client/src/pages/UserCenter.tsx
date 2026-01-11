@@ -225,18 +225,11 @@ export default function UserCenter() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-white/60">VIP等级：</span>
-                  <div className="flex items-center gap-1">
-                    {vipInfo.level > 0 && <Crown className="h-4 w-4 text-[#D4AF37]" />}
-                    <Badge 
-                      variant="outline" 
-                      className={`text-xs font-semibold ${
-                        vipInfo.level > 0 
-                          ? "bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50" 
-                          : "text-white/60 border-white/20"
-                      }`}
-                    >
+                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-400/20 to-yellow-600/20 border border-amber-500/50 rounded-full px-3 py-1">
+                    <img src="/vip-badge.png" alt="VIP" className="h-4 w-4" />
+                    <span className="text-xs font-bold text-amber-400 whitespace-nowrap">
                       {vipInfo.label}
-                    </Badge>
+                    </span>
                   </div>
                 </div>
                 

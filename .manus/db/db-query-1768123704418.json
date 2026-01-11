@@ -1,0 +1,66 @@
+{
+  "query": "SELECT sp.id, sp.userId, sp.stockUserId, su.name as stock_name, u.username as member_name \nFROM stockUserPermissions sp \nLEFT JOIN stockUsers su ON sp.stockUserId = su.id \nLEFT JOIN users u ON sp.userId = u.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT sp.id, sp.userId, sp.stockUserId, su.name as stock_name, u.username as member_name \nFROM stockUserPermissions sp \nLEFT JOIN stockUsers su ON sp.stockUserId = su.id \nLEFT JOIN users u ON sp.userId = u.id;",
+  "rows": [
+    {
+      "id": "150027",
+      "userId": "1350103",
+      "stockUserId": "210014",
+      "stock_name": "3999Qi",
+      "member_name": "DBW"
+    },
+    {
+      "id": "180001",
+      "userId": "1350103",
+      "stockUserId": "210013",
+      "stock_name": "2262Li",
+      "member_name": "DBW"
+    },
+    {
+      "id": "150001",
+      "userId": "1350103",
+      "stockUserId": "2",
+      "stock_name": "NULL",
+      "member_name": "DBW"
+    },
+    {
+      "id": "150002",
+      "userId": "1350103",
+      "stockUserId": "1",
+      "stock_name": "NULL",
+      "member_name": "DBW"
+    },
+    {
+      "id": "150008",
+      "userId": "210400",
+      "stockUserId": "2",
+      "stock_name": "NULL",
+      "member_name": "WHY"
+    },
+    {
+      "id": "150003",
+      "userId": "1350350",
+      "stockUserId": "1350103",
+      "stock_name": "NULL",
+      "member_name": "testadmin"
+    },
+    {
+      "id": "150005",
+      "userId": "1350350",
+      "stockUserId": "2",
+      "stock_name": "NULL",
+      "member_name": "testadmin"
+    },
+    {
+      "id": "150007",
+      "userId": "1350350",
+      "stockUserId": "1",
+      "stock_name": "NULL",
+      "member_name": "testadmin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tstockUserId\tstock_name\tmember_name\n150027\t1350103\t210014\t3999Qi\tDBW\n180001\t1350103\t210013\t2262Li\tDBW\n150001\t1350103\t2\tNULL\tDBW\n150002\t1350103\t1\tNULL\tDBW\n150008\t210400\t2\tNULL\tWHY\n150003\t1350350\t1350103\tNULL\ttestadmin\n150005\t1350350\t2\tNULL\ttestadmin\n150007\t1350350\t1\tNULL\ttestadmin\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

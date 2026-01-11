@@ -136,17 +136,12 @@ export default function Home() {
                 {userData && (
                   <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs">
                     <span className="font-semibold text-primary whitespace-nowrap leading-tight">{userData.name}</span>
-                    <Badge 
-                      variant="outline" 
-                      className={`text-[9px] sm:text-xs font-semibold whitespace-nowrap px-1 py-0 h-4 sm:h-5 ${
-                        vipInfo.level > 0 
-                          ? "bg-primary/20 text-primary border-primary/50" 
-                          : "text-muted-foreground border-border"
-                      }`}
-                    >
-                      {vipInfo.level > 0 && <Crown className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 inline" />}
-                      {vipInfo.label}
-                    </Badge>
+                    <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400/20 to-yellow-600/20 border border-amber-500/50 rounded-full px-2 py-0.5">
+                      <img src="/vip-badge.png" alt="VIP" className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-[9px] sm:text-xs font-bold text-amber-400 whitespace-nowrap">
+                        {vipInfo.label}
+                      </span>
+                    </div>
                   </div>
                 )}
                 <Link href="/user-center">
