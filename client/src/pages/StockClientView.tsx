@@ -362,18 +362,14 @@ export default function StockClientView() {
                   </CardContent>
                 </Card>
 
-                {/* 累计盈亏+收益率 */}
+                {/* 累计盈亏 */}
                 <Card className="bg-black/50 border-white/10">
                   <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
                     <p className="text-sm text-white/60 mb-2">累计盈亏</p>
-                    <div className="flex items-baseline gap-2">
-                      <p className={`text-xl font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {formatCurrency(Math.abs(stockUserStats.totalProfit))}
-                      </p>
-                      <p className={`text-sm font-semibold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
-                      </p>
-                    </div>
+                    <p className={`text-xl font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {stockUserStats.totalProfit >= 0 ? '+' : ''}{formatCurrency(stockUserStats.totalProfit)}
+                      <span className="text-sm ml-1">({stockUserStats.totalProfit >= 0 ? '+' : ''}{stockUserStats.totalProfitRate}%)</span>
+                    </p>
                   </CardContent>
                 </Card>
             </div>
