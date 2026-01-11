@@ -855,7 +855,78 @@ export default function StocksManagement() {
                     </>
                   )}
                   
-                  {/* 资金曲线图 - 余额和日盈亏视角（曲线在下） */}
+                  {/* 余额编辑面板 - 移到日历下方、曲线图上方 */}
+                  {selectedDate && (
+                    <Card className="bg-black/50 border-white/10 mt-6">
+                      <CardHeader>
+                        <CardTitle className="text-white">
+                          <Calendar className="w-5 h-5 inline-block mr-2" />
+                          {selectedDate} 余额记录
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>账户余额 (¥)</Label>
+                            <Input
+                              type="number"
+                              value={balanceInput}
+                              onChange={(e) => setBalanceInput(e.target.value)}
+                              placeholder="请输入当日账户余额"
+                              className="bg-black/50 border-white/20"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>备注（可选）</Label>
+                            <Textarea
+                              value={balanceNotes}
+                              onChange={(e) => setBalanceNotes(e.target.value)}
+                              placeholder="可选备注信息"
+                              className="bg-black/50 border-white/20"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={handleSaveBalance}
+                              className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
+                              disabled={setBalanceMutation.isPending}
+                            >
+                              {setBalanceMutation.isPending ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                "保存"
+                              )}
+                            </Button>
+                            {getBalanceForDate(parseInt(selectedDate.split('-')[2])) && (
+                              <Button
+                                variant="destructive"
+                                onClick={handleDeleteBalance}
+                                disabled={deleteBalanceMutation.isPending}
+                              >
+                                {deleteBalanceMutation.isPending ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  "删除记录"
+                                )}
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedDate(null);
+                                setBalanceInput("");
+                                setBalanceNotes("");
+                              }}
+                            >
+                              取消
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {/* 资金曲线图 - 余额和日盈亏视角（曲线在最下方） */}
                   {userStats && userStats.dailyProfits && userStats.dailyProfits.length > 0 && (viewMode === "balance" || (viewMode === "profit" && profitPeriod === "day")) && (
                     <div className="mt-6">
                       <div className="mb-3">
@@ -1068,76 +1139,7 @@ export default function StocksManagement() {
                 </CardContent>
               </Card>
               
-              {/* 余额编辑面板 */}
-              {selectedDate && (
-                <Card className="bg-black/50 border-white/10">
-                  <CardHeader>
-                    <CardTitle className="text-white">
-                      <Calendar className="w-5 h-5 inline-block mr-2" />
-                      {selectedDate} 余额记录
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>账户余额 (¥)</Label>
-                        <Input
-                          type="number"
-                          value={balanceInput}
-                          onChange={(e) => setBalanceInput(e.target.value)}
-                          placeholder="请输入当日账户余额"
-                          className="bg-black/50 border-white/20"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>备注（可选）</Label>
-                        <Textarea
-                          value={balanceNotes}
-                          onChange={(e) => setBalanceNotes(e.target.value)}
-                          placeholder="可选备注信息"
-                          className="bg-black/50 border-white/20"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={handleSaveBalance}
-                          className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
-                          disabled={setBalanceMutation.isPending}
-                        >
-                          {setBalanceMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            "保存"
-                          )}
-                        </Button>
-                        {getBalanceForDate(parseInt(selectedDate.split('-')[2])) && (
-                          <Button
-                            variant="destructive"
-                            onClick={handleDeleteBalance}
-                            disabled={deleteBalanceMutation.isPending}
-                          >
-                            {deleteBalanceMutation.isPending ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              "删除记录"
-                            )}
-                          </Button>
-                        )}
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedDate(null);
-                            setBalanceInput("");
-                            setBalanceNotes("");
-                          }}
-                        >
-                          取消
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+
             </div>
           )}
         </TabsContent>
