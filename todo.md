@@ -1866,3 +1866,14 @@
 - [x] 在Home.tsx导航栏中添加logo图标
 - [x] 验证logo在首页左上角正确显示
 - [x] 调整logo尺寸（h-14 w-14）并与文字垂直对齐
+
+## Logo更新 - 替换为金色盾牌logo
+- [ ] 将金色盾牌logo上传到项目
+- [ ] 在Management UI Settings中更新网站logo
+- [ ] 验证logo在首页左上角正确显示
+- [ ] 验证logo在浏览器标签页显示
+
+## 首页Logo更新
+- [x] 在runyi首页左上角添加公司logo（金色盾牌设计）
+- [x] 将logo文件保存到client/public/company-logo.png
+- [x] 更新Home.tsx中的logo引用路径
