@@ -17,7 +17,7 @@ import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
 import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 import StocksManagement from "@/components/admin/StocksManagement";
-import StaffManagement from "@/components/admin/StaffManagement";
+
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
@@ -334,7 +334,6 @@ export default function AdminDashboard() {
             authData?.role === "super_admin" ? 1 : 0, // users
             permissions?.permissions?.permissionManagement ? 2 : 0, // products, orders
             permissions?.permissions?.memberManagement ? 1 : 0, // stocks
-            permissions?.permissions?.staffManagement ? 1 : 0, // staff
             authData?.role === "super_admin" ? 1 : 0 // settings
           ].reduce((a, b) => a + b, 0)}, minmax(0, 1fr))` }}>
             {authData?.role === "super_admin" && (
@@ -370,11 +369,7 @@ export default function AdminDashboard() {
                 A股
               </TabsTrigger>
             )}
-            {permissions?.permissions?.staffManagement && (
-              <TabsTrigger value="staff" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-                员工
-              </TabsTrigger>
-            )}
+
             {authData?.role === "super_admin" && (
               <TabsTrigger value="settings" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
                 设置
@@ -1140,12 +1135,7 @@ export default function AdminDashboard() {
             </TabsContent>
           )}
 
-          {/* Staff Management */}
-          {permissions?.permissions?.staffManagement && (
-            <TabsContent value="staff" className="mt-6">
-              <StaffManagement />
-            </TabsContent>
-          )}
+
 
           <TabsContent value="settings" className="mt-6">
             <Card className="bg-black/50 border-white/10 max-w-md">

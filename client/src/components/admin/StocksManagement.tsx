@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import FundsCurveChart from "./FundsCurveChart";
 import StockPermissionsManager from "./StockPermissionsManager";
 import MemberPermissionsView from "./MemberPermissionsView";
+import StaffManagement from "./StaffManagement";
 
 interface StockUser {
   id: number;
@@ -364,6 +365,9 @@ export default function StocksManagement() {
               </TabsTrigger>
               <TabsTrigger value="members" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
                 会员管理
+              </TabsTrigger>
+              <TabsTrigger value="staff" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+                员工管理
               </TabsTrigger>
             </>
           )}
@@ -1085,6 +1089,11 @@ export default function StocksManagement() {
               <MemberPermissionsView />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* 员工管理标签页 */}
+        <TabsContent value="staff" className="mt-4">
+          <StaffManagement />
         </TabsContent>
       </Tabs>
     </div>
