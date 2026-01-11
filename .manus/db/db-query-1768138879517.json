@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, username, name, email FROM users WHERE username = 'DBW';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, username, name, email FROM users WHERE username = 'DBW';",
+  "rows": [
+    {
+      "id": "1350103",
+      "username": "DBW",
+      "name": "DBW",
+      "email": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\temail\n1350103\tDBW\tDBW\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 106
+}
