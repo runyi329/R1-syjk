@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { stockUsers, stockBalances, stockUserPermissions, users, type StockBalance, type StockUser } from "../../drizzle/schema";
+import { stockUsers, stockBalances, stockUserPermissions, staffStockPermissions, users, type StockBalance, type StockUser } from "../../drizzle/schema";
 import { eq, desc, and, asc, gte } from "drizzle-orm";
 
 export const stocksRouter = router({
@@ -751,13 +751,14 @@ export const stocksRouter = router({
 
   // ==================== 员工分配管理 ====================
   
-  // 获取股票用户已分配的员工列表
+  // 获取股票用户已分配的员工列表（使用staffStockPermissions表）
   getAssignedStaff: adminProcedure
     .input(z.object({ stockUserId: z.number() }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
+      // 从staffStockPermissions表查询已分配的员工
       const assignedStaff = await db
         .select({
           id: users.id,
@@ -766,12 +767,12 @@ export const stocksRouter = router({
         })
         .from(users)
         .innerJoin(
-          stockUserPermissions,
-          eq(users.id, stockUserPermissions.userId)
+          staffStockPermissions,
+          eq(users.id, staffStockPermissions.staffUserId)
         )
         .where(
           and(
-            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(staffStockPermissions.stockUserId, input.stockUserId),
             eq(users.role, "staff_admin")
           )
         );
@@ -779,24 +780,24 @@ export const stocksRouter = router({
       return assignedStaff;
     }),
 
-  // 为股票用户分配员工
+  // 为股票用户分配员工（使用staffStockPermissions表，不影响客户授权）
   assignStaffToUser: adminProcedure
     .input(z.object({
       stockUserId: z.number(),
       staffId: z.number(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
-      // 检查是否已经分配
+      // 检查是否已经分配（使用staffStockPermissions表）
       const [existing] = await db
         .select()
-        .from(stockUserPermissions)
+        .from(staffStockPermissions)
         .where(
           and(
-            eq(stockUserPermissions.stockUserId, input.stockUserId),
-            eq(stockUserPermissions.userId, input.staffId)
+            eq(staffStockPermissions.stockUserId, input.stockUserId),
+            eq(staffStockPermissions.staffUserId, input.staffId)
           )
         );
       
@@ -804,18 +805,19 @@ export const stocksRouter = router({
         throw new Error("该员工已经被分配给该股票用户");
       }
       
-      // 创建分配记录
+      // 创建分配记录（使用staffStockPermissions表）
       await db
-        .insert(stockUserPermissions)
+        .insert(staffStockPermissions)
         .values({
           stockUserId: input.stockUserId,
-          userId: input.staffId,
+          staffUserId: input.staffId,
+          createdBy: ctx.user.id,
         });
       
       return { success: true };
     }),
 
-  // 移除股票用户的员工分配
+  // 移除股票用户的员工分配（使用staffStockPermissions表，不影响客户授权）
   removeStaffFromUser: adminProcedure
     .input(z.object({
       stockUserId: z.number(),
@@ -825,12 +827,13 @@ export const stocksRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
+      // 从staffStockPermissions表删除（不影响stockUserPermissions客户授权表）
       await db
-        .delete(stockUserPermissions)
+        .delete(staffStockPermissions)
         .where(
           and(
-            eq(stockUserPermissions.stockUserId, input.stockUserId),
-            eq(stockUserPermissions.userId, input.staffId)
+            eq(staffStockPermissions.stockUserId, input.stockUserId),
+            eq(staffStockPermissions.staffUserId, input.staffId)
           )
         );
       
