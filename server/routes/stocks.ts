@@ -748,4 +748,92 @@ export const stocksRouter = router({
         recordCount: balances.length,
       };
     }),
+
+  // ==================== 员工分配管理 ====================
+  
+  // 获取股票用户已分配的员工列表
+  getAssignedStaff: adminProcedure
+    .input(z.object({ stockUserId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      const assignedStaff = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          email: users.email,
+        })
+        .from(users)
+        .innerJoin(
+          stockUserPermissions,
+          eq(users.id, stockUserPermissions.userId)
+        )
+        .where(
+          and(
+            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(users.role, "staff_admin")
+          )
+        );
+      
+      return assignedStaff;
+    }),
+
+  // 为股票用户分配员工
+  assignStaffToUser: adminProcedure
+    .input(z.object({
+      stockUserId: z.number(),
+      staffId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      // 检查是否已经分配
+      const [existing] = await db
+        .select()
+        .from(stockUserPermissions)
+        .where(
+          and(
+            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(stockUserPermissions.userId, input.staffId)
+          )
+        );
+      
+      if (existing) {
+        throw new Error("该员工已经被分配给该股票用户");
+      }
+      
+      // 创建分配记录
+      await db
+        .insert(stockUserPermissions)
+        .values({
+          stockUserId: input.stockUserId,
+          userId: input.staffId,
+        });
+      
+      return { success: true };
+    }),
+
+  // 移除股票用户的员工分配
+  removeStaffFromUser: adminProcedure
+    .input(z.object({
+      stockUserId: z.number(),
+      staffId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      
+      await db
+        .delete(stockUserPermissions)
+        .where(
+          and(
+            eq(stockUserPermissions.stockUserId, input.stockUserId),
+            eq(stockUserPermissions.userId, input.staffId)
+          )
+        );
+      
+      return { success: true };
+    }),
 });

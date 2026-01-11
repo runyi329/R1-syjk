@@ -9,12 +9,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
-import { Loader2, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, TrendingUp, TrendingDown, User, Shield } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, TrendingUp, TrendingDown, User, Shield, Users } from "lucide-react";
 import { toast } from "sonner";
 import FundsCurveChart from "./FundsCurveChart";
 import StockPermissionsManager from "./StockPermissionsManager";
 import MemberPermissionsView from "./MemberPermissionsView";
 import StaffManagement from "./StaffManagement";
+import AssignStaffDialog from "./AssignStaffDialog";
 
 interface StockUser {
   id: number;
@@ -71,6 +72,10 @@ export default function StocksManagement() {
   
   // 盈亏时间维度：day（日）、month（月）、year（年）
   const [profitPeriod, setProfitPeriod] = useState<"day" | "month" | "year">("day");
+  
+  // 员工分配对话框状态
+  const [isAssignStaffOpen, setIsAssignStaffOpen] = useState(false);
+  const [assigningUser, setAssigningUser] = useState<StockUser | null>(null);
   
   // 获取所有股票用户
   const { data: stockUsers, refetch: refetchUsers, isLoading: isLoadingUsers } = trpc.stocks.getAllStockUsers.useQuery();
@@ -495,6 +500,20 @@ export default function StocksManagement() {
                           <Badge variant={user.status === "active" ? "default" : "secondary"}>
                             {user.status === "active" ? "活跃" : "停用"}
                           </Badge>
+                          {authData?.role === "admin" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-[#D4AF37] hover:text-[#D4AF37]/80"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setAssigningUser(user);
+                                setIsAssignStaffOpen(true);
+                              }}
+                            >
+                              <Users className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="ghost"
@@ -1096,6 +1115,25 @@ export default function StocksManagement() {
           <StaffManagement />
         </TabsContent>
       </Tabs>
+
+      {/* 员工分配对话框 */}
+      <Dialog open={isAssignStaffOpen} onOpenChange={setIsAssignStaffOpen}>
+        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>为 {assigningUser?.name} 分配员工</DialogTitle>
+            <DialogDescription className="text-white/60">
+              选择可以管理该股票用户的员工
+            </DialogDescription>
+          </DialogHeader>
+          <AssignStaffDialog 
+            stockUserId={assigningUser?.id || 0}
+            onClose={() => {
+              setIsAssignStaffOpen(false);
+              setAssigningUser(null);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
