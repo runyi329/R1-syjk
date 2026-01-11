@@ -385,4 +385,20 @@ export const usersRouter = router({
         user: targetUser,
       };
     }),
+
+  // 管理员：重设用户密码
+  resetUserPassword: adminProcedure
+    .input(z.object({ 
+      userId: z.number(), 
+      newPassword: z.string().min(6).max(50) 
+    }))
+    .mutation(async ({ input }) => {
+      // 哈希新密码
+      const newPasswordHash = db.hashPassword(input.newPassword);
+
+      // 更新用户密码
+      await db.updateUserPassword(input.userId, newPasswordHash);
+
+      return { success: true };
+    }),
 });

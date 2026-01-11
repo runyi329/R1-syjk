@@ -60,6 +60,7 @@ export default function AdminDashboard() {
   const [editingUserStatus, setEditingUserStatus] = useState<"active" | "frozen">("active");
   const [editingUserRole, setEditingUserRole] = useState<"user" | "admin" | "super_admin" | "staff_admin">("user");
   const [editingUserNotes, setEditingUserNotes] = useState("");
+  const [editingUserPassword, setEditingUserPassword] = useState("");
   const [isEditingUser, setIsEditingUser] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
@@ -185,6 +186,16 @@ export default function AdminDashboard() {
       setEditingUserId(null);
     },
     onError: (error: any) => toast.error(`删除失败：${error.message}`),
+  });
+
+  const resetUserPasswordMutation = trpc.users.resetUserPassword.useMutation({
+    onSuccess: () => {
+      toast.success("密码已重设");
+      refetchUsers();
+      setIsEditUserOpen(false);
+      setEditingUserId(null);
+    },
+    onError: (error: any) => toast.error(`重设密码失败：${error.message}`),
   });
 
   const loginAsUserMutation = trpc.users.loginAsUser.useMutation({
@@ -527,6 +538,7 @@ export default function AdminDashboard() {
                               setEditingUserStatus(user.accountStatus);
                               setEditingUserRole(user.role);
                               setEditingUserNotes((user as any).notes || "");
+                              setEditingUserPassword("");
                             } else {
                               setIsEditUserOpen(false);
                               setEditingUserId(null);
@@ -611,6 +623,17 @@ export default function AdminDashboard() {
                                     className="bg-white/5 border-white/10 text-white min-h-[80px]"
                                   />
                                 </div>
+                                <div>
+                                  <Label className="text-white">重设密码（可选）</Label>
+                                  <Input
+                                    type="password"
+                                    value={editingUserPassword}
+                                    onChange={(e) => setEditingUserPassword(e.target.value)}
+                                    placeholder="输入新密码（6-50个字符）"
+                                    className="bg-white/5 border-white/10 text-white"
+                                  />
+                                  <p className="text-xs text-white/40 mt-1">留空则不修改密码</p>
+                                </div>
                               </div>
                               <DialogFooter className="flex-col sm:flex-row gap-2">
                                 <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -675,8 +698,13 @@ export default function AdminDashboard() {
                                         toast.error("用户名至少需要2个字符");
                                         return;
                                       }
+                                      // 验证密码长度
+                                      if (editingUserPassword && (editingUserPassword.length < 6 || editingUserPassword.length > 50)) {
+                                        toast.error("密码长度必须在6-50个字符之间");
+                                        return;
+                                      }
                                       setIsEditingUser(true);
-                                      Promise.all([
+                                      const promises = [
                                         updateUserNameMutation.mutateAsync({
                                           userId: user.id,
                                           name: editingUserName,
@@ -697,7 +725,17 @@ export default function AdminDashboard() {
                                           userId: user.id,
                                           role: editingUserRole,
                                         }),
-                                      ]).finally(() => setIsEditingUser(false));
+                                      ];
+                                      // 如果填写了密码，添加重设密码请求
+                                      if (editingUserPassword) {
+                                        promises.push(
+                                          resetUserPasswordMutation.mutateAsync({
+                                            userId: user.id,
+                                            newPassword: editingUserPassword,
+                                          })
+                                        );
+                                      }
+                                      Promise.all(promises).finally(() => setIsEditingUser(false));
                                     }}
                                     className="bg-[#D4AF37] text-black hover:bg-[#E5C158]"
                                     disabled={isEditingUser}

@@ -34,6 +34,11 @@ export default function StockClientView() {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
 
+  // 设置页面标题
+  useEffect(() => {
+    document.title = "A股客户数据查看 - 数金研投";
+  }, []);
+
   // 获取用户可查看的股票客户列表
   const { data: accessibleStockUsers, isLoading: isLoadingStockUsers } = trpc.stocks.getMyAccessibleStockUsers.useQuery(
     { userId: user?.id || 0 },
