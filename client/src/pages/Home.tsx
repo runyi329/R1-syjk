@@ -103,15 +103,17 @@ export default function Home() {
       {/* 头部导航 */}
       <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
         <div className="container mx-auto py-3 px-2 sm:px-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src={siteConfig?.logoUrl || "/logo.png"} alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
-            <div className="flex flex-col">
-              <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
-                {language === 'en' ? 'Runyi Investment' : '数金研投'}
-              </h1>
-              <span className="text-[10px] text-muted-foreground tracking-wider uppercase mt-1">Runyi Investment</span>
+          <Link href={authData?.role === "super_admin" ? "/admin" : "/"}>
+            <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+              <img src={siteConfig?.logoUrl || "/logo.png"} alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
+              <div className="flex flex-col">
+                <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
+                  {language === 'en' ? 'Runyi Investment' : '数金研投'}
+                </h1>
+                <span className="text-[10px] text-muted-foreground tracking-wider uppercase mt-1">Runyi Investment</span>
+              </div>
             </div>
-          </div>
+          </Link>
           
           <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
             <DropdownMenu>
