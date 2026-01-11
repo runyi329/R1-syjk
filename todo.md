@@ -1877,3 +1877,8 @@
 - [x] 在runyi首页左上角添加公司logo（金色盾牌设计）
 - [x] 将logo文件保存到client/public/company-logo.png
 - [x] 更新Home.tsx中的logo引用路径
+
+## Logo 融合度优化
+- [x] 调整 Logo 与导航栏的融合度：移除黑色背景，使用透明背景
+- [x] 优化 Logo 与页面整体设计的视觉协调
+- [x] 测试 Logo 在不同页面的显示效果
