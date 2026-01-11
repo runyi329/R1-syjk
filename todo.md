@@ -1859,3 +1859,9 @@
 - [x] 替换原始Logo文件为优化版本
 - [x] 重启开发服务器验证修复
 - [x] 确认Logo正常显示在首页导航栏
+
+## Logo更新 - 使用用户提供的金色S图标
+- [x] 上传logo图标到S3（已完成：https://files.manuscdn.com/user_upload_by_module/session_file/310519663279996243/ZCNEMiyHDkxiKIpv.png）
+- [x] 下载logo到client/public目录
+- [x] 在Home.tsx导航栏中添加logo图标
+- [x] 验证logo在首页左上角正确显示
