@@ -1865,3 +1865,4 @@
 - [x] 下载logo到client/public目录
 - [x] 在Home.tsx导航栏中添加logo图标
 - [x] 验证logo在首页左上角正确显示
+- [x] 调整logo尺寸（h-14 w-14）并与文字垂直对齐
