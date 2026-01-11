@@ -1,0 +1,22 @@
+{
+  "query": "SELECT u.id as user_id, u.username, u.role, ap.id as perm_id, ap.userId as perm_userId, ap.balanceManagement, ap.userManagement, ap.permissionManagement, ap.memberManagement, ap.status FROM users u LEFT JOIN adminPermissions ap ON u.id = ap.userId WHERE u.role = 'staff_admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT u.id as user_id, u.username, u.role, ap.id as perm_id, ap.userId as perm_userId, ap.balanceManagement, ap.userManagement, ap.permissionManagement, ap.memberManagement, ap.status FROM users u LEFT JOIN adminPermissions ap ON u.id = ap.userId WHERE u.role = 'staff_admin';",
+  "rows": [
+    {
+      "user_id": "210400",
+      "username": "123456",
+      "role": "staff_admin",
+      "perm_id": "2",
+      "perm_userId": "210400",
+      "balanceManagement": "1",
+      "userManagement": "1",
+      "permissionManagement": "1",
+      "memberManagement": "1",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tusername\trole\tperm_id\tperm_userId\tbalanceManagement\tuserManagement\tpermissionManagement\tmemberManagement\tstatus\n210400\t123456\tstaff_admin\t2\t210400\t1\t1\t1\t1\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 392
+}

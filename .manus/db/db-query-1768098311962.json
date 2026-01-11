@@ -1,0 +1,25 @@
+{
+  "query": "SELECT u.id, u.username, u.role, ap.* FROM users u LEFT JOIN adminPermissions ap ON u.id = ap.userId WHERE u.role = 'staff_admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT u.id, u.username, u.role, ap.* FROM users u LEFT JOIN adminPermissions ap ON u.id = ap.userId WHERE u.role = 'staff_admin';",
+  "rows": [
+    {
+      "id": "NULL",
+      "username": "123456",
+      "role": "staff_admin",
+      "userId": "NULL",
+      "balanceManagement": "NULL",
+      "userManagement": "NULL",
+      "permissionManagement": "NULL",
+      "memberManagement": "NULL",
+      "staffManagement": "NULL",
+      "status": "NULL",
+      "createdBy": "NULL",
+      "createdAt": "NULL",
+      "updatedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\trole\tid\tuserId\tbalanceManagement\tuserManagement\tpermissionManagement\tmemberManagement\tstaffManagement\tstatus\tcreatedBy\tcreatedAt\tupdatedAt\n210400\t123456\tstaff_admin\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 407
+}

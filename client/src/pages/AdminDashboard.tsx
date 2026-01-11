@@ -328,14 +328,14 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
-        <Tabs defaultValue={permissions?.permissions?.balanceManagement ? "deposits" : "users"} className="w-full">
+        <Tabs defaultValue={permissions?.permissions?.memberManagement && !permissions?.permissions?.balanceManagement && !permissions?.permissions?.userManagement ? "stocks" : permissions?.permissions?.balanceManagement ? "deposits" : "users"} className="w-full">
           <TabsList className="bg-black/50 border border-white/10 grid w-full overflow-x-auto" style={{ gridTemplateColumns: `repeat(${[
             permissions?.permissions?.balanceManagement,
             permissions?.permissions?.userManagement,
             permissions?.permissions?.permissionManagement,
             permissions?.permissions?.memberManagement,
             permissions?.permissions?.staffManagement,
-            true // settings always visible
+            authData?.role === "super_admin" // settings only for super admin
           ].filter(Boolean).length}, minmax(0, 1fr))` }}>
             {permissions?.permissions?.balanceManagement && (
               <>
@@ -375,9 +375,11 @@ export default function AdminDashboard() {
                 员工
               </TabsTrigger>
             )}
-            <TabsTrigger value="settings" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              设置
-            </TabsTrigger>
+            {authData?.role === "super_admin" && (
+              <TabsTrigger value="settings" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                设置
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* Deposits Management */}

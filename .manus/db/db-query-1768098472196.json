@@ -1,0 +1,15 @@
+{
+  "query": "SELECT ap.userId, u.username, u.role FROM adminPermissions ap LEFT JOIN users u ON ap.userId = u.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT ap.userId, u.username, u.role FROM adminPermissions ap LEFT JOIN users u ON ap.userId = u.id;",
+  "rows": [
+    {
+      "userId": "210400",
+      "username": "123456",
+      "role": "staff_admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tusername\trole\n210400\t123456\tstaff_admin\n",
+  "stderr": "",
+  "execution_time_ms": 390
+}

@@ -8,14 +8,49 @@ export const stocksRouter = router({
   // ==================== 股票用户管理 ====================
   
   // 获取所有股票用户
-  getAllStockUsers: adminProcedure.query(async () => {
+  getAllStockUsers: adminProcedure.query(async ({ ctx }) => {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
-    const users = await db
+    
+    // 查询当前用户信息
+    const [currentUser] = await db
       .select()
-      .from(stockUsers)
-      .orderBy(desc(stockUsers.createdAt));
-    return users;
+      .from(users)
+      .where(eq(users.id, ctx.user.id));
+    
+    // 超级管理员可以看到所有股票用户
+    if (currentUser?.role === "super_admin") {
+      const allUsers = await db
+        .select()
+        .from(stockUsers)
+        .orderBy(desc(stockUsers.createdAt));
+      return allUsers;
+    }
+    
+    // 普通管理员只能看到分配给他的股票用户
+    if (currentUser?.role === "staff_admin") {
+      const assignedUsers = await db
+        .select({
+          id: stockUsers.id,
+          name: stockUsers.name,
+          initialBalance: stockUsers.initialBalance,
+          notes: stockUsers.notes,
+          status: stockUsers.status,
+          createdAt: stockUsers.createdAt,
+          updatedAt: stockUsers.updatedAt,
+        })
+        .from(stockUsers)
+        .innerJoin(
+          stockUserPermissions,
+          eq(stockUsers.id, stockUserPermissions.stockUserId)
+        )
+        .where(eq(stockUserPermissions.userId, ctx.user.id))
+        .orderBy(desc(stockUsers.createdAt));
+      return assignedUsers;
+    }
+    
+    // 其他角色返回空数组
+    return [];
   }),
 
   // 获取单个股票用户

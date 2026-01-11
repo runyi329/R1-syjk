@@ -1,0 +1,28 @@
+{
+  "query": "SELECT u.id, u.username, u.role, (SELECT COUNT(*) FROM adminPermissions ap WHERE ap.userId = u.id) as has_perm FROM users u WHERE u.role IN ('admin', 'super_admin', 'staff_admin');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT u.id, u.username, u.role, (SELECT COUNT(*) FROM adminPermissions ap WHERE ap.userId = u.id) as has_perm FROM users u WHERE u.role IN ('admin', 'super_admin', 'staff_admin');",
+  "rows": [
+    {
+      "id": "1",
+      "username": "NULL",
+      "role": "admin",
+      "has_perm": "0"
+    },
+    {
+      "id": "210400",
+      "username": "123456",
+      "role": "staff_admin",
+      "has_perm": "1"
+    },
+    {
+      "id": "330137",
+      "username": "runyi",
+      "role": "super_admin",
+      "has_perm": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\trole\thas_perm\n1\tNULL\tadmin\t0\n210400\t123456\tstaff_admin\t1\n330137\trunyi\tsuper_admin\t0\n",
+  "stderr": "",
+  "execution_time_ms": 388
+}

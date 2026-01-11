@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM adminPermissions WHERE userId NOT IN (SELECT id FROM users WHERE role = 'staff_admin');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute DELETE FROM adminPermissions WHERE userId NOT IN (SELECT id FROM users WHERE role = 'staff_admin');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 433
+}
