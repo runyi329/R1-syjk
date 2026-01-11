@@ -1576,3 +1576,10 @@
 - [x] 测试禁用/启用员工功能
 - [x] 测试删除员工功能
 - [x] 所有8个测试用例全部通过
+
+## Bug修复 - 权限错误 (10002)
+- [x] 诊断权限错误原因（API Query Error: You do not have required permission）
+- [x] 检查前端调用的API和权限要求
+- [x] 检查后端权限验证逻辑
+- [x] 修复权限错误（修改adminProcedure支持所有管理员角色）
+- [x] 测试验证修复效果
