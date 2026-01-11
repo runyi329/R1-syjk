@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO adminPermissions (userId, balanceManagement, userManagement, status, createdBy, createdAt, updatedAt) VALUES ((SELECT id FROM users WHERE username = 'testadmin'), true, true, 'active', 1, NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute INSERT INTO adminPermissions (userId, balanceManagement, userManagement, status, createdBy, createdAt, updatedAt) VALUES ((SELECT id FROM users WHERE username = 'testadmin'), true, true, 'active', 1, NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 411
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +50,9 @@ export default function StocksManagement() {
   // 获取当前用户角色，用于权限判断
   const { data: authData } = trpc.auth.me.useQuery();
   
+  // 获取当前用户的股票权限
+  const { data: stockPermissions } = trpc.adminPermissions.getMyStockPermissions.useQuery();
+  
   // 用户表单状态
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
@@ -78,7 +81,23 @@ export default function StocksManagement() {
   const [assigningUser, setAssigningUser] = useState<StockUser | null>(null);
   
   // 获取所有股票用户
-  const { data: stockUsers, refetch: refetchUsers, isLoading: isLoadingUsers } = trpc.stocks.getAllStockUsers.useQuery();
+  const { data: allStockUsers, refetch: refetchUsers, isLoading: isLoadingUsers } = trpc.stocks.getAllStockUsers.useQuery();
+  
+  // 根据权限过滤股票用户列表
+  const stockUsers = useMemo(() => {
+    if (!allStockUsers) return [];
+    if (!stockPermissions) return [];
+    
+    // 超级管理员可以看到所有用户
+    if (stockPermissions.hasFullAccess) {
+      return allStockUsers;
+    }
+    
+    // 普通管理员只能看到分配给他的用户
+    return allStockUsers.filter(user => 
+      stockPermissions.stockUserIds.includes(user.id)
+    );
+  }, [allStockUsers, stockPermissions]);
   
   // 获取用户余额记录
   const { data: userBalances, refetch: refetchBalances } = trpc.stocks.getStockBalances.useQuery(

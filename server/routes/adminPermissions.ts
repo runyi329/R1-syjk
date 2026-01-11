@@ -341,7 +341,7 @@ export const adminPermissionsRouter = router({
 /**
  * 为员工分配股票用户权限
  */
-const assignStockPermissionsRouter = router({
+export const assignStockPermissionsRouter = router({
   assignStockToStaff: protectedProcedure
     .input(
       z.object({

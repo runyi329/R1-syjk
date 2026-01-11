@@ -394,15 +394,15 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
-        <Tabs defaultValue={authData?.role === "super_admin" ? "deposits" : permissions?.permissions?.memberManagement ? "stocks" : "products"} className="w-full">
+        <Tabs defaultValue={permissions?.permissions?.balanceManagement ? "deposits" : permissions?.permissions?.userManagement ? "users" : permissions?.permissions?.memberManagement ? "stocks" : "products"} className="w-full">
           <TabsList className="bg-black/50 border border-white/10 grid w-full overflow-x-auto" style={{ gridTemplateColumns: `repeat(${[
-            authData?.role === "super_admin" ? 3 : 0, // deposits, withdrawals, wallets
-            authData?.role === "super_admin" ? 1 : 0, // users
+            permissions?.permissions?.balanceManagement ? 3 : 0, // deposits, withdrawals, wallets
+            permissions?.permissions?.userManagement ? 1 : 0, // users
             permissions?.permissions?.permissionManagement ? 2 : 0, // products, orders
             permissions?.permissions?.memberManagement ? 1 : 0, // stocks
             authData?.role === "super_admin" ? 1 : 0 // settings
           ].reduce((a, b) => a + b, 0)}, minmax(0, 1fr))` }}>
-            {authData?.role === "super_admin" && (
+            {permissions?.permissions?.balanceManagement && (
               <>
                 <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
                   充值
@@ -415,7 +415,7 @@ export default function AdminDashboard() {
                 </TabsTrigger>
               </>
             )}
-            {authData?.role === "super_admin" && (
+            {permissions?.permissions?.userManagement && (
               <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
                 用户
               </TabsTrigger>

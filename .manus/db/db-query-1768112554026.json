@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, status FROM stockUsers LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, name, status FROM stockUsers LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "2262Li",
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "name": "3999Qi",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tstatus\n1\t2262Li\tactive\n2\t3999Qi\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 398
+}

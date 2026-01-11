@@ -1677,3 +1677,11 @@
 - [x] 修复普通管理员登录后台时“权限配置不存在”的错误
 - [x] 确保创建管理员时自动创建adminPermissions记录
 - [x] 为现有管理员补充权限配置记录
+
+## 修复普通管理员登录后台看不到内容的问题
+- [x] 诊断问题原因（Tab显示逻辑基于角色而不是权限）
+- [x] 检查数据库中的权限配置是否正确
+- [x] 修复AdminDashboard的Tab显示逻辑（改为基于权限）
+- [x] 创建testadmin测试账户（用户名：testadmin，密码：123456）
+- [x] 为testadmin分配balanceManagement、userManagement、memberManagement权限
+- [x] 测试普通管理员登录后台的显示效果（充值、提现、地址、用户、A股Tab全部显示）

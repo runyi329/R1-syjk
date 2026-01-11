@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO staffStockPermissions (staffUserId, stockUserId, createdBy, createdAt) VALUES ((SELECT id FROM users WHERE username = 'testadmin'), (SELECT id FROM stockUsers LIMIT 1), 1, NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute INSERT INTO staffStockPermissions (staffUserId, stockUserId, createdBy, createdAt) VALUES ((SELECT id FROM users WHERE username = 'testadmin'), (SELECT id FROM stockUsers LIMIT 1), 1, NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 417
+}
