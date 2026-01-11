@@ -29,6 +29,7 @@ export const stocksRouter = router({
     
     // 普通管理员只能看到分配给他的股票用户
     if (currentUser?.role === "staff_admin") {
+      const { staffStockPermissions } = await import("../../drizzle/schema");
       const assignedUsers = await db
         .select({
           id: stockUsers.id,
@@ -41,10 +42,10 @@ export const stocksRouter = router({
         })
         .from(stockUsers)
         .innerJoin(
-          stockUserPermissions,
-          eq(stockUsers.id, stockUserPermissions.stockUserId)
+          staffStockPermissions,
+          eq(stockUsers.id, staffStockPermissions.stockUserId)
         )
-        .where(eq(stockUserPermissions.userId, ctx.user.id))
+        .where(eq(staffStockPermissions.staffUserId, ctx.user.id))
         .orderBy(desc(stockUsers.createdAt));
       return assignedUsers;
     }

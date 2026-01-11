@@ -1720,3 +1720,15 @@
 - [x] 为缺少权限配置的staff_admin用户创建权限记录
 - [x] 修复getMyPermissions函数，当权限配置不存在时自动创建
 - [x] 编写单元测试验证自动创建权限配置功能（3个测试全部通过）
+
+## WHY用户后台看不到已分配股票账户
+- [x] 诊断WHY用户看不到3999Qi和2262Li账户的原因
+- [x] 检查staffStockPermissions表中的权限记录
+- [x] 检查getMyStockPermissions API的查询逻辑
+- [x] 修复权限查询或数据库配置问题
+- [x] 测试验证WHY用户可以看到两个账户
+
+## 修夏WHY用户登录后台显示"暂无股票用户"的问题
+- [x] 修复股票用户列表加载逻辑（权限数据加载前返回空数组）
+- [x] 修夏getAllStockUsers API使用错误的权限表（应使用staffStockPermissions而不是stockUserPermissions）
+- [x] 编写单元测试验证修复效果（4个测试全部通过）

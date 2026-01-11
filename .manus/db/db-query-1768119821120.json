@@ -1,0 +1,28 @@
+{
+  "query": "\n-- 查询WHY用户的所有股票权限\nSELECT \n  ssp.id,\n  ssp.staffUserId,\n  ssp.stockUserId,\n  su.name as stockUserName,\n  su.initialBalance,\n  su.status,\n  ssp.createdAt\nFROM staffStockPermissions ssp\nJOIN stockUsers su ON ssp.stockUserId = su.id\nWHERE ssp.staffUserId = (SELECT id FROM users WHERE username = 'WHY')\nORDER BY ssp.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询WHY用户的所有股票权限\nSELECT \n  ssp.id,\n  ssp.staffUserId,\n  ssp.stockUserId,\n  su.name as stockUserName,\n  su.initialBalance,\n  su.status,\n  ssp.createdAt\nFROM staffStockPermissions ssp\nJOIN stockUsers su ON ssp.stockUserId = su.id\nWHERE ssp.staffUserId = (SELECT id FROM users WHERE username = 'WHY')\nORDER BY ssp.createdAt DESC;\n",
+  "rows": [
+    {
+      "id": "22",
+      "staffUserId": "210400",
+      "stockUserId": "210013",
+      "stockUserName": "2262Li",
+      "initialBalance": "0.00",
+      "status": "active",
+      "createdAt": "2026-01-11 08:23:34"
+    },
+    {
+      "id": "20",
+      "staffUserId": "210400",
+      "stockUserId": "210014",
+      "stockUserName": "3999Qi",
+      "initialBalance": "0.00",
+      "status": "active",
+      "createdAt": "2026-01-11 08:08:11"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstaffUserId\tstockUserId\tstockUserName\tinitialBalance\tstatus\tcreatedAt\n22\t210400\t210013\t2262Li\t0.00\tactive\t2026-01-11 08:23:34\n20\t210400\t210014\t3999Qi\t0.00\tactive\t2026-01-11 08:08:11\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

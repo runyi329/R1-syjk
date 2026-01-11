@@ -1,0 +1,26 @@
+{
+  "query": "\n-- 为WHY用户添加2262Li账户的权限\nINSERT INTO staffStockPermissions (staffUserId, stockUserId, createdBy, createdAt)\nVALUES (\n  (SELECT id FROM users WHERE username = 'WHY'),\n  (SELECT id FROM stockUsers WHERE name = '2262Li'),\n  (SELECT id FROM users WHERE username = 'runyi'),\n  NOW()\n);\n\n-- 验证插入结果\nSELECT ssp.*, su.name as stockUserName\nFROM staffStockPermissions ssp\nJOIN stockUsers su ON ssp.stockUserId = su.id\nWHERE ssp.staffUserId IN (SELECT id FROM users WHERE username = 'WHY')\nORDER BY ssp.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 为WHY用户添加2262Li账户的权限\nINSERT INTO staffStockPermissions (staffUserId, stockUserId, createdBy, createdAt)\nVALUES (\n  (SELECT id FROM users WHERE username = 'WHY'),\n  (SELECT id FROM stockUsers WHERE name = '2262Li'),\n  (SELECT id FROM users WHERE username = 'runyi'),\n  NOW()\n);\n\n-- 验证插入结果\nSELECT ssp.*, su.name as stockUserName\nFROM staffStockPermissions ssp\nJOIN stockUsers su ON ssp.stockUserId = su.id\nWHERE ssp.staffUserId IN (SELECT id FROM users WHERE username = 'WHY')\nORDER BY ssp.createdAt DESC;\n",
+  "rows": [
+    {
+      "id": "22",
+      "staffUserId": "210400",
+      "stockUserId": "210013",
+      "createdAt": "2026-01-11 08:23:34",
+      "createdBy": "330137",
+      "stockUserName": "2262Li"
+    },
+    {
+      "id": "20",
+      "staffUserId": "210400",
+      "stockUserId": "210014",
+      "createdAt": "2026-01-11 08:08:11",
+      "createdBy": "330137",
+      "stockUserName": "3999Qi"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstaffUserId\tstockUserId\tcreatedAt\tcreatedBy\tstockUserName\n22\t210400\t210013\t2026-01-11 08:23:34\t330137\t2262Li\n20\t210400\t210014\t2026-01-11 08:08:11\t330137\t3999Qi\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

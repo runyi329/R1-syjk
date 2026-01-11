@@ -1,0 +1,12 @@
+{
+  "query": "\n-- 查询WHY用户的基本信息\nSELECT id, username, role FROM users WHERE username = 'WHY';\n\n-- 查询WHY用户的股票权限记录\nSELECT * FROM staffStockPermissions WHERE staffUserId IN (SELECT id FROM users WHERE username = 'WHY');\n\n-- 查询3999Qi和2262Li的股票用户信息\nSELECT * FROM stockUsers WHERE username IN ('3999Qi', '2262Li');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询WHY用户的基本信息\nSELECT id, username, role FROM users WHERE username = 'WHY';\n\n-- 查询WHY用户的股票权限记录\nSELECT * FROM staffStockPermissions WHERE staffUserId IN (SELECT id FROM users WHERE username = 'WHY');\n\n-- 查询3999Qi和2262Li的股票用户信息\nSELECT * FROM stockUsers WHERE username IN ('3999Qi', '2262Li');\n",
+  "returncode": 1,
+  "logs": [
+    "id\tusername\trole",
+    "210400\tWHY\tstaff_admin",
+    "id\tstaffUserId\tstockUserId\tcreatedAt\tcreatedBy",
+    "20\t210400\t210014\t2026-01-11 08:08:11\t330137",
+    "ERROR 1054 (42S22) at line 9: Unknown column 'username' in 'where clause'"
+  ]
+}

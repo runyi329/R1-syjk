@@ -85,8 +85,8 @@ export default function StocksManagement() {
   
   // 根据权限过滤股票用户列表
   const stockUsers = useMemo(() => {
-    if (!allStockUsers) return [];
-    if (!stockPermissions) return [];
+    // 如果数据还在加载中，返回 undefined 而不是空数组
+    if (!allStockUsers || !stockPermissions) return undefined;
     
     // 超级管理员可以看到所有用户
     if (stockPermissions.hasFullAccess) {
@@ -487,11 +487,11 @@ export default function StocksManagement() {
               </Dialog>
             </CardHeader>
             <CardContent>
-              {isLoadingUsers ? (
+              {isLoadingUsers || !stockUsers ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
-              ) : !stockUsers || stockUsers.length === 0 ? (
+              ) : stockUsers.length === 0 ? (
                 <div className="text-center py-8 text-white/60">
                   暂无股票用户，点击上方按钮添加
                 </div>
