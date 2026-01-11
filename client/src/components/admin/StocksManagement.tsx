@@ -526,7 +526,7 @@ export default function StocksManagement() {
                           <Badge variant={user.status === "active" ? "default" : "secondary"}>
                             {user.status === "active" ? "活跃" : "停用"}
                           </Badge>
-                          {authData?.role === "admin" && (
+                          {authData?.role === "super_admin" && (
                             <Button
                               size="sm"
                               variant="ghost"

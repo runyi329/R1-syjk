@@ -1685,3 +1685,10 @@
 - [x] 创建testadmin测试账户（用户名：testadmin，密码：123456）
 - [x] 为testadmin分配balanceManagement、userManagement、memberManagement权限
 - [x] 测试普通管理员登录后台的显示效果（充值、提现、地址、用户、A股Tab全部显示）
+
+
+## 修复股票用户分配功能逻辑错误
+- [x] 移除用户页面中的分配股票用户按钮
+- [x] 在A股页面股票用户列表每行添加分配按钮
+- [x] 分配对象改为只能选择普通管理员
+- [x] 创建股票用户与普通管理员的关联关系

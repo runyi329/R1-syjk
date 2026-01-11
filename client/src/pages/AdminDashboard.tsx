@@ -17,7 +17,7 @@ import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
 import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 import StocksManagement from "@/components/admin/StocksManagement";
-import AssignStaffDialog from "@/components/admin/AssignStaffDialog";
+
 
 
 export default function AdminDashboard() {
@@ -64,9 +64,7 @@ export default function AdminDashboard() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
 
-  // Staff assignment state
-  const [isAssignStaffOpen, setIsAssignStaffOpen] = useState(false);
-  const [assigningStockUserId, setAssigningStockUserId] = useState<number | null>(null);
+
 
   // Backup management state
   const [backupFile, setBackupFile] = useState<File | null>(null);
@@ -517,21 +515,7 @@ export default function AdminDashboard() {
                                 {user.accountStatus === "active" ? "正常" : "已冻结"}
                               </Badge>
                             </div>
-                            {/* 员工管理按钮 - 仅对股票用户且超级管理员可见 */}
-                            {authData?.role === "super_admin" && user.role === "user" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setAssigningStockUserId(user.id);
-                                  setIsAssignStaffOpen(true);
-                                }}
-                                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
-                                title="分配员工管理"
-                              >
-                                <Users className="h-4 w-4" />
-                              </Button>
-                            )}
+
                           </div>
                         </div>
                         <div className="grid grid-cols-2 sm:flex gap-2">
@@ -899,27 +883,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* 员工分配对话框 */}
-            <Dialog open={isAssignStaffOpen} onOpenChange={setIsAssignStaffOpen}>
-              <DialogContent className="bg-black border-white/10 max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-white">分配员工管理</DialogTitle>
-                  <DialogDescription className="text-white/60">
-                    选择哪些员工可以管理该股票用户
-                  </DialogDescription>
-                </DialogHeader>
-                {assigningStockUserId && (
-                  <AssignStaffDialog
-                    stockUserId={assigningStockUserId}
-                    onClose={() => {
-                      setIsAssignStaffOpen(false);
-                      setAssigningStockUserId(null);
-                      refetchUsers();
-                    }}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
+
             </TabsContent>
           )}
 
