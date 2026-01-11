@@ -222,8 +222,8 @@ export default function StockClientView() {
                 </Button>
               </Link>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-white">A股客户数据</h1>
-                <p className="text-sm text-white/60">查看您有权限的股票客户数据</p>
+                <h1 className="text-xl md:text-2xl font-bold text-white">A股数据</h1>
+                <p className="text-sm text-white/60"></p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export default function StockClientView() {
               选择股票ID
             </CardTitle>
             <CardDescription className="text-white/60">
-              选择您有权限查看的股票客户
+              选择股票客户
             </CardDescription>
           </CardHeader>
           <CardContent>
