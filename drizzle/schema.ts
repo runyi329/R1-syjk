@@ -395,3 +395,21 @@ export const adminPermissions = mysqlTable("adminPermissions", {
 
 export type AdminPermission = typeof adminPermissions.$inferSelect;
 export type InsertAdminPermission = typeof adminPermissions.$inferInsert;
+
+/**
+ * 员工股票权限表 - 存储员工对股票用户的访问权限
+ */
+export const staffStockPermissions = mysqlTable("staffStockPermissions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 员工用户ID（关联users表） */
+  staffUserId: int("staffUserId").notNull(),
+  /** 股票用户ID（关联stockUsers表） */
+  stockUserId: int("stockUserId").notNull(),
+  /** 创建时间 */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** 创建者ID */
+  createdBy: int("createdBy").notNull(),
+});
+
+export type StaffStockPermission = typeof staffStockPermissions.$inferSelect;
+export type InsertStaffStockPermission = typeof staffStockPermissions.$inferInsert;

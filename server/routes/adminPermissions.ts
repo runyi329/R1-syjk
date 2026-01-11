@@ -338,5 +338,113 @@ export const adminPermissionsRouter = router({
     }),
 });
 
+/**
+ * 为员工分配股票用户权限
+ */
+const assignStockPermissionsRouter = router({
+  assignStockToStaff: protectedProcedure
+    .input(
+      z.object({
+        staffUserId: z.number(),
+        stockUserIds: z.array(z.number()),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // 检查是否为超级管理员
+      await checkSuperAdmin(ctx.user.id);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库不可用" });
+
+      // 导入staffStockPermissions表
+      const { staffStockPermissions } = await import("../../drizzle/schema");
+
+      // 先删除该员工的所有股票权限
+      await db.delete(staffStockPermissions).where(eq(staffStockPermissions.staffUserId, input.staffUserId));
+
+      // 批量插入新的权限
+      if (input.stockUserIds.length > 0) {
+        const values = input.stockUserIds.map((stockUserId) => ({
+          staffUserId: input.staffUserId,
+          stockUserId,
+          createdBy: ctx.user.id,
+        }));
+        await db.insert(staffStockPermissions).values(values);
+      }
+
+      return {
+        success: true,
+        message: "股票权限分配成功",
+      };
+    }),
+
+  /**
+   * 获取员工可访问的股票用户列表
+   */
+  getStaffStockPermissions: protectedProcedure
+    .input(z.object({ staffUserId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      // 检查是否为超级管理员
+      await checkSuperAdmin(ctx.user.id);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库不可用" });
+
+      const { staffStockPermissions, stockUsers } = await import("../../drizzle/schema");
+
+      // 查询该员工的所有股票权限
+      const permissions = await db
+        .select({
+          id: staffStockPermissions.id,
+          stockUserId: staffStockPermissions.stockUserId,
+          stockUserName: stockUsers.name,
+          createdAt: staffStockPermissions.createdAt,
+        })
+        .from(staffStockPermissions)
+        .leftJoin(stockUsers, eq(staffStockPermissions.stockUserId, stockUsers.id))
+        .where(eq(staffStockPermissions.staffUserId, input.staffUserId));
+
+      return permissions;
+    }),
+
+  /**
+   * 获取当前员工可访问的股票用户ID列表（用于前端筛选）
+   */
+  getMyStockPermissions: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库不可用" });
+
+    const user = await db.select().from(users).where(eq(users.id, ctx.user.id)).limit(1);
+
+    // 超级管理员可以访问所有股票用户
+    if (user[0]?.role === "super_admin" || user[0]?.role === "admin") {
+      return { hasFullAccess: true, stockUserIds: [] };
+    }
+
+    // 普通管理员只能访问分配给他的股票用户
+    if (user[0]?.role === "staff_admin") {
+      const { staffStockPermissions } = await import("../../drizzle/schema");
+      const permissions = await db
+        .select({ stockUserId: staffStockPermissions.stockUserId })
+        .from(staffStockPermissions)
+        .where(eq(staffStockPermissions.staffUserId, ctx.user.id));
+
+      return {
+        hasFullAccess: false,
+        stockUserIds: permissions.map((p) => p.stockUserId),
+      };
+    }
+
+    // 普通用户没有权限
+    return { hasFullAccess: false, stockUserIds: [] };
+  }),
+});
+
+// 合并所有路由
+export const adminPermissionsRouterWithStockPermissions = router({
+  ...adminPermissionsRouter._def.procedures,
+  ...assignStockPermissionsRouter._def.procedures,
+});
+
 // 导出权限检查函数供其他路由使用
 export { checkSuperAdmin, checkPermission };

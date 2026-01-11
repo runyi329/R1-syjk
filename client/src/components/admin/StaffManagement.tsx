@@ -7,8 +7,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
-import { Loader2, UserPlus, Edit, Trash2, Lock, Unlock } from "lucide-react";
+import { Loader2, UserPlus, Edit, Trash2, Lock, Unlock, Users } from "lucide-react";
 import { toast } from "sonner";
+import AssignStockPermissionsDialog from "./AssignStockPermissionsDialog";
 
 export default function StaffManagement() {
   const { data: staffList, refetch: refetchStaff } = trpc.adminPermissions.listStaffAdmins.useQuery();
@@ -45,6 +46,11 @@ export default function StaffManagement() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletingStaffId, setDeletingStaffId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // 股票权限分配状态
+  const [isStockPermissionsDialogOpen, setIsStockPermissionsDialogOpen] = useState(false);
+  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
+  const [selectedStaffName, setSelectedStaffName] = useState("");
 
   // 创建员工
   const handleCreateStaff = async () => {
@@ -269,6 +275,21 @@ export default function StaffManagement() {
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
+                    {/* 股票权限管理按钮 */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedStaffId(staff.id);
+                        setSelectedStaffName(staff.username || "");
+                        setIsStockPermissionsDialogOpen(true);
+                      }}
+                      className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                      title="管理股票权限"
+                    >
+                      <Users className="w-4 h-4" />
+                    </Button>
+
                     {/* 编辑权限按钮 */}
                     <Button
                       size="sm"
@@ -422,6 +443,16 @@ export default function StaffManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 股票权限分配对话框 */}
+      {selectedStaffId && (
+        <AssignStockPermissionsDialog
+          open={isStockPermissionsDialogOpen}
+          onOpenChange={setIsStockPermissionsDialogOpen}
+          staffId={selectedStaffId}
+          staffName={selectedStaffName}
+        />
+      )}
     </div>
   );
 }
