@@ -5,6 +5,9 @@ import { TRPCError } from "@trpc/server";
 import { sdk } from "../_core/sdk";
 import { getSessionCookieOptions } from "../_core/cookies";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { getDb } from "../db";
+import { users } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export const usersRouter = router({
   // 用户：获取自己的信息
@@ -316,11 +319,42 @@ export const usersRouter = router({
       return { success: true };
     }),
 
-  // 管理员：修改用户角色
+  // 管理员:修改用户角色
   updateUserRole: adminProcedure
     .input(z.object({ userId: z.number(), role: z.enum(['user', 'admin', 'super_admin', 'staff_admin']) }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const database = await getDb();
+      if (!database) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库不可用" });
+      
+      // 获取旧角色
+      const [oldUser] = await database.select({ role: users.role }).from(users).where(eq(users.id, input.userId)).limit(1);
+      const oldRole = oldUser?.role;
+      
+      // 更新用户角色
       await db.updateUserRole(input.userId, input.role);
+      
+      // 如果新角色是staff_admin且旧角色不是staff_admin,自动创建权限配置
+      if (input.role === 'staff_admin' && oldRole !== 'staff_admin') {
+        const { adminPermissions } = await import("../../drizzle/schema");
+        
+        // 检查是否已存在权限配置
+        const existing = await database.select().from(adminPermissions).where(eq(adminPermissions.userId, input.userId)).limit(1);
+        
+        if (existing.length === 0) {
+          // 创建默认权限配置(所有权限默认关闭)
+          await database.insert(adminPermissions).values({
+            userId: input.userId,
+            balanceManagement: false,
+            userManagement: false,
+            permissionManagement: false,
+            memberManagement: false,
+            staffManagement: false,
+            status: "active",
+            createdBy: ctx.user.id,
+          });
+        }
+      }
+      
       return { success: true };
     }),
 
