@@ -1,0 +1,15 @@
+{
+  "query": "\nSELECT id, userId, createdBy FROM adminPermissions;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \nSELECT id, userId, createdBy FROM adminPermissions;\n",
+  "rows": [
+    {
+      "id": "30005",
+      "userId": "1350679",
+      "createdBy": "1350678"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcreatedBy\n30005\t1350679\t1350678\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

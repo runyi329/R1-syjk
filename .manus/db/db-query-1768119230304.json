@@ -1,0 +1,24 @@
+{
+  "query": "\nSELECT u.id, u.username, u.role, ap.id as perm_id, ap.userId as perm_user_id\nFROM users u \nLEFT JOIN adminPermissions ap ON u.id = ap.userId\nWHERE u.role = 'staff_admin';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \nSELECT u.id, u.username, u.role, ap.id as perm_id, ap.userId as perm_user_id\nFROM users u \nLEFT JOIN adminPermissions ap ON u.id = ap.userId\nWHERE u.role = 'staff_admin';\n",
+  "rows": [
+    {
+      "id": "210400",
+      "username": "WHY",
+      "role": "staff_admin",
+      "perm_id": "NULL",
+      "perm_user_id": "NULL"
+    },
+    {
+      "id": "1350350",
+      "username": "testadmin",
+      "role": "staff_admin",
+      "perm_id": "NULL",
+      "perm_user_id": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\trole\tperm_id\tperm_user_id\n210400\tWHY\tstaff_admin\tNULL\tNULL\n1350350\ttestadmin\tstaff_admin\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

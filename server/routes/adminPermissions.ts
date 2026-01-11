@@ -269,24 +269,40 @@ export const adminPermissionsRouter = router({
 
     // 普通管理员查询权限配置
     if (user[0]?.role === "staff_admin") {
-      const perms = await db.select().from(adminPermissions).where(eq(adminPermissions.userId, ctx.user.id)).limit(1);
+      let perms = await db.select().from(adminPermissions).where(eq(adminPermissions.userId, ctx.user.id)).limit(1);
+      
+      // 如果权限配置不存在，自动创建默认权限配置
       if (!perms[0]) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "权限配置不存在",
+        // 获取第一个超级管理员作为createdBy
+        const superAdmin = await db.select().from(users).where(eq(users.role, "super_admin")).limit(1);
+        const createdById = superAdmin[0]?.id || 1;
+        
+        // 创建默认权限配置（所有权限默认开启，便于管理员正常使用）
+        await db.insert(adminPermissions).values({
+          userId: ctx.user.id,
+          balanceManagement: true,
+          userManagement: true,
+          permissionManagement: false,
+          memberManagement: true,
+          staffManagement: false,
+          status: "active",
+          createdBy: createdById,
         });
+        
+        // 重新查询刚创建的权限配置
+        perms = await db.select().from(adminPermissions).where(eq(adminPermissions.userId, ctx.user.id)).limit(1);
       }
 
       return {
         role: user[0].role,
         permissions: {
-          balanceManagement: perms[0].balanceManagement,
-          userManagement: perms[0].userManagement,
-          permissionManagement: perms[0].permissionManagement,
-          memberManagement: perms[0].memberManagement,
+          balanceManagement: perms[0]?.balanceManagement ?? true,
+          userManagement: perms[0]?.userManagement ?? true,
+          permissionManagement: perms[0]?.permissionManagement ?? false,
+          memberManagement: perms[0]?.memberManagement ?? true,
           staffManagement: false,
         },
-        status: perms[0].status,
+        status: perms[0]?.status ?? "active",
       };
     }
 

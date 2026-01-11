@@ -1,0 +1,23 @@
+{
+  "query": "\nSELECT * FROM adminPermissions;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \nSELECT * FROM adminPermissions;\n",
+  "rows": [
+    {
+      "id": "30005",
+      "userId": "1350679",
+      "balanceManagement": "0",
+      "userManagement": "0",
+      "permissionManagement": "0",
+      "memberManagement": "0",
+      "staffManagement": "0",
+      "status": "active",
+      "createdBy": "1350678",
+      "createdAt": "2026-01-11 07:24:52",
+      "updatedAt": "2026-01-11 07:24:52"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tbalanceManagement\tuserManagement\tpermissionManagement\tmemberManagement\tstaffManagement\tstatus\tcreatedBy\tcreatedAt\tupdatedAt\n30005\t1350679\t0\t0\t0\t0\t0\tactive\t1350678\t2026-01-11 07:24:52\t2026-01-11 07:24:52\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}
