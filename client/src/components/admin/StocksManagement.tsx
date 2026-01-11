@@ -787,18 +787,14 @@ export default function StocksManagement() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* 资金曲线图 */}
-                  {userStats && userStats.dailyProfits && userStats.dailyProfits.length > 0 && (
+                  {/* 资金曲线图 - 只在余额和日盈亏视角显示（月盈亏和年盈亏的曲线在数据下方显示） */}
+                  {userStats && userStats.dailyProfits && userStats.dailyProfits.length > 0 && (viewMode === "balance" || (viewMode === "profit" && profitPeriod === "day")) && (
                     <div className="mb-6">
                       <div className="mb-3">
                         <h3 className="text-lg font-medium text-white mb-1">
                           {viewMode === "balance" 
                             ? "余额变化曲线" 
-                            : profitPeriod === "day" 
-                              ? "日盈亏曲线" 
-                              : profitPeriod === "month" 
-                                ? "月盈亏曲线" 
-                                : "年盈亏曲线"
+                            : "日盈亏曲线"
                           }
                         </h3>
                         <p className="text-sm text-white/60">
@@ -948,6 +944,23 @@ export default function StocksManagement() {
                           );
                         })}
                       </div>
+                      
+                      {/* 月盈亏曲线图 - 移到数据下方 */}
+                      {userStats && userStats.dailyProfits && userStats.dailyProfits.length > 0 && (
+                        <div className="mt-4">
+                          <div className="mb-3">
+                            <h3 className="text-lg font-medium text-white mb-1">月盈亏曲线</h3>
+                            <p className="text-sm text-white/60">展示盈亏金额随时间的变化趋势</p>
+                          </div>
+                          <FundsCurveChart 
+                            data={userStats.dailyProfits}
+                            viewMode={viewMode}
+                            profitPeriod={profitPeriod}
+                            currentYear={currentYear}
+                            currentMonth={currentMonth}
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                   
@@ -1033,6 +1046,23 @@ export default function StocksManagement() {
                           });
                         })()}
                       </div>
+                      
+                      {/* 年盈亏曲线图 - 移到数据下方 */}
+                      {userStats && userStats.dailyProfits && userStats.dailyProfits.length > 0 && (
+                        <div className="mt-4">
+                          <div className="mb-3">
+                            <h3 className="text-lg font-medium text-white mb-1">年盈亏曲线</h3>
+                            <p className="text-sm text-white/60">展示盈亏金额随时间的变化趋势</p>
+                          </div>
+                          <FundsCurveChart 
+                            data={userStats.dailyProfits}
+                            viewMode={viewMode}
+                            profitPeriod={profitPeriod}
+                            currentYear={currentYear}
+                            currentMonth={currentMonth}
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>
