@@ -58,22 +58,29 @@ export function MarketTicker() {
             key={market.symbol} 
             className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow"
           >
-            <div className="flex justify-between items-center mb-1">
+            <div className="flex justify-between items-start mb-1">
               <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
-              {!market.isOpen && (
-                <Clock className="w-3 h-3 text-muted-foreground" />
-              )}
+              <div className="flex items-center gap-1">
+                {!market.isOpen && (
+                  <Clock className="w-3 h-3 text-muted-foreground" />
+                )}
+                <span className={cn(
+                  "text-xs font-medium",
+                  market.change >= 0 ? "text-[var(--danger)]" : "text-[var(--success)]"
+                )}>
+                  ({Math.abs(market.changePercent).toFixed(2)}%)
+                </span>
+              </div>
             </div>
-            <div className="text-lg font-bold font-mono tracking-tight">
+            <div className="text-lg font-bold font-mono tracking-tight text-right">
               {market.price.toFixed(2)}
             </div>
             <div className={cn(
-              "flex items-center text-xs font-medium",
+              "flex items-center justify-end text-xs font-medium",
               market.change >= 0 ? "text-[var(--danger)]" : "text-[var(--success)]" // 中国大陆：红涨绿跌
             )}>
               {market.change >= 0 ? <ArrowUp className="w-3 h-3 mr-0.5" /> : <ArrowDown className="w-3 h-3 mr-0.5" />}
               <span>{Math.abs(market.change).toFixed(2)}</span>
-              <span className="ml-1">({Math.abs(market.changePercent).toFixed(2)}%)</span>
             </div>
           </div>
         ))}
