@@ -102,12 +102,12 @@ export default function Home() {
     <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground flex flex-col">
       {/* 头部导航 */}
       <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
-        <div className="container mx-auto py-2 px-2 sm:px-4 flex justify-between items-end">
+        <div className="container mx-auto py-3 px-2 sm:px-4 flex justify-between items-center">
           <div 
-            className="flex items-end gap-2"
+            className="flex items-center gap-2"
           >
-              <img src="/logo.png" alt="Logo" className="h-16 w-16 object-contain flex-shrink-0" />
-              <div className="flex flex-col justify-end pb-1">
+              <img src="/logo.png" alt="Logo" className="h-14 w-14 object-contain flex-shrink-0" />
+              <div className="flex flex-col justify-center">
                 <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                   {language === 'en' ? 'Runyi Investment' : '数金研投'}
                 </h1>
