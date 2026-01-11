@@ -459,9 +459,14 @@ export default function BaccaratAnalysis() {
                       </div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                      <div className="text-xs text-muted-foreground mb-1">盈亏率</div>
-                      <div className={`text-lg font-bold ${simulationResult.profitLossRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {simulationResult.profitLossRate >= 0 ? '+' : ''}{simulationResult.profitLossRate.toFixed(2)}%
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="text-xs text-muted-foreground">累计盈亏</div>
+                        <div className={`text-xs font-bold ${simulationResult.profitLossRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                          {simulationResult.profitLossRate >= 0 ? '+' : ''}{simulationResult.profitLossRate.toFixed(2)}%
+                        </div>
+                      </div>
+                      <div className={`text-lg font-bold text-right ${simulationResult.profitLoss >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        {simulationResult.profitLoss >= 0 ? '+' : ''}¥{simulationResult.profitLoss.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
                       </div>
                     </div>
                   </div>
