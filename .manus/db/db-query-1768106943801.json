@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, name, initialBalance FROM stockUsers ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, name, initialBalance FROM stockUsers ORDER BY id;",
+  "rows": [
+    {
+      "id": "210001",
+      "name": "测试股票用户1",
+      "initialBalance": "100000.00"
+    },
+    {
+      "id": "210002",
+      "name": "测试股票用户2",
+      "initialBalance": "200000.00"
+    },
+    {
+      "id": "210003",
+      "name": "测试股票用户3",
+      "initialBalance": "300000.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tinitialBalance\n210001\t测试股票用户1\t100000.00\n210002\t测试股票用户2\t200000.00\n210003\t测试股票用户3\t300000.00\n",
+  "stderr": "",
+  "execution_time_ms": 396
+}

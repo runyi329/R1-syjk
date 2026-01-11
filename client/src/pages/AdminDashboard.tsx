@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock, Key, LogIn, Users } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, UserPlus, UserMinus, Lock, Unlock, Key, LogIn, Users, Download, Upload, Database } from "lucide-react";
 import { toast } from "sonner";
 import DepositsManagement from "@/components/admin/DepositsManagement";
 import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
@@ -22,6 +22,7 @@ import AssignStaffDialog from "@/components/admin/AssignStaffDialog";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
   const { data: authData, isLoading: authLoading } = trpc.auth.me.useQuery();
   const { data: userData } = trpc.users.getMe.useQuery(undefined, {
     enabled: !!authData,
@@ -66,6 +67,9 @@ export default function AdminDashboard() {
   // Staff assignment state
   const [isAssignStaffOpen, setIsAssignStaffOpen] = useState(false);
   const [assigningStockUserId, setAssigningStockUserId] = useState<number | null>(null);
+
+  // Backup management state
+  const [backupFile, setBackupFile] = useState<File | null>(null);
 
   // Product management state
   const [productForm, setProductForm] = useState({
@@ -206,6 +210,63 @@ export default function AdminDashboard() {
     },
     onError: (error: any) => toast.error(`修改失败：${error.message}`),
   });
+
+  const exportBackupMutation = trpc.backup.exportBackup.useMutation({
+    onSuccess: (backup) => {
+      // 创建JSON文件并下载
+      const dataStr = JSON.stringify(backup, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.success("数据导出成功");
+    },
+    onError: (error: any) => toast.error(`导出失败：${error.message}`),
+  });
+
+  const importBackupMutation = trpc.backup.importBackup.useMutation({
+    onSuccess: () => {
+      toast.success("数据导入成功");
+      setBackupFile(null);
+      refetchUsers();
+      refetchProducts();
+      refetchOrders();
+    },
+    onError: (error: any) => toast.error(`导入失败：${error.message}`),
+  });
+
+  // Backup export handler
+  const handleExportBackup = () => {
+    exportBackupMutation.mutate();
+  };
+
+  // Backup import handler
+  const handleImportBackup = async () => {
+    if (!backupFile) {
+      toast.error("请选择备份文件");
+      return;
+    }
+
+    try {
+      // 读取JSON文件
+      const fileContent = await backupFile.text();
+      const backup = JSON.parse(fileContent);
+      
+      // 调用导入API
+      await importBackupMutation.mutateAsync({
+        backup,
+        overwrite: false // 不覆盖现有数据
+      });
+    } catch (error: any) {
+      toast.error(`导入失败：${error.message}`);
+    }
+  };
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -1263,6 +1324,77 @@ export default function AdminDashboard() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* Data Backup Management */}
+            <Card className="bg-black/50 border-white/10 max-w-md mt-6">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Database className="w-5 h-5" />
+                  数据备份管理
+                </CardTitle>
+                <CardDescription className="text-white/60">导出或导入管理后台数据</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Export Backup */}
+                <div className="space-y-2">
+                  <Label className="text-white">导出备份</Label>
+                  <Button
+                    onClick={handleExportBackup}
+                    className="w-full bg-[#D4AF37] text-black hover:bg-[#E5C158]"
+                    disabled={exportBackupMutation.isPending}
+                  >
+                    {exportBackupMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        导出中...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        一键导出所有数据
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-white/40">
+                    导出所有用户、资金、订单、A股等数据到JSON文件
+                  </p>
+                </div>
+
+                {/* Import Backup */}
+                <div className="space-y-2">
+                  <Label className="text-white">导入备份</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept=".json"
+                      onChange={(e) => setBackupFile(e.target.files?.[0] || null)}
+                      className="bg-white/10 border-white/20 text-white file:bg-[#D4AF37] file:text-black file:border-0 file:mr-4"
+                      disabled={importBackupMutation.isPending}
+                    />
+                    <Button
+                      onClick={handleImportBackup}
+                      className="bg-[#D4AF37] text-black hover:bg-[#E5C158] whitespace-nowrap"
+                      disabled={!backupFile || importBackupMutation.isPending}
+                    >
+                      {importBackupMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          导入中...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          导入
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-white/40">
+                    上传备份文件恢复数据（不会删除现有数据，只添加缺失的数据）
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

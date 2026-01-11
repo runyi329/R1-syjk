@@ -1,0 +1,58 @@
+{
+  "query": "SELECT id, username, email, role FROM users ORDER BY id ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, username, email, role FROM users ORDER BY id ASC;",
+  "rows": [
+    {
+      "id": "1",
+      "username": "NULL",
+      "email": "runyimacau@gmail.com",
+      "role": "admin"
+    },
+    {
+      "id": "210400",
+      "username": "WHY",
+      "email": "NULL",
+      "role": "staff_admin"
+    },
+    {
+      "id": "330085",
+      "username": "DBW",
+      "email": "NULL",
+      "role": "user"
+    },
+    {
+      "id": "330137",
+      "username": "runyi",
+      "email": "admin@runyi.com",
+      "role": "super_admin"
+    },
+    {
+      "id": "330226",
+      "username": "Y123321",
+      "email": "NULL",
+      "role": "user"
+    },
+    {
+      "id": "1230398",
+      "username": "user_test_role",
+      "email": "NULL",
+      "role": "user"
+    },
+    {
+      "id": "1350103",
+      "username": "test_super_admin",
+      "email": "NULL",
+      "role": "super_admin"
+    },
+    {
+      "id": "1350104",
+      "username": "test_staff_admin",
+      "email": "NULL",
+      "role": "staff_admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\temail\trole\n1\tNULL\trunyimacau@gmail.com\tadmin\n210400\tWHY\tNULL\tstaff_admin\n330085\tDBW\tNULL\tuser\n330137\trunyi\tadmin@runyi.com\tsuper_admin\n330226\tY123321\tNULL\tuser\n1230398\tuser_test_role\tNULL\tuser\n1350103\ttest_super_admin\tNULL\tsuper_admin\n1350104\ttest_staff_admin\tNULL\tstaff_admin\n",
+  "stderr": "",
+  "execution_time_ms": 402
+}
