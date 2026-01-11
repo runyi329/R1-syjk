@@ -1535,3 +1535,44 @@
 - [x] 超级管理员显示紫色标签
 - [x] 普通用户显示蓝色标签
 - [x] 测试验证显示效果
+
+
+## 新功能需求 - 角色权限管理系统
+### 数据库设计
+- [x] 修改users表的role字段，添加super_admin和staff_admin角色
+- [x] 创建adminPermissions表（管理员权限表）
+- [x] 推送数据库schema变更
+
+
+
+### 后端API开发
+- [x] 创建adminPermissions路由文件
+- [x] 实现创建普通管理员API（createStaffAdmin）
+- [x] 实现获取员工列表API（listStaffAdmins）
+- [x] 实现更新员工权限API（updateStaffPermissions）
+- [x] 实现禁用/启用员工API（toggleStaffStatus）
+- [x] 实现删除员工API（deleteStaffAdmin）
+- [x] 实现获取当前用户权限API（getMyPermissions）
+- [x] 实现权限检查函数（checkSuperAdmin, checkPermission）
+- [x] 在routers.ts中注册adminPermissions路由
+
+### 前端功能实现
+- [x] 创建StaffManagement组件
+- [x] 实现员工列表展示（用户名、权限、状态）
+- [x] 实现添加员工功能（创建普通管理员账户）
+- [x] 实现编辑员工权限功能（选择开放哪些功能）
+- [x] 实现禁用/启用员工功能
+- [x] 实现删除员工功能
+- [x] 在AdminDashboard添加员工管理标签页
+- [x] 实现权限控制：根据权限动态显示标签页
+- [x] 修复AdminDashboard中的类型错误
+- [x] 修复db.ts和users.ts中的角色类型定义
+
+### 测试验证
+- [x] 编写vitest单元测试（角色权限API）
+- [x] 测试创建普通管理员功能
+- [x] 测试查询普通管理员列表
+- [x] 测试更新普通管理员权限
+- [x] 测试禁用/启用员工功能
+- [x] 测试删除员工功能
+- [x] 所有8个测试用例全部通过

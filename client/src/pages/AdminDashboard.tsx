@@ -17,11 +17,15 @@ import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
 import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 import StocksManagement from "@/components/admin/StocksManagement";
+import StaffManagement from "@/components/admin/StaffManagement";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { data: authData, isLoading: authLoading } = trpc.auth.me.useQuery();
   const { data: userData } = trpc.users.getMe.useQuery(undefined, {
+    enabled: !!authData,
+  });
+  const { data: permissions } = trpc.adminPermissions.getMyPermissions.useQuery(undefined, {
     enabled: !!authData,
   });
   const { data: users, refetch: refetchUsers } = trpc.users.getAllUsers.useQuery(undefined, {
@@ -52,7 +56,7 @@ export default function AdminDashboard() {
   const [editingUserName, setEditingUserName] = useState("");
   const [editingUserVipLevel, setEditingUserVipLevel] = useState("0");
   const [editingUserStatus, setEditingUserStatus] = useState<"active" | "frozen">("active");
-  const [editingUserRole, setEditingUserRole] = useState<"user" | "admin">("user");
+  const [editingUserRole, setEditingUserRole] = useState<"user" | "admin" | "super_admin" | "staff_admin">("user");
   const [editingUserNotes, setEditingUserNotes] = useState("");
   const [isEditingUser, setIsEditingUser] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -324,51 +328,82 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
-        <Tabs defaultValue="deposits" className="w-full">
-          <TabsList className="bg-black/50 border border-white/10 grid grid-cols-7 w-full overflow-x-auto">
-            <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              充值
-            </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              提现
-            </TabsTrigger>
-            <TabsTrigger value="wallets" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              地址
-            </TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              用户
-            </TabsTrigger>
-            <TabsTrigger value="products" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              商品
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              订单
-            </TabsTrigger>
-            <TabsTrigger value="stocks" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
-              A股
-            </TabsTrigger>
+        <Tabs defaultValue={permissions?.permissions?.balanceManagement ? "deposits" : "users"} className="w-full">
+          <TabsList className="bg-black/50 border border-white/10 grid w-full overflow-x-auto" style={{ gridTemplateColumns: `repeat(${[
+            permissions?.permissions?.balanceManagement,
+            permissions?.permissions?.userManagement,
+            permissions?.permissions?.permissionManagement,
+            permissions?.permissions?.memberManagement,
+            permissions?.permissions?.staffManagement,
+            true // settings always visible
+          ].filter(Boolean).length}, minmax(0, 1fr))` }}>
+            {permissions?.permissions?.balanceManagement && (
+              <>
+                <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                  充值
+                </TabsTrigger>
+                <TabsTrigger value="withdrawals" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                  提现
+                </TabsTrigger>
+                <TabsTrigger value="wallets" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                  地址
+                </TabsTrigger>
+              </>
+            )}
+            {permissions?.permissions?.userManagement && (
+              <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                用户
+              </TabsTrigger>
+            )}
+            {permissions?.permissions?.permissionManagement && (
+              <>
+                <TabsTrigger value="products" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                  商品
+                </TabsTrigger>
+                <TabsTrigger value="orders" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                  订单
+                </TabsTrigger>
+              </>
+            )}
+            {permissions?.permissions?.memberManagement && (
+              <TabsTrigger value="stocks" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                A股
+              </TabsTrigger>
+            )}
+            {permissions?.permissions?.staffManagement && (
+              <TabsTrigger value="staff" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
+                员工
+              </TabsTrigger>
+            )}
             <TabsTrigger value="settings" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
               设置
             </TabsTrigger>
           </TabsList>
 
           {/* Deposits Management */}
-          <TabsContent value="deposits" className="mt-6">
-            <DepositsManagement />
-          </TabsContent>
+          {permissions?.permissions?.balanceManagement && (
+            <TabsContent value="deposits" className="mt-6">
+              <DepositsManagement />
+            </TabsContent>
+          )}
 
           {/* Withdrawals Management */}
-          <TabsContent value="withdrawals" className="mt-6">
-            <WithdrawalsManagement />
-          </TabsContent>
+          {permissions?.permissions?.balanceManagement && (
+            <TabsContent value="withdrawals" className="mt-6">
+              <WithdrawalsManagement />
+            </TabsContent>
+          )}
 
           {/* Wallet Addresses Management */}
-          <TabsContent value="wallets" className="mt-6">
-            <WalletAddressesManagement />
-          </TabsContent>
+          {permissions?.permissions?.balanceManagement && (
+            <TabsContent value="wallets" className="mt-6">
+              <WalletAddressesManagement />
+            </TabsContent>
+          )}
 
           {/* Users Management */}
-          <TabsContent value="users" className="mt-6">
+          {permissions?.permissions?.userManagement && (
+            <TabsContent value="users" className="mt-6">
             <Card className="bg-black/50 border-white/10">
               <CardHeader>
                 <CardTitle className="text-white">用户列表</CardTitle>
@@ -782,10 +817,12 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            </TabsContent>
+          )}
 
           {/* Products Management */}
-          <TabsContent value="products" className="mt-6">
+          {permissions?.permissions?.permissionManagement && (
+            <TabsContent value="products" className="mt-6">
             <Card className="bg-black/50 border-white/10">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -1024,10 +1061,12 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            </TabsContent>
+          )}
 
           {/* Orders Management */}
-          <TabsContent value="orders" className="mt-6">
+          {permissions?.permissions?.permissionManagement && (
+            <TabsContent value="orders" className="mt-6">
             <Card className="bg-black/50 border-white/10">
               <CardHeader>
                 <CardTitle className="text-white">订单列表</CardTitle>
@@ -1086,14 +1125,23 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            </TabsContent>
+          )}
 
           {/* Stocks Management */}
-          <TabsContent value="stocks" className="mt-6">
-            <StocksManagement />
-          </TabsContent>
+          {permissions?.permissions?.memberManagement && (
+            <TabsContent value="stocks" className="mt-6">
+              <StocksManagement />
+            </TabsContent>
+          )}
 
-          {/* Settings Tab */}
+          {/* Staff Management */}
+          {permissions?.permissions?.staffManagement && (
+            <TabsContent value="staff" className="mt-6">
+              <StaffManagement />
+            </TabsContent>
+          )}
+
           <TabsContent value="settings" className="mt-6">
             <Card className="bg-black/50 border-white/10 max-w-md">
               <CardHeader>

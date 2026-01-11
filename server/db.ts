@@ -151,7 +151,7 @@ export async function updateUserNotes(userId: number, notes: string | null) {
   await db.update(users).set({ notes }).where(eq(users.id, userId));
 }
 
-export async function updateUserRole(userId: number, role: "user" | "admin") {
+export async function updateUserRole(userId: number, role: "user" | "admin" | "super_admin" | "staff_admin") {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ role }).where(eq(users.id, userId));

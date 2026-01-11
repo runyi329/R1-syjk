@@ -318,7 +318,7 @@ export const usersRouter = router({
 
   // 管理员：修改用户角色
   updateUserRole: adminProcedure
-    .input(z.object({ userId: z.number(), role: z.enum(['user', 'admin']) }))
+    .input(z.object({ userId: z.number(), role: z.enum(['user', 'admin', 'super_admin', 'staff_admin']) }))
     .mutation(async ({ input }) => {
       await db.updateUserRole(input.userId, input.role);
       return { success: true };

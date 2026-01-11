@@ -20,7 +20,8 @@ export const users = mysqlTable("users", {
   username: varchar("username", { length: 64 }).unique(),
   /** 密码哈希 - 用于用户名+密码注册登录 */
   passwordHash: text("passwordHash"),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  /** 用户角色：user-普通用户，admin-旧版管理员，super_admin-超级管理员，staff_admin-普通管理员 */
+  role: mysqlEnum("role", ["user", "admin", "super_admin", "staff_admin"]).default("user").notNull(),
   /** 注册方式：oauth-OAuth登录，password-用户名密码注册 */
   registerMethod: mysqlEnum("registerMethod", ["oauth", "password"]).default("oauth").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -366,3 +367,31 @@ export const stockUserPermissions = mysqlTable("stockUserPermissions", {
 
 export type StockUserPermission = typeof stockUserPermissions.$inferSelect;
 export type InsertStockUserPermission = typeof stockUserPermissions.$inferInsert;
+
+/**
+ * 管理员权限表 - 存储普通管理员的权限配置
+ */
+export const adminPermissions = mysqlTable("adminPermissions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 关联用户ID（管理员） */
+  userId: int("userId").notNull().unique(),
+  /** 余额管理权限 */
+  balanceManagement: boolean("balanceManagement").default(false).notNull(),
+  /** 用户管理权限 */
+  userManagement: boolean("userManagement").default(false).notNull(),
+  /** 权限管理权限 */
+  permissionManagement: boolean("permissionManagement").default(false).notNull(),
+  /** 会员管理权限 */
+  memberManagement: boolean("memberManagement").default(false).notNull(),
+  /** 员工管理权限（仅超级管理员可用） */
+  staffManagement: boolean("staffManagement").default(false).notNull(),
+  /** 账户状态：active-正常，disabled-禁用 */
+  status: mysqlEnum("status", ["active", "disabled"]).default("active").notNull(),
+  /** 创建人ID（超级管理员） */
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AdminPermission = typeof adminPermissions.$inferSelect;
+export type InsertAdminPermission = typeof adminPermissions.$inferInsert;
