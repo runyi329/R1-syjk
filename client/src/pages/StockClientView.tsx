@@ -322,7 +322,7 @@ export default function StockClientView() {
               </CardContent>
             </Card>
 
-            {/* 2×2共4个卡片 */}
+            {/* 第一行: 初始资金 + 开始金额 */}
             <div className="grid grid-cols-2 gap-1">
                 {/* 初始资金 */}
                 <Card className="bg-black/50 border-white/10">
@@ -343,7 +343,10 @@ export default function StockClientView() {
                     </p>
                   </CardContent>
                 </Card>
+            </div>
 
+            {/* 第二行: 最新余额 + 累计盈亏 */}
+            <div className="grid grid-cols-2 gap-1">
                 {/* 最新余额 */}
                 <Card className="bg-black/50 border-white/10">
                   <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
@@ -356,7 +359,7 @@ export default function StockClientView() {
 
                 {/* 累计盈亏+收益率 */}
                 <Card className="bg-black/50 border-white/10">
-                  <CardContent className="p-4 flex flex-col text-left">
+                  <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
                     <div className="flex items-start justify-between mb-2">
                       <p className="text-sm text-white/60">累计盈亏</p>
                       <p className={`text-sm font-semibold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
