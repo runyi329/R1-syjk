@@ -683,22 +683,11 @@ export default function StocksManagement() {
                 </CardHeader>
                 {userStats && (
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
                       <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
                         <div className="text-[10px] md:text-sm text-white/60 truncate mb-2">最新余额</div>
                         <div className="text-sm md:text-xl font-bold text-white truncate">
                           ¥{formatAmount(userStats.latestBalance)}
-                        </div>
-                      </div>
-                      <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="text-[10px] md:text-sm text-white/60 truncate">累计盈亏</div>
-                          <div className={`text-[10px] md:text-sm font-bold ${userStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                            {userStats.totalProfitRate >= 0 ? '+' : ''}{userStats.totalProfitRate}%
-                          </div>
-                        </div>
-                        <div className={`text-sm md:text-xl font-bold truncate ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                          {userStats.totalProfit >= 0 ? '+' : ''}¥{formatAmount(userStats.totalProfit)}
                         </div>
                       </div>
                       <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
@@ -711,6 +700,12 @@ export default function StocksManagement() {
                         <div className="text-[10px] md:text-sm text-white/60 truncate mb-2">记录天数</div>
                         <div className="text-sm md:text-xl font-bold text-white truncate">
                           {userStats.recordCount} 天
+                        </div>
+                      </div>
+                      <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
+                        <div className="text-[10px] md:text-sm text-white/60 truncate mb-2">累计盈亏</div>
+                        <div className={`text-sm md:text-xl font-bold truncate ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                          {userStats.totalProfit >= 0 ? '+' : ''}¥{formatAmount(userStats.totalProfit)}
                         </div>
                       </div>
                     </div>

@@ -458,12 +458,7 @@ export default function BaccaratAnalysis() {
                         {simulationResult.profitLoss >= 0 ? '+' : ''}¥{simulationResult.profitLoss.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
                       </div>
                     </div>
-                    <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                      <div className="text-xs text-muted-foreground mb-1">累计盈亏</div>
-                      <div className={`text-lg font-bold ${simulationResult.profitLoss >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {simulationResult.profitLoss >= 0 ? '+' : ''}¥{simulationResult.profitLoss.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
-                      </div>
-                    </div>
+
                   </div>
 
                   {/* 总投注局数 */}
