@@ -11,7 +11,7 @@ export function Logo({ size = 56, className = "" }: LogoProps) {
       style={{
         width: `${size}px`,
         height: `${size}px`,
-        objectFit: "contain",
+        objectFit: "contain", borderRadius: '10px',
       }}
       className={`flex-shrink-0 ${className}`}
     />
