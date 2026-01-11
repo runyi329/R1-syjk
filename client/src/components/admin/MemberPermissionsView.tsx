@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
@@ -22,7 +22,21 @@ interface MemberPermission {
 }
 
 export default function MemberPermissionsView() {
-  const { data: memberPermissions, isLoading } = trpc.stocks.getMemberPermissions.useQuery();
+  const utils = trpc.useUtils();
+  const { data: memberPermissions, isLoading, refetch } = trpc.stocks.getMemberPermissions.useQuery(
+    undefined,
+    {
+      // 禁用自动缓存,每次都重新获取数据
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
+  );
+
+  // 组件挂载时刷新数据
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   if (isLoading) {
     return (
