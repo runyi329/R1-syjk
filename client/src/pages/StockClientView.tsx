@@ -293,7 +293,7 @@ export default function StockClientView() {
                     <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
                       <Percent className="w-4 h-4 text-[#D4AF37]" />
                     </div>
-                    <p className="text-2xl font-bold text-[#D4AF37]">
+                    <p className="text-2xl font-bold text-[#D4AF37]" style={{fontSize: '18px'}}>
                       {stockUserStats.profitPercentage}%
                     </p>
                   </div>
@@ -314,7 +314,7 @@ export default function StockClientView() {
                       <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                         <Calendar className="w-4 h-4 text-blue-400" />
                       </div>
-                      <p className="text-base font-semibold text-white">
+                      <p className="text-base font-semibold text-white" style={{fontSize: '18px'}}>
                         {new Date(stockUserStats.authorizationDate).toLocaleDateString('zh-CN', {
                           year: 'numeric',
                           month: '2-digit',
