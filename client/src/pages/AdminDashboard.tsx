@@ -29,13 +29,13 @@ export default function AdminDashboard() {
     enabled: !!authData,
   });
   const { data: users, refetch: refetchUsers } = trpc.users.getAllUsers.useQuery(undefined, {
-    enabled: authData?.role === "admin",
+    enabled: authData?.role === "super_admin" || authData?.role === "staff_admin",
   });
   const { data: products, refetch: refetchProducts } = trpc.products.getAllProducts.useQuery(undefined, {
-    enabled: authData?.role === "admin",
+    enabled: authData?.role === "super_admin" || authData?.role === "staff_admin",
   });
   const { data: orders, refetch: refetchOrders } = trpc.orders.getAllOrders.useQuery(undefined, {
-    enabled: authData?.role === "admin",
+    enabled: authData?.role === "super_admin" || authData?.role === "staff_admin",
   });
 
   // Points management state
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    if (!authLoading && (!authData || authData.role !== "admin")) {
+    if (!authLoading && (!authData || (authData.role !== "super_admin" && authData.role !== "staff_admin"))) {
       toast.error("您没有权限访问此页面");
       setLocation("/");
     }
@@ -305,7 +305,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!authData || authData.role !== "admin") {
+  if (!authData || (authData.role !== "super_admin" && authData.role !== "staff_admin")) {
     return null;
   }
 

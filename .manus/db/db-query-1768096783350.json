@@ -1,0 +1,28 @@
+{
+  "query": "\n-- 查询ID为210400的用户当前角色\nSELECT id, username, name, role FROM users WHERE id = 210400;\n\n-- 将该用户角色恢复为super_admin\nUPDATE users SET role = 'super_admin' WHERE id = 210400;\n\n-- 验证更新结果\nSELECT id, username, name, role FROM users WHERE id = 210400;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询ID为210400的用户当前角色\nSELECT id, username, name, role FROM users WHERE id = 210400;\n\n-- 将该用户角色恢复为super_admin\nUPDATE users SET role = 'super_admin' WHERE id = 210400;\n\n-- 验证更新结果\nSELECT id, username, name, role FROM users WHERE id = 210400;\n",
+  "rows": [
+    {
+      "id": "210400",
+      "username": "123456",
+      "name": "123456",
+      "role": "staff_admin"
+    },
+    {
+      "id": "id",
+      "username": "username",
+      "name": "name",
+      "role": "role"
+    },
+    {
+      "id": "210400",
+      "username": "123456",
+      "name": "123456",
+      "role": "super_admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\trole\n210400\t123456\t123456\tstaff_admin\nid\tusername\tname\trole\n210400\t123456\t123456\tsuper_admin\n",
+  "stderr": "",
+  "execution_time_ms": 562
+}

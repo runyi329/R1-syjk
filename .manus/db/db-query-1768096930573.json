@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 查询runyi账户的详细信息\nSELECT id, username, name, role, accountStatus FROM users WHERE username = 'runyi';\n\n-- 查询runyi的管理员权限配置\nSELECT * FROM adminPermissions WHERE userId IN (SELECT id FROM users WHERE username = 'runyi');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询runyi账户的详细信息\nSELECT id, username, name, role, accountStatus FROM users WHERE username = 'runyi';\n\n-- 查询runyi的管理员权限配置\nSELECT * FROM adminPermissions WHERE userId IN (SELECT id FROM users WHERE username = 'runyi');\n",
+  "rows": [
+    {
+      "id": "330137",
+      "username": "runyi",
+      "name": "runyi",
+      "role": "super_admin",
+      "accountStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\trole\taccountStatus\n330137\trunyi\trunyi\tsuper_admin\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 450
+}

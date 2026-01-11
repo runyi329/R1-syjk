@@ -1,0 +1,8 @@
+{
+  "query": "\n-- 查询runyi账户的详细信息\nSELECT id, username, name, role, status FROM users WHERE username = 'runyi';\n\n-- 查询runyi的管理员权限配置\nSELECT * FROM adminPermissions WHERE userId IN (SELECT id FROM users WHERE username = 'runyi');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询runyi账户的详细信息\nSELECT id, username, name, role, status FROM users WHERE username = 'runyi';\n\n-- 查询runyi的管理员权限配置\nSELECT * FROM adminPermissions WHERE userId IN (SELECT id FROM users WHERE username = 'runyi');\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'status' in 'field list'"
+  ]
+}
