@@ -280,7 +280,7 @@ export default function Home() {
         <section className="py-12 bg-secondary/10 border-y border-border/30 overflow-hidden">
           <div className="container mx-auto px-4">
             <div className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
-              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-start text-left p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
                   <TrendingUp className="w-6 h-6" />
                 </div>
@@ -290,7 +290,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-start text-left p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
@@ -300,7 +300,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-center text-center p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
+              <div className="flex-shrink-0 w-[85vw] md:w-auto snap-center flex flex-col items-start text-left p-6 bg-card/50 backdrop-blur-sm rounded-xl border border-primary/20 hover:border-primary/50 transition-colors group">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform duration-300 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
                   <Users className="w-6 h-6" />
                 </div>
