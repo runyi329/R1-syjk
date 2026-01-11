@@ -23,6 +23,7 @@ interface MemberPermission {
 
 export default function MemberPermissionsView() {
   const utils = trpc.useUtils();
+  const { data: authData } = trpc.auth.me.useQuery();
   const { data: memberPermissions, isLoading, refetch } = trpc.stocks.getMemberPermissions.useQuery(
     undefined,
     {
@@ -32,6 +33,9 @@ export default function MemberPermissionsView() {
       staleTime: 0,
     }
   );
+  
+  // 判断是否为普通管理员
+  const isStaffAdmin = authData?.role === "staff_admin";
 
   // 组件挂载时刷新数据
   useEffect(() => {
@@ -83,11 +87,14 @@ export default function MemberPermissionsView() {
                   key={`${stockUser.stockUserId}-${index}`}
                   className="bg-black/30 rounded-lg p-4 border border-white/5"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <h4 className="text-white font-medium">
-                      {stockUser.stockUserName || "未知股票用户"}
-                    </h4>
-                  </div>
+                  {/* 普通管理员不显示股票用户名 */}
+                  {!isStaffAdmin && (
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="text-white font-medium">
+                        {stockUser.stockUserName || "未知股票用户"}
+                      </h4>
+                    </div>
+                  )}
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                     <div className="flex items-center gap-2">
@@ -108,27 +115,32 @@ export default function MemberPermissionsView() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-[#D4AF37]" />
-                      <div>
-                        <p className="text-white/60">授权日期</p>
-                        <p className="text-white font-medium">
-                          {stockUser.authorizationDate
-                            ? format(new Date(stockUser.authorizationDate), "yyyy-MM-dd", { locale: zhCN })
-                            : "未设置"}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-[#D4AF37]" />
-                      <div>
-                        <p className="text-white/60">保证金</p>
-                        <p className="text-white font-medium">
-                          ¥{parseFloat(stockUser.deposit).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
+                    {/* 普通管理员不显示授权日期和保证金 */}
+                    {!isStaffAdmin && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-[#D4AF37]" />
+                          <div>
+                            <p className="text-white/60">授权日期</p>
+                            <p className="text-white font-medium">
+                              {stockUser.authorizationDate
+                                ? format(new Date(stockUser.authorizationDate), "yyyy-MM-dd", { locale: zhCN })
+                                : "未设置"}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-[#D4AF37]" />
+                          <div>
+                            <p className="text-white/60">保证金</p>
+                            <p className="text-white font-medium">
+                              ¥{parseFloat(stockUser.deposit).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

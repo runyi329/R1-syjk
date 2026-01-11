@@ -540,38 +540,44 @@ export default function StocksManagement() {
                               <Users className="w-4 h-4" />
                             </Button>
                           )}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingUser(user);
-                              setUserForm({
-                                name: user.name,
-                                initialBalance: user.initialBalance,
-                                notes: user.notes || "",
-                              });
-                              setIsEditUserOpen(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-red-500 hover:text-red-400"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (confirm(`确定要删除用户 ${user.name} 吗？这将同时删除所有余额记录。`)) {
-                                deleteUserMutation.mutate({ id: user.id });
-                              }
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          {/* 普通管理员不显示编辑和删除按针 */}
+                          {authData?.role === "super_admin" && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingUser(user);
+                                  setUserForm({
+                                    name: user.name,
+                                    initialBalance: user.initialBalance,
+                                    notes: user.notes || "",
+                                  });
+                                  setIsEditUserOpen(true);
+                                }}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-500 hover:text-red-400"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm(`确定要删除用户 ${user.name} 吗？这将同时删除所有余额记录。`)) {
+                                    deleteUserMutation.mutate({ id: user.id });
+                                  }
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
-                      {user.notes && (
+                      {/* 普通管理员不显示备注信息 */}
+                      {authData?.role === "super_admin" && user.notes && (
                         <div className="mt-2 text-sm text-white/40">{user.notes}</div>
                       )}
                     </div>
