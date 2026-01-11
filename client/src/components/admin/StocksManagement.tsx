@@ -685,7 +685,7 @@ export default function StocksManagement() {
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                       <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-[10px] md:text-sm text-white/60 truncate">最新余额</div>
+                        <div className="text-[10px] md:text-sm text-white/60 truncate mb-2">最新余额</div>
                         <div className="text-sm md:text-xl font-bold text-white truncate">
                           ¥{formatAmount(userStats.latestBalance)}
                         </div>
@@ -702,13 +702,13 @@ export default function StocksManagement() {
                         </div>
                       </div>
                       <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-[10px] md:text-sm text-white/60 truncate">收益率</div>
+                        <div className="text-[10px] md:text-sm text-white/60 truncate mb-2">收益率</div>
                         <div className={`text-sm md:text-xl font-bold truncate ${userStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                           {userStats.totalProfitRate >= 0 ? '+' : ''}{userStats.totalProfitRate}%
                         </div>
                       </div>
                       <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-[10px] md:text-sm text-white/60 truncate">记录天数</div>
+                        <div className="text-[10px] md:text-sm text-white/60 truncate mb-2">记录天数</div>
                         <div className="text-sm md:text-xl font-bold text-white truncate">
                           {userStats.recordCount} 天
                         </div>

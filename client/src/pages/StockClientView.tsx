@@ -365,9 +365,9 @@ export default function StockClientView() {
                 {/* 累计盈亏+收益率 */}
                 <Card className="bg-black/50 border-white/10">
                   <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm text-white/60">累计盈亏</p>
-                      <p className={`text-sm font-semibold ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-white/60 mb-2">累计盈亏</p>
+                      <p className={`text-sm font-semibold mb-2 ${stockUserStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {stockUserStats.totalProfitRate >= 0 ? '+' : ''}{stockUserStats.totalProfitRate.toFixed(2)}%
                       </p>
                     </div>

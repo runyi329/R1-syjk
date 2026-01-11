@@ -494,13 +494,17 @@ export default function BaccaratAnalysis() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">总投注金额</div>
-                      <div className="text-lg font-bold text-card-foreground">¥{simulationResult.totalBetAmount.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                      <div className="flex items-baseline gap-1">
+                        <div className="text-lg font-bold text-card-foreground">¥{simulationResult.totalBetAmount.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</div>
+                      </div>
                       <div className="text-xs text-primary mt-1">流水倍数 {simulationResult.turnoverMultiple.toFixed(2)}x</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg border border-border">
                       <div className="text-xs text-muted-foreground mb-1">平均每局盈亏</div>
-                      <div className={`text-lg font-bold ${simulationResult.avgProfitPerRound >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {simulationResult.avgProfitPerRound >= 0 ? '+' : ''}¥{simulationResult.avgProfitPerRound.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
+                      <div className="flex items-baseline gap-1">
+                        <div className={`text-lg font-bold ${simulationResult.avgProfitPerRound >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                          {simulationResult.avgProfitPerRound >= 0 ? '+' : ''}¥{simulationResult.avgProfitPerRound.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}
+                        </div>
                       </div>
                       <div className="text-xs text-primary mt-1">期望亏损 ¥-1.17 (偏差 {(simulationResult.avgProfitPerRound + 1.17).toFixed(2)})</div>
                     </div>
