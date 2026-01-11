@@ -104,10 +104,10 @@ export default function Home() {
       <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
         <div className="container mx-auto py-0 px-2 sm:px-4 flex justify-between items-start">
           <div 
-            className="flex items-center gap-2 pt-1"
+            className="flex items-start gap-2"
           >
               <img src="/logo.png" alt="Logo" className="h-16 w-16 object-contain flex-shrink-0" />
-              <div className="flex flex-col justify-center">
+              <div className="flex flex-col justify-start">
                 <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                   {language === 'en' ? 'Runyi Investment' : '数金研投'}
                 </h1>
