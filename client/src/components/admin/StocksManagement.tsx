@@ -697,7 +697,7 @@ export default function StocksManagement() {
                             {userStats.totalProfitRate >= 0 ? '+' : ''}{userStats.totalProfitRate}%
                           </div>
                         </div>
-                        <div className={`text-sm md:text-xl font-bold text-right ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        <div className={`text-sm md:text-xl font-bold text-right break-words ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                           {userStats.totalProfit >= 0 ? '+' : ''}¥{formatAmount(userStats.totalProfit)}
                         </div>
                       </div>

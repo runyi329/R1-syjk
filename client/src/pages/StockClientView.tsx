@@ -368,11 +368,11 @@ export default function StockClientView() {
                     </div>
                     <div className="flex items-center gap-1.5">
                       {stockUserStats.totalProfit >= 0 ? (
-                        <TrendingUp className="w-5 h-5 text-red-500" />
+                        <TrendingUp className="w-5 h-5 text-red-500 flex-shrink-0" />
                       ) : (
-                        <TrendingDown className="w-5 h-5 text-green-500" />
+                        <TrendingDown className="w-5 h-5 text-green-500 flex-shrink-0" />
                       )}
-                      <p className={`text-lg font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      <p className={`text-lg font-bold break-all ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {formatCurrency(Math.abs(stockUserStats.totalProfit))}
                       </p>
                     </div>
