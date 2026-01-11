@@ -691,8 +691,13 @@ export default function StocksManagement() {
                         </div>
                       </div>
                       <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-[10px] md:text-sm text-white/60 truncate">累计盈亏</div>
-                        <div className={`text-sm md:text-xl font-bold truncate ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        <div className="flex justify-between items-center mb-1">
+                          <div className="text-[10px] md:text-sm text-white/60 truncate">累计盈亏</div>
+                          <div className={`text-[10px] md:text-sm font-bold ${userStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                            {userStats.totalProfitRate >= 0 ? '+' : ''}{userStats.totalProfitRate}%
+                          </div>
+                        </div>
+                        <div className={`text-sm md:text-xl font-bold text-right ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                           {userStats.totalProfit >= 0 ? '+' : ''}¥{formatAmount(userStats.totalProfit)}
                         </div>
                       </div>
