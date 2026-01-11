@@ -20,6 +20,7 @@ export default function Home() {
   const { data: userData } = trpc.users.getMe.useQuery(undefined, {
     enabled: !!authData,
   });
+  const { data: siteConfig } = trpc.siteConfig.getConfig.useQuery();
   const [location, setLocation] = useLocation();
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -103,7 +104,7 @@ export default function Home() {
       <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
         <div className="container mx-auto py-3 px-2 sm:px-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
+            <img src={siteConfig?.logoUrl || "/logo.png"} alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
             <div className="flex flex-col">
               <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                 {language === 'en' ? 'Runyi Investment' : '数金研投'}

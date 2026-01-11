@@ -297,6 +297,26 @@ export const cumulativeProfit = mysqlTable("cumulativeProfit", {
 export type CumulativeProfit = typeof cumulativeProfit.$inferSelect;
 export type InsertCumulativeProfit = typeof cumulativeProfit.$inferInsert;
 
+/**
+ * 网站配置表 - 存储网站全局配置，如logo URL等
+ */
+export const siteConfigs = mysqlTable("siteConfigs", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Logo图片URL - 首页和管理员后台使用 */
+  logoUrl: text("logoUrl"),
+  /** 网站标题 */
+  siteTitle: varchar("siteTitle", { length: 255 }),
+  /** 网站描述 */
+  siteDescription: text("siteDescription"),
+  /** 最后修改人ID */
+  updatedBy: int("updatedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SiteConfig = typeof siteConfigs.$inferSelect;
+export type InsertSiteConfig = typeof siteConfigs.$inferInsert;
+
 
 /**
  * 股票用户表 - A股管理功能，存储股票账户用户

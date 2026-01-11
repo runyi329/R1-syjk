@@ -17,6 +17,7 @@ import WithdrawalsManagement from "@/components/admin/WithdrawalsManagement";
 import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 import StocksManagement from "@/components/admin/StocksManagement";
+import SiteConfigManagement from "@/components/admin/SiteConfigManagement";
 
 
 
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
   const { data: userData } = trpc.users.getMe.useQuery(undefined, {
     enabled: !!authData,
   });
+  const { data: siteConfig } = trpc.siteConfig.getConfig.useQuery();
   const { data: permissions } = trpc.adminPermissions.getMyPermissions.useQuery(undefined, {
     enabled: !!authData,
   });
@@ -390,7 +392,7 @@ export default function AdminDashboard() {
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
           <button onClick={() => setLocation("/")} className="flex items-center gap-2">
-            <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded" />
+            <img src={siteConfig?.logoUrl || "/logo.png"} alt="数金研投 Logo" className="w-10 h-10 rounded" />
             <div>
               <div className="text-[#D4AF37] font-bold text-lg">管理员后台</div>
               <div className="text-xs text-white/60">ADMIN DASHBOARD</div>
@@ -1399,6 +1401,11 @@ export default function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Site Configuration Management */}
+            <div className="mt-6">
+              <SiteConfigManagement />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
