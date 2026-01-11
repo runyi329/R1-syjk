@@ -45,6 +45,9 @@ export default function StocksManagement() {
   const [activeTab, setActiveTab] = useState("users");
   const [selectedUser, setSelectedUser] = useState<StockUser | null>(null);
   
+  // 获取当前用户角色，用于权限判断
+  const { data: authData } = trpc.auth.me.useQuery();
+  
   // 用户表单状态
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
@@ -354,12 +357,16 @@ export default function StocksManagement() {
           <TabsTrigger value="calendar" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
             余额管理
           </TabsTrigger>
-          <TabsTrigger value="permissions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
-            权限管理
-          </TabsTrigger>
-          <TabsTrigger value="members" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
-            会员管理
-          </TabsTrigger>
+          {authData?.role === "super_admin" && (
+            <>
+              <TabsTrigger value="permissions" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+                权限管理
+              </TabsTrigger>
+              <TabsTrigger value="members" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black">
+                会员管理
+              </TabsTrigger>
+            </>
+          )}
         </TabsList>
         
         {/* 用户管理标签页 */}
@@ -371,21 +378,23 @@ export default function StocksManagement() {
                 <CardDescription className="text-white/60">管理A股账户用户</CardDescription>
               </div>
               <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-                <div className="flex gap-2">
-                  <DialogTrigger asChild>
-                    <Button className="bg-[#D4AF37] text-black hover:bg-[#E5C158]">
-                      <Plus className="w-4 h-4 mr-2" />
-                      添加用户
+                {authData?.role === "super_admin" && (
+                  <div className="flex gap-2">
+                    <DialogTrigger asChild>
+                      <Button className="bg-[#D4AF37] text-black hover:bg-[#E5C158]">
+                        <Plus className="w-4 h-4 mr-2" />
+                        添加用户
+                      </Button>
+                    </DialogTrigger>
+                    <Button 
+                      className="bg-blue-600 text-white hover:bg-blue-700"
+                      onClick={() => setActiveTab("permissions")}
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      客户权限设置
                     </Button>
-                  </DialogTrigger>
-                  <Button 
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                    onClick={() => setActiveTab("permissions")}
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    客户权限设置
-                  </Button>
-                </div>
+                  </div>
+                )}
                 <DialogContent className="bg-[#1a1a1a] border-white/10 text-white">
                   <DialogHeader>
                     <DialogTitle>添加股票用户</DialogTitle>

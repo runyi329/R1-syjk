@@ -328,16 +328,16 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4">
-        <Tabs defaultValue={permissions?.permissions?.memberManagement && !permissions?.permissions?.balanceManagement && !permissions?.permissions?.userManagement ? "stocks" : permissions?.permissions?.balanceManagement ? "deposits" : "users"} className="w-full">
+        <Tabs defaultValue={authData?.role === "super_admin" ? "deposits" : permissions?.permissions?.memberManagement ? "stocks" : "products"} className="w-full">
           <TabsList className="bg-black/50 border border-white/10 grid w-full overflow-x-auto" style={{ gridTemplateColumns: `repeat(${[
-            permissions?.permissions?.balanceManagement,
-            permissions?.permissions?.userManagement,
-            permissions?.permissions?.permissionManagement,
-            permissions?.permissions?.memberManagement,
-            permissions?.permissions?.staffManagement,
-            authData?.role === "super_admin" // settings only for super admin
-          ].filter(Boolean).length}, minmax(0, 1fr))` }}>
-            {permissions?.permissions?.balanceManagement && (
+            authData?.role === "super_admin" ? 3 : 0, // deposits, withdrawals, wallets
+            authData?.role === "super_admin" ? 1 : 0, // users
+            permissions?.permissions?.permissionManagement ? 2 : 0, // products, orders
+            permissions?.permissions?.memberManagement ? 1 : 0, // stocks
+            permissions?.permissions?.staffManagement ? 1 : 0, // staff
+            authData?.role === "super_admin" ? 1 : 0 // settings
+          ].reduce((a, b) => a + b, 0)}, minmax(0, 1fr))` }}>
+            {authData?.role === "super_admin" && (
               <>
                 <TabsTrigger value="deposits" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
                   充值
@@ -350,7 +350,7 @@ export default function AdminDashboard() {
                 </TabsTrigger>
               </>
             )}
-            {permissions?.permissions?.userManagement && (
+            {authData?.role === "super_admin" && (
               <TabsTrigger value="users" className="data-[state=active]:bg-[#D4AF37] data-[state=active]:text-black text-xs sm:text-sm">
                 用户
               </TabsTrigger>
