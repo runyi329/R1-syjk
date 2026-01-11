@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
@@ -57,7 +58,7 @@ export default function Register() {
       <header className="border-b border-border bg-card/80 backdrop-blur-md z-50">
         <div className="container mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
+            <Logo size={40} className="rounded-lg shadow-[0_0_15px_rgba(var(--primary),0.3)]" />
             <div className="flex flex-col">
               <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                 数金研投

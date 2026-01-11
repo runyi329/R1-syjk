@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
@@ -65,7 +66,7 @@ export default function Shop() {
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
           <button onClick={() => setLocation("/")} className="flex items-center gap-2">
-            <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded" />
+            <Logo size={40} />
             <div>
               <div className="text-[#D4AF37] font-bold text-lg">数金研投</div>
               <div className="text-xs text-white/60">SHUJIN RESEARCH</div>

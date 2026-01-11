@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Logo } from "@/components/Logo";
 import { Crown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -106,7 +107,7 @@ export default function Home() {
           <div 
             className="flex items-center gap-2"
           >
-              <img src="/company-logo.png" alt="Logo" className="h-14 w-14 object-contain flex-shrink-0 bg-transparent" />
+              <Logo size={56} className="flex-shrink-0" />
               <div className="flex flex-col justify-center">
                 <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                   {language === 'en' ? 'Runyi Investment' : '数金研投'}
@@ -405,12 +406,12 @@ export default function Home() {
           {userData && (userData.role === 'super_admin' || userData.role === 'staff_admin') ? (
             <button onClick={() => setLocation('/admin')} className="inline-block mb-6 group bg-transparent border-none p-0 cursor-pointer">
               <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm group-hover:shadow-[0_0_25px_rgba(var(--primary),0.5)] transition-all duration-300 cursor-pointer">
-                <img src="/logo.png" alt="Logo" className="w-full h-full rounded-md" />
+                <Logo size={48} className="rounded-md" />
               </div>
             </button>
           ) : (
             <div className="w-12 h-12 border-2 border-primary rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-black/50 backdrop-blur-sm mx-auto mb-6">
-              <img src="/logo.png" alt="Logo" className="w-full h-full rounded-md" />
+              <Logo size={48} className="rounded-md" />
             </div>
           )}
           <h3 className="font-bold text-lg mb-2">{content.name}</h3>

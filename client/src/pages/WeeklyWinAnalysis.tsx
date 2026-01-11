@@ -2,6 +2,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3, ChevronDown, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect, useRef } from "react";
@@ -157,7 +158,7 @@ export default function WeeklyWinAnalysis() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <img src="/logo.png" alt="数金研投 Logo" className="w-8 h-8 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
+            <Logo size={32} className="shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
             <h1 className="text-xl font-bold tracking-tight">周周赢产品分析</h1>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">

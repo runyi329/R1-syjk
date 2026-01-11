@@ -8,6 +8,7 @@ import baccaratData from "../data/baccaratData.json";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 import {
   Drawer,
   DrawerContent,
@@ -127,7 +128,7 @@ export default function BaccaratAnalysis() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <img src="/logo.png" alt="数金研投 Logo" className="w-8 h-8 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
+            <Logo size={32} className="shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
             <h1 className="text-xl font-bold tracking-tight">百家乐数据透视</h1>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
@@ -705,7 +706,9 @@ export default function BaccaratAnalysis() {
         </section>
 
         <footer className="border-t border-border pt-8 pb-12 text-center text-sm text-muted-foreground">
-          <img src="/logo.png" alt="数金研投 Logo" className="w-10 h-10 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)] mx-auto mb-4" />
+          <div className="flex justify-center mb-4">
+            <Logo size={40} className="shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
+          </div>
           <p className="font-medium">© 2026 数金研投 | 专业百家乐数据分析</p>
           <p className="mt-2 text-xs">赌博有风险，请理性娱乐。本站仅供数据分析参考。</p>
         </footer>
