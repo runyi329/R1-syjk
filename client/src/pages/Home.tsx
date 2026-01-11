@@ -106,7 +106,7 @@ export default function Home() {
           <div 
             className="flex items-center gap-2"
           >
-              <img src="/company-logo.png" alt="Logo" className="h-14 w-14 object-contain flex-shrink-0" />
+              <img src="/company-logo.png" alt="Logo" className="h-14 w-14 object-contain flex-shrink-0 bg-transparent" />
               <div className="flex flex-col justify-center">
                 <h1 className="text-lg font-bold tracking-tight leading-none text-primary">
                   {language === 'en' ? 'Runyi Investment' : '数金研投'}
