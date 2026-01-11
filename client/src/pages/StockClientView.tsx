@@ -350,15 +350,28 @@ export default function StockClientView() {
                 </Card>
             </div>
 
-            {/* 最新余额 */}
-            <Card className="bg-black/50 border-white/10">
-              <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
-                <p className="text-sm text-white/60 mb-2">最新余额</p>
-                <p className="text-xl font-bold text-white">
-                  {formatCurrency(stockUserStats.latestBalance)}
-                </p>
-              </CardContent>
-            </Card>
+            {/* 第二行: 最新余额 + 累计盈亏 */}
+            <div className="grid grid-cols-2 gap-1">
+              {/* 最新余额 */}
+              <Card className="bg-black/50 border-white/10">
+                <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
+                  <p className="text-sm text-white/60 mb-2">最新余额</p>
+                  <p className="text-xl font-bold text-white">
+                    {formatCurrency(stockUserStats.latestBalance)}
+                  </p>
+                </CardContent>
+              </Card>
+              
+              {/* 累计盈亏 */}
+              <Card className="bg-black/50 border-white/10">
+                <CardContent className="p-4 h-[35px] flex flex-col justify-center text-left">
+                  <p className="text-sm text-white/60 mb-2">累计盈亏</p>
+                  <p className={`text-xl font-bold ${stockUserStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    {stockUserStats.totalProfit >= 0 ? '+' : ''}{formatCurrency(stockUserStats.totalProfit)}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* 日历视图 */}
             <Card className="bg-black/50 border-white/10">
