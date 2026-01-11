@@ -424,12 +424,14 @@ export default function AdminDashboard() {
                               <Badge
                                 variant="outline"
                                 className={
-                                  user.role === "admin"
+                                  user.role === "super_admin"
                                     ? "bg-purple-500/20 text-purple-400 border-purple-500/50 text-xs"
+                                    : user.role === "staff_admin"
+                                    ? "bg-orange-500/20 text-orange-400 border-orange-500/50 text-xs"
                                     : "bg-blue-500/20 text-blue-400 border-blue-500/50 text-xs"
                                 }
                               >
-                                {user.role === "admin" ? "超级管理员" : "普通用户"}
+                                {user.role === "super_admin" ? "超级管理员" : user.role === "staff_admin" ? "普通管理员" : "普通用户"}
                               </Badge>
                             </div>
                             {(user as any).notes && (
@@ -527,13 +529,14 @@ export default function AdminDashboard() {
                                 </div>
                                 <div>
                                   <Label className="text-white">用户角色</Label>
-                                  <Select value={editingUserRole} onValueChange={(value) => setEditingUserRole(value as "user" | "admin")}>
+                                  <Select value={editingUserRole} onValueChange={(value) => setEditingUserRole(value as "user" | "staff_admin" | "super_admin")}>
                                     <SelectTrigger className="bg-white/5 border-white/10 text-white">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-black border-white/10">
                                       <SelectItem value="user">普通用户</SelectItem>
-                                      <SelectItem value="admin">超级管理员</SelectItem>
+                                      <SelectItem value="staff_admin">普通管理员</SelectItem>
+                                      <SelectItem value="super_admin">超级管理员</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
