@@ -683,28 +683,28 @@ export default function StocksManagement() {
                 </CardHeader>
                 {userStats && (
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-sm text-white/60">最新余额</div>
-                        <div className="text-xl font-bold text-white">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                      <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
+                        <div className="text-[10px] md:text-sm text-white/60 truncate">最新余额</div>
+                        <div className="text-sm md:text-xl font-bold text-white truncate">
                           ¥{formatAmount(userStats.latestBalance)}
                         </div>
                       </div>
-                      <div className="p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-sm text-white/60">累计盈亏</div>
-                        <div className={`text-xl font-bold ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
+                        <div className="text-[10px] md:text-sm text-white/60 truncate">累计盈亏</div>
+                        <div className={`text-sm md:text-xl font-bold truncate ${userStats.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                           {userStats.totalProfit >= 0 ? '+' : ''}¥{formatAmount(userStats.totalProfit)}
                         </div>
                       </div>
-                      <div className="p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-sm text-white/60">收益率</div>
-                        <div className={`text-xl font-bold ${userStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
+                        <div className="text-[10px] md:text-sm text-white/60 truncate">收益率</div>
+                        <div className={`text-sm md:text-xl font-bold truncate ${userStats.totalProfitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
                           {userStats.totalProfitRate >= 0 ? '+' : ''}{userStats.totalProfitRate}%
                         </div>
                       </div>
-                      <div className="p-3 rounded-lg bg-black/30 border border-white/10">
-                        <div className="text-sm text-white/60">记录天数</div>
-                        <div className="text-xl font-bold text-white">
+                      <div className="p-2 md:p-3 rounded-lg bg-black/30 border border-white/10">
+                        <div className="text-[10px] md:text-sm text-white/60 truncate">记录天数</div>
+                        <div className="text-sm md:text-xl font-bold text-white truncate">
                           {userStats.recordCount} 天
                         </div>
                       </div>
@@ -824,7 +824,7 @@ export default function StocksManagement() {
                       {/* 星期标题 */}
                       <div className="grid grid-cols-7 gap-[2px] mb-1">
                         {weekDays.map((day) => (
-                          <div key={day} className="text-center text-[10px] text-white/60 py-1">
+                          <div key={day} className="text-center text-[9px] md:text-[10px] text-white/60 py-0.5 md:py-1">
                             {day}
                           </div>
                         ))}
@@ -852,7 +852,7 @@ export default function StocksManagement() {
                             <div
                               key={day}
                               onClick={() => handleDateClick(day)}
-                              className={`h-[60px] md:h-[72px] px-[2px] py-1 rounded border cursor-pointer transition-colors flex flex-col justify-between ${
+                              className={`h-[50px] md:h-[72px] px-[2px] py-0.5 md:py-1 rounded border cursor-pointer transition-colors flex flex-col justify-between ${
                                 isSelected
                                   ? 'border-[#D4AF37] bg-[#D4AF37]/20'
                                   : isToday
@@ -866,16 +866,16 @@ export default function StocksManagement() {
                                   : 'border-white/10 hover:border-white/30'
                               }`}
                             >
-                              <div className="text-[10px] text-white/60 text-center">{day}</div>
+                              <div className="text-[9px] md:text-[10px] text-white/60 text-center">{day}</div>
                               {viewMode === "balance" && balance && (
-                                <div className="text-[9px] md:text-[10px] font-medium text-white text-center leading-tight whitespace-nowrap overflow-hidden">
+                                <div className="text-[8px] md:text-[10px] font-medium text-white text-center leading-tight overflow-hidden" style={{ wordBreak: 'break-all' }}>
                                   {formatCompactAmount(balance.balance)}
                                 </div>
                               )}
                               {viewMode === "profit" && profitPeriod === "day" && profit && (
-                                <div className={`text-[9px] md:text-[10px] font-medium text-center leading-tight whitespace-nowrap overflow-hidden ${
+                                <div className={`text-[8px] md:text-[10px] font-medium text-center leading-tight overflow-hidden ${
                                   profit.dailyProfit >= 0 ? 'text-green-400' : 'text-red-400'
-                                }`}>
+                                }`} style={{ wordBreak: 'break-all' }}>
                                   {profit.dailyProfit >= 0 ? '+' : ''}{formatCompactAmount(profit.dailyProfit)}
                                 </div>
                               )}
