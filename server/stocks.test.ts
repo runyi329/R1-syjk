@@ -7,22 +7,28 @@ describe("Stocks Management", () => {
   let testUserId: number;
   
   beforeAll(async () => {
-    // 清理测试数据
+    // 清理测试数据 - 只删除标记为测试数据的记录
     const db = await getDb();
     if (!db) throw new Error("Database not available");
     
-    // 删除测试用户（如果存在）
-    await db.delete(stockUsers).where(eq(stockUsers.name, "测试股票用户"));
+    // 删除测试用户（只删除标记为测试数据的记录）
+    await db.delete(stockUsers).where(
+      eq(stockUsers.isTestData, true)
+    );
   });
   
   afterAll(async () => {
-    // 清理测试数据
+    // 清理测试数据 - 只删除标记为测试数据的记录
     const db = await getDb();
     if (!db) return;
     
     if (testUserId) {
+      // 只删除该测试用户的余额记录
       await db.delete(stockBalances).where(eq(stockBalances.stockUserId, testUserId));
-      await db.delete(stockUsers).where(eq(stockUsers.id, testUserId));
+      // 只删除标记为测试数据的用户
+      await db.delete(stockUsers).where(
+        eq(stockUsers.id, testUserId)
+      );
     }
   });
   
@@ -36,6 +42,7 @@ describe("Stocks Management", () => {
         initialBalance: "100000.00",
         notes: "测试备注",
         status: "active",
+        isTestData: true,  // 标记为测试数据
       });
       
       testUserId = result.insertId;
@@ -243,6 +250,7 @@ describe("Stocks Management", () => {
         name: "测试股票用户2",
         initialBalance: "200000.00",
         status: "active",
+        isTestData: true,  // 标记为测试数据
       });
       testStockUserId2 = stockUserResult.insertId;
     });
@@ -265,9 +273,11 @@ describe("Stocks Management", () => {
         await db.delete(users).where(eq(users.id, testWebsiteUserId));
       }
       
-      // 清理第二个股票用户
+      // 清理第二个股票用户（只删除标记为测试数据的记录）
       if (testStockUserId2) {
-        await db.delete(stockUsers).where(eq(stockUsers.id, testStockUserId2));
+        await db.delete(stockUsers).where(
+          eq(stockUsers.id, testStockUserId2)
+        );
       }
     });
     

@@ -1,0 +1,1 @@
+ALTER TABLE `stockUsers` ADD `isTestData` boolean DEFAULT false NOT NULL;

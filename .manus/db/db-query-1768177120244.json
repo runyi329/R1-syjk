@@ -1,0 +1,168 @@
+{
+  "query": "DESCRIBE users; SELECT * FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute DESCRIBE users; SELECT * FROM users;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "openId",
+      "Type": "varchar(64)",
+      "Null": "NO",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "name",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(320)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "loginMethod",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "role",
+      "Type": "enum('user','admin','super_admin','staff_admin')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "user",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "lastSignedIn",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "usdtBalance",
+      "Type": "decimal(20,8)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0.00000000",
+      "Extra": ""
+    },
+    {
+      "Field": "accountStatus",
+      "Type": "enum('active','frozen')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "active",
+      "Extra": ""
+    },
+    {
+      "Field": "username",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "passwordHash",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "registerMethod",
+      "Type": "enum('oauth','password')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "oauth",
+      "Extra": ""
+    },
+    {
+      "Field": "vipLevel",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "notes",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [
+    "id\topenId\tname\temail\tloginMethod\trole\tcreatedAt\tupdatedAt\tlastSignedIn\tusdtBalance\taccountStatus\tusername\tpasswordHash\tregisterMethod\tvipLevel\tnotes",
+    "1\tbzUJg9XyuXafDixiiEqJds\trun\trunyimacau@gmail.com\tgoogle\tadmin\t2026-01-05 18:21:50\t2026-01-11 19:39:55\t2026-01-11 19:39:56\t565.00000000\tactive\tNULL\t20c57997be99466830c0de3cfb53ad4ddefa9c493b03645e3a5494205920ae2e\toauth\t0\tNULL",
+    "210400\tpassword_123456_1767693414784\tWHY\tNULL\tNULL\tstaff_admin\t2026-01-06 09:56:54\t2026-01-11 17:27:47\t2026-01-11 17:27:47\t0.00000000\tactive\tWHY\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t0\t君君",
+    "330137\tadmin-1767705808164\trunyi\tadmin@runyi.com\tNULL\tsuper_admin\t2026-01-06 13:23:28\t2026-01-12 00:18:21\t2026-01-12 00:18:21\t0.00000000\tactive\trunyi\t66a563c968c80a637b243ba7eef80e21156ef02798c3b33feb3c39ad762c72e2\tpassword\t1\tNULL",
+    "1350103\ttest_super_1768105731624\tDBW\tNULL\tNULL\tuser\t2026-01-11 04:28:51\t2026-01-11 14:49:13\t2026-01-11 14:49:13\t0.00000000\tactive\tDBW\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t1\tNULL",
+    "1350350\ttestadmin_openid\tTest Admin\tNULL\tNULL\tstaff_admin\t2026-01-11 06:11:40\t2026-01-11 07:07:22\t2026-01-11 07:07:23\t0.00000000\tactive\ttestadmin\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t0\tNULL",
+    "1350664\tpassword_security_test_1768116289057_1768116289064\tYJH\tNULL\tNULL\tuser\t2026-01-11 07:24:49\t2026-01-11 18:51:18\t2026-01-11 18:51:19\t0.00000000\tactive\tYJH\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t1\tNULL",
+    "1350671\tpassword_lock_test_1768116290219_1768116290220\tLock Test\tNULL\tNULL\tuser\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t0.00000000\tfrozen\tlock_test_1768116290219\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350673\tpassword_unlock_test_1768116290502_1768116290502\tUnlock Test\tNULL\tNULL\tuser\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t0.00000000\tactive\tunlock_test_1768116290502\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350674\tpassword_locked_login_test_1768116290958_1768116290958\tLocked Login Test\tNULL\tNULL\tuser\t2026-01-11 07:24:50\t2026-01-11 07:24:51\t2026-01-11 07:24:50\t0.00000000\tfrozen\tlocked_login_test_1768116290958\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350681\tpassword_testuser_1768116291903_1768116292293\tTest User\tNULL\tNULL\tuser\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t0.00000000\tactive\ttestuser_1768116291903\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL",
+    "1350683\tpassword_lock_flow_1768116292720_1768116292720\tLock Flow Test\tNULL\tNULL\tuser\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t0.00000000\tactive\tlock_flow_1768116292720\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350718\tpassword_security_test_1768116972623_1768116972630\tSecurity Test User\tNULL\tNULL\tuser\t2026-01-11 07:36:12\t2026-01-11 07:36:12\t2026-01-11 07:36:12\t0.00000000\tactive\tsecurity_test_1768116972623\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL",
+    "1350725\tpassword_lock_test_1768116973789_1768116973789\tLock Test\tNULL\tNULL\tuser\t2026-01-11 07:36:13\t2026-01-11 07:36:13\t2026-01-11 07:36:13\t0.00000000\tfrozen\tlock_test_1768116973789\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350727\tpassword_unlock_test_1768116974083_1768116974083\tUnlock Test\tNULL\tNULL\tuser\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t0.00000000\tactive\tunlock_test_1768116974083\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350728\tpassword_locked_login_test_1768116974546_1768116974546\tLocked Login Test\tNULL\tNULL\tuser\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t0.00000000\tfrozen\tlocked_login_test_1768116974546\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350734\tpassword_testuser_1768116975592_1768116975974\tTest User\tNULL\tNULL\tuser\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t0.00000000\tactive\ttestuser_1768116975592\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL",
+    "1350737\tpassword_lock_flow_1768116976385_1768116976385\tLock Flow Test\tNULL\tNULL\tuser\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t0.00000000\tactive\tlock_flow_1768116976385\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1350738\tpassword_testuser_1768116976327_1768116976331\t第二个名字\tNULL\tNULL\tuser\t2026-01-11 07:36:16\t2026-01-11 07:36:17\t2026-01-11 07:36:16\t0.00000000\tactive\t第二个名字\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500068\tpassword_security_test_1768153861046_1768153861070\tSecurity Test User\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tactive\tsecurity_test_1768153861046\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL",
+    "1500074\tpassword_lock_test_1768153861333_1768153861333\tLock Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tfrozen\tlock_test_1768153861333\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500077\tpassword_unlock_test_1768153861367_1768153861367\tUnlock Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tactive\tunlock_test_1768153861367\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500078\tpassword_locked_login_test_1768153861418_1768153861419\tLocked Login Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tfrozen\tlocked_login_test_1768153861418\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500084\tpassword_lock_flow_1768153861670_1768153861671\tLock Flow Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tactive\tlock_flow_1768153861670\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500091\ttest_super_1768153864813\tNULL\tNULL\tNULL\tsuper_admin\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t0.00000000\tactive\ttest_super_admin\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500092\ttest_staff_1768153864827\tNULL\tNULL\tNULL\tstaff_admin\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t0.00000000\tactive\ttest_staff_admin\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL",
+    "1500101\tpassword_testuser_1768153870484_1768153870613\tTest User\tNULL\tNULL\tuser\t2026-01-11 17:51:10\t2026-01-11 17:51:10\t2026-01-11 17:51:10\t0.00000000\tactive\ttestuser_1768153870484\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL",
+    "1500111\tadmin_test_role_openid\tAdmin Test\tNULL\tNULL\tadmin\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t0.00000000\tactive\tadmin_test_role\t240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9\tpassword\t0\tNULL",
+    "1500112\tuser_test_role_openid\tUser Test\tNULL\tNULL\tuser\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t0.00000000\tactive\tuser_test_role\te606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446\tpassword\t0\tNULL"
+  ],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nopenId\tvarchar(64)\tNO\tUNI\tNULL\t\nname\ttext\tYES\t\tNULL\t\nemail\tvarchar(320)\tYES\t\tNULL\t\nloginMethod\tvarchar(64)\tYES\t\tNULL\t\nrole\tenum('user','admin','super_admin','staff_admin')\tNO\t\tuser\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nlastSignedIn\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nusdtBalance\tdecimal(20,8)\tNO\t\t0.00000000\t\naccountStatus\tenum('active','frozen')\tNO\t\tactive\t\nusername\tvarchar(64)\tYES\tUNI\tNULL\t\npasswordHash\ttext\tYES\t\tNULL\t\nregisterMethod\tenum('oauth','password')\tNO\t\toauth\t\nvipLevel\tint(11)\tNO\t\t0\t\nnotes\ttext\tYES\t\tNULL\t\nid\topenId\tname\temail\tloginMethod\trole\tcreatedAt\tupdatedAt\tlastSignedIn\tusdtBalance\taccountStatus\tusername\tpasswordHash\tregisterMethod\tvipLevel\tnotes\n1\tbzUJg9XyuXafDixiiEqJds\trun\trunyimacau@gmail.com\tgoogle\tadmin\t2026-01-05 18:21:50\t2026-01-11 19:39:55\t2026-01-11 19:39:56\t565.00000000\tactive\tNULL\t20c57997be99466830c0de3cfb53ad4ddefa9c493b03645e3a5494205920ae2e\toauth\t0\tNULL\n210400\tpassword_123456_1767693414784\tWHY\tNULL\tNULL\tstaff_admin\t2026-01-06 09:56:54\t2026-01-11 17:27:47\t2026-01-11 17:27:47\t0.00000000\tactive\tWHY\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t0\t君君\n330137\tadmin-1767705808164\trunyi\tadmin@runyi.com\tNULL\tsuper_admin\t2026-01-06 13:23:28\t2026-01-12 00:18:21\t2026-01-12 00:18:21\t0.00000000\tactive\trunyi\t66a563c968c80a637b243ba7eef80e21156ef02798c3b33feb3c39ad762c72e2\tpassword\t1\tNULL\n1350103\ttest_super_1768105731624\tDBW\tNULL\tNULL\tuser\t2026-01-11 04:28:51\t2026-01-11 14:49:13\t2026-01-11 14:49:13\t0.00000000\tactive\tDBW\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t1\tNULL\n1350350\ttestadmin_openid\tTest Admin\tNULL\tNULL\tstaff_admin\t2026-01-11 06:11:40\t2026-01-11 07:07:22\t2026-01-11 07:07:23\t0.00000000\tactive\ttestadmin\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t0\tNULL\n1350664\tpassword_security_test_1768116289057_1768116289064\tYJH\tNULL\tNULL\tuser\t2026-01-11 07:24:49\t2026-01-11 18:51:18\t2026-01-11 18:51:19\t0.00000000\tactive\tYJH\t8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92\tpassword\t1\tNULL\n1350671\tpassword_lock_test_1768116290219_1768116290220\tLock Test\tNULL\tNULL\tuser\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t0.00000000\tfrozen\tlock_test_1768116290219\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350673\tpassword_unlock_test_1768116290502_1768116290502\tUnlock Test\tNULL\tNULL\tuser\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t2026-01-11 07:24:50\t0.00000000\tactive\tunlock_test_1768116290502\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350674\tpassword_locked_login_test_1768116290958_1768116290958\tLocked Login Test\tNULL\tNULL\tuser\t2026-01-11 07:24:50\t2026-01-11 07:24:51\t2026-01-11 07:24:50\t0.00000000\tfrozen\tlocked_login_test_1768116290958\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350681\tpassword_testuser_1768116291903_1768116292293\tTest User\tNULL\tNULL\tuser\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t0.00000000\tactive\ttestuser_1768116291903\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL\n1350683\tpassword_lock_flow_1768116292720_1768116292720\tLock Flow Test\tNULL\tNULL\tuser\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t2026-01-11 07:24:52\t0.00000000\tactive\tlock_flow_1768116292720\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350718\tpassword_security_test_1768116972623_1768116972630\tSecurity Test User\tNULL\tNULL\tuser\t2026-01-11 07:36:12\t2026-01-11 07:36:12\t2026-01-11 07:36:12\t0.00000000\tactive\tsecurity_test_1768116972623\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL\n1350725\tpassword_lock_test_1768116973789_1768116973789\tLock Test\tNULL\tNULL\tuser\t2026-01-11 07:36:13\t2026-01-11 07:36:13\t2026-01-11 07:36:13\t0.00000000\tfrozen\tlock_test_1768116973789\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350727\tpassword_unlock_test_1768116974083_1768116974083\tUnlock Test\tNULL\tNULL\tuser\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t0.00000000\tactive\tunlock_test_1768116974083\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350728\tpassword_locked_login_test_1768116974546_1768116974546\tLocked Login Test\tNULL\tNULL\tuser\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t2026-01-11 07:36:14\t0.00000000\tfrozen\tlocked_login_test_1768116974546\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350734\tpassword_testuser_1768116975592_1768116975974\tTest User\tNULL\tNULL\tuser\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t0.00000000\tactive\ttestuser_1768116975592\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL\n1350737\tpassword_lock_flow_1768116976385_1768116976385\tLock Flow Test\tNULL\tNULL\tuser\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t2026-01-11 07:36:16\t0.00000000\tactive\tlock_flow_1768116976385\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1350738\tpassword_testuser_1768116976327_1768116976331\t第二个名字\tNULL\tNULL\tuser\t2026-01-11 07:36:16\t2026-01-11 07:36:17\t2026-01-11 07:36:16\t0.00000000\tactive\t第二个名字\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500068\tpassword_security_test_1768153861046_1768153861070\tSecurity Test User\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tactive\tsecurity_test_1768153861046\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL\n1500074\tpassword_lock_test_1768153861333_1768153861333\tLock Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tfrozen\tlock_test_1768153861333\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500077\tpassword_unlock_test_1768153861367_1768153861367\tUnlock Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tactive\tunlock_test_1768153861367\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500078\tpassword_locked_login_test_1768153861418_1768153861419\tLocked Login Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tfrozen\tlocked_login_test_1768153861418\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500084\tpassword_lock_flow_1768153861670_1768153861671\tLock Flow Test\tNULL\tNULL\tuser\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t2026-01-11 17:51:01\t0.00000000\tactive\tlock_flow_1768153861670\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500091\ttest_super_1768153864813\tNULL\tNULL\tNULL\tsuper_admin\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t0.00000000\tactive\ttest_super_admin\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500092\ttest_staff_1768153864827\tNULL\tNULL\tNULL\tstaff_admin\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t2026-01-11 17:51:04\t0.00000000\tactive\ttest_staff_admin\tef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f\tpassword\t0\tNULL\n1500101\tpassword_testuser_1768153870484_1768153870613\tTest User\tNULL\tNULL\tuser\t2026-01-11 17:51:10\t2026-01-11 17:51:10\t2026-01-11 17:51:10\t0.00000000\tactive\ttestuser_1768153870484\te2b4acd109102ad7a518d36bb43ba20092fd360bc6967b2ca8f160d806c03688\tpassword\t0\tNULL\n1500111\tadmin_test_role_openid\tAdmin Test\tNULL\tNULL\tadmin\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t0.00000000\tactive\tadmin_test_role\t240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9\tpassword\t0\tNULL\n1500112\tuser_test_role_openid\tUser Test\tNULL\tNULL\tuser\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t2026-01-11 17:51:14\t0.00000000\tactive\tuser_test_role\te606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446\tpassword\t0\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

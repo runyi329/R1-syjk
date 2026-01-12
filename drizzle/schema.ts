@@ -331,6 +331,8 @@ export const stockUsers = mysqlTable("stockUsers", {
   notes: text("notes"),
   /** 状态：active-活跃，inactive-停用 */
   status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
+  /** 是否为测试数据：用于区分测试数据和生产数据，防止测试污染生产数据库 */
+  isTestData: boolean("isTestData").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

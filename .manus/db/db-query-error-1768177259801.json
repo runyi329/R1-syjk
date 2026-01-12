@@ -1,0 +1,16 @@
+{
+  "query": "DESCRIBE stockUsers; SELECT id, name, symbol, exchange, createdAt, updatedAt FROM stockUsers ORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute DESCRIBE stockUsers; SELECT id, name, symbol, exchange, createdAt, updatedAt FROM stockUsers ORDER BY createdAt DESC;",
+  "returncode": 1,
+  "logs": [
+    "Field\tType\tNull\tKey\tDefault\tExtra",
+    "id\tint(11)\tNO\tPRI\tNULL\tauto_increment",
+    "name\tvarchar(255)\tNO\t\tNULL\t",
+    "initialBalance\tdecimal(20,2)\tNO\t\tNULL\t",
+    "notes\ttext\tYES\t\tNULL\t",
+    "status\tenum('active','inactive')\tNO\t\tactive\t",
+    "createdAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t",
+    "updatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP",
+    "ERROR 1054 (42S22) at line 1: Unknown column 'symbol' in 'field list'"
+  ]
+}

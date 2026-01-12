@@ -102,19 +102,14 @@ export const backupRouter = router({
           });
         }
 
-        // 如果选择覆盖模式，先清空所有表（保留当前登录用户）
+        // 注意：已禁用覆盖模式以保护生产数据
+        // 所有导入都采用合并模式，不会删除现有数据
         if (overwrite) {
-          await db.delete(staffStockPermissions);
-          await db.delete(stockUserPermissions);
-          await db.delete(stockBalances);
-          await db.delete(stockUsers);
-          await db.delete(walletAddresses);
-          await db.delete(withdrawals);
-          await db.delete(deposits);
-          await db.delete(orders);
-          await db.delete(products);
-          await db.delete(pointTransactions);
-          // 不删除users表，避免当前登录用户丢失
+          console.warn(
+            "[Backup] 覆盖模式已禁用，以保护生产数据安全。" +
+            "所有数据将以合并模式导入。"
+          );
+          // 不执行任何删除操作，仅进行合并导入
         }
 
         // 导入数据

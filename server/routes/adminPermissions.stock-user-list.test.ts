@@ -15,10 +15,9 @@ describe("股票用户列表加载测试", () => {
     const db = await getDb();
     if (!db) throw new Error("数据库不可用");
 
-    // 清理测试数据
+    // 清理测试数据 - 只删除标记为测试数据的记录
     await db.delete(staffStockPermissions).where(eq(staffStockPermissions.staffUserId, 0));
-    await db.delete(stockUsers).where(eq(stockUsers.name, "测试股票用户1"));
-    await db.delete(stockUsers).where(eq(stockUsers.name, "测试股票用户2"));
+    await db.delete(stockUsers).where(eq(stockUsers.isTestData, true));
     await db.delete(users).where(eq(users.username, "test_super_admin"));
     await db.delete(users).where(eq(users.username, "test_staff_admin"));
 
@@ -48,6 +47,7 @@ describe("股票用户列表加载测试", () => {
       initialBalance: "100000.00",
       notes: "测试用户1",
       status: "active",
+      isTestData: true,  // 标记为测试数据
     });
     stockUser1Id = stockUser1.insertId;
 
@@ -56,6 +56,7 @@ describe("股票用户列表加载测试", () => {
       initialBalance: "200000.00",
       notes: "测试用户2",
       status: "active",
+      isTestData: true,  // 标记为测试数据
     });
     stockUser2Id = stockUser2.insertId;
 
@@ -71,10 +72,9 @@ describe("股票用户列表加载测试", () => {
     const db = await getDb();
     if (!db) return;
 
-    // 清理测试数据
+    // 清理测试数据 - 只删除标记为测试数据的记录
     await db.delete(staffStockPermissions).where(eq(staffStockPermissions.staffUserId, staffAdminId));
-    await db.delete(stockUsers).where(eq(stockUsers.id, stockUser1Id));
-    await db.delete(stockUsers).where(eq(stockUsers.id, stockUser2Id));
+    await db.delete(stockUsers).where(eq(stockUsers.isTestData, true));
     await db.delete(users).where(eq(users.id, superAdminId));
     await db.delete(users).where(eq(users.id, staffAdminId));
   });

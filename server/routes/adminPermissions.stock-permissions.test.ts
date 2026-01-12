@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { appRouter } from "../routers";
 import { getDb } from "../db";
 import { users, stockUsers, staffStockPermissions, adminPermissions } from "../../drizzle/schema";
@@ -16,9 +16,9 @@ describe("员工股票权限管理API测试", () => {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
-    // 清理测试数据
+    // 清理测试数据 - 只删除标记为测试数据的记录
     await db.delete(staffStockPermissions);
-    await db.delete(stockUsers);
+    await db.delete(stockUsers).where(eq(stockUsers.isTestData, true));
     await db.delete(adminPermissions);
     await db.delete(users).where(eq(users.username, "test_super_admin"));
     await db.delete(users).where(eq(users.username, "test_staff_admin"));
@@ -61,6 +61,7 @@ describe("员工股票权限管理API测试", () => {
       initialBalance: "100000.00",
       notes: "测试用户1",
       status: "active",
+      isTestData: true,  // 标记为测试数据
     });
     stockUser1Id = stock1.insertId;
 
@@ -69,6 +70,7 @@ describe("员工股票权限管理API测试", () => {
       initialBalance: "200000.00",
       notes: "测试用户2",
       status: "active",
+      isTestData: true,  // 标记为测试数据
     });
     stockUser2Id = stock2.insertId;
 
@@ -77,6 +79,7 @@ describe("员工股票权限管理API测试", () => {
       initialBalance: "300000.00",
       notes: "测试用户3",
       status: "active",
+      isTestData: true,  // 标记为测试数据
     });
     stockUser3Id = stock3.insertId;
   });
@@ -188,5 +191,17 @@ describe("员工股票权限管理API测试", () => {
     });
 
     expect(permissions.length).toBe(0);
+  });
+
+  afterAll(async () => {
+    const db = await getDb();
+    if (!db) return;
+
+    // 清理测试数据 - 只删除标记为测试数据的记录
+    await db.delete(staffStockPermissions);
+    await db.delete(stockUsers).where(eq(stockUsers.isTestData, true));
+    await db.delete(adminPermissions);
+    await db.delete(users).where(eq(users.username, "test_super_admin"));
+    await db.delete(users).where(eq(users.username, "test_staff_admin"));
   });
 });
