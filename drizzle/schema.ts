@@ -1,4 +1,4 @@
-import { boolean, decimal, int, mysqlEnum, mysqlTable, text, timestamp, varchar, unique, index } from "drizzle-orm/mysql-core";
+import { boolean, decimal, int, json, mysqlEnum, mysqlTable, text, timestamp, varchar, unique, index } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -333,8 +333,41 @@ export const stockUsers = mysqlTable("stockUsers", {
   status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
   /** 是否为测试数据：用于区分测试数据和生产数据，防止测试污染生产数据库 */
   isTestData: boolean("isTestData").default(false).notNull(),
+  /** 软删除标志：true表示已删除，false表示未删除 */
+  isDeleted: boolean("isDeleted").default(false).notNull(),
+  /** 删除时间戳：记录何时被删除 */
+  deletedAt: timestamp("deletedAt"),
+  /** 删除者ID：记录谁删除了这条记录 */
+  deletedBy: int("deletedBy"),
+  /** 删除原因：记录为什么删除这条记录 */
+  deleteReason: text("deleteReason"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * 数据操作审计日志表 - 记录所有重要操作（创建、修改、删除）
+ */
+export const auditLogs = mysqlTable("auditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 操作者用户ID */
+  userId: int("userId").notNull(),
+  /** 操作类型：create-创建，update-修改，delete-删除，restore-恢复 */
+  operationType: mysqlEnum("operationType", ["create", "update", "delete", "restore"]).notNull(),
+  /** 操作对象类型：stockUser-股票客户，stockBalance-余额记录等 */
+  entityType: varchar("entityType", { length: 64 }).notNull(),
+  /** 操作对象ID */
+  entityId: int("entityId").notNull(),
+  /** 操作前的数据（JSON格式） */
+  beforeData: json("beforeData"),
+  /** 操作后的数据（JSON格式） */
+  afterData: json("afterData"),
+  /** 操作原因/备注 */
+  reason: text("reason"),
+  /** 操作IP地址 */
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  /** 操作时间戳 */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type StockUser = typeof stockUsers.$inferSelect;

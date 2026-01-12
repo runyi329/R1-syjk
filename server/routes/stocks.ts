@@ -522,6 +522,21 @@ export const stocksRouter = router({
       }
       
       // 创建授权记录
+      // 处理日期：确保日期格式正确
+      let authDate: Date | null = null;
+      if (input.authorizationDate) {
+        // 如果是 YYYY-MM-DD 格式，添加 00:00:00 以便正确解析
+        const dateStr = input.authorizationDate.trim();
+        // 验证日期格式
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          throw new Error("Invalid date format. Expected YYYY-MM-DD");
+        }
+        authDate = new Date(dateStr + 'T00:00:00Z');
+        if (isNaN(authDate.getTime())) {
+          throw new Error("Invalid authorization date");
+        }
+      }
+      
       await db
         .insert(stockUserPermissions)
         .values({
@@ -529,7 +544,7 @@ export const stocksRouter = router({
           userId: input.userId,
           startAmount: input.startAmount,
           profitPercentage: input.profitPercentage,
-          authorizationDate: input.authorizationDate ? new Date(input.authorizationDate) : null,
+          authorizationDate: authDate,
           deposit: input.deposit || "0",
         });
       
@@ -550,12 +565,27 @@ export const stocksRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       
+      // 处理日期：确保日期格式正确
+      let authDate: Date | null = null;
+      if (input.authorizationDate) {
+        // 如果是 YYYY-MM-DD 格式，添加 00:00:00 以便正确解析
+        const dateStr = input.authorizationDate.trim();
+        // 验证日期格式
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          throw new Error("Invalid date format. Expected YYYY-MM-DD");
+        }
+        authDate = new Date(dateStr + 'T00:00:00Z');
+        if (isNaN(authDate.getTime())) {
+          throw new Error("Invalid authorization date");
+        }
+      }
+      
       await db
         .update(stockUserPermissions)
         .set({
           startAmount: input.startAmount,
           profitPercentage: input.profitPercentage,
-          authorizationDate: input.authorizationDate ? new Date(input.authorizationDate) : null,
+          authorizationDate: authDate,
           deposit: input.deposit || "0",
           updatedAt: new Date(),
         })

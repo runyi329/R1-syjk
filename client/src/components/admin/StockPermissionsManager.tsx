@@ -114,12 +114,25 @@ export default function StockPermissionsManager() {
       return;
     }
 
+    // 验证并格式化日期
+    let formattedDate: string | undefined = undefined;
+    if (authorizationDate) {
+      // 确保日期格式为 YYYY-MM-DD
+      const dateObj = new Date(authorizationDate);
+      if (!isNaN(dateObj.getTime())) {
+        formattedDate = dateObj.toISOString().split('T')[0];
+      } else {
+        toast.error("授权日期格式无效");
+        return;
+      }
+    }
+
     addPermissionMutation.mutate({
       stockUserId: selectedStockUser.id,
       userId: parseInt(selectedWebsiteUserId),
       startAmount: startAmount,
       profitPercentage: percentage,
-      authorizationDate: authorizationDate || undefined,
+      authorizationDate: formattedDate,
       deposit: deposit || "0",
     });
   };
@@ -151,12 +164,25 @@ export default function StockPermissionsManager() {
       return;
     }
 
+    // 验证并格式化日期
+    let formattedDate: string | undefined = undefined;
+    if (editAuthorizationDate) {
+      // 确保日期格式为 YYYY-MM-DD
+      const dateObj = new Date(editAuthorizationDate);
+      if (!isNaN(dateObj.getTime())) {
+        formattedDate = dateObj.toISOString().split('T')[0];
+      } else {
+        toast.error("授权日期格式无效");
+        return;
+      }
+    }
+
     updatePermissionMutation.mutate({
       stockUserId: selectedStockUser.id,
       userId: editingPermission.userId,
       startAmount: editStartAmount,
       profitPercentage: percentage,
-      authorizationDate: editAuthorizationDate || undefined,
+      authorizationDate: formattedDate,
       deposit: editDeposit || "0",
     });
   };
