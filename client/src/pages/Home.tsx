@@ -261,7 +261,7 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6">
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-yellow-200 to-primary whitespace-nowrap">
-                {language === 'en' ? 'Strategic Research for Personal Investment' : '个人投资的战略研究'}
+                {language === 'en' ? 'Strategic Research for Personal Investment' : '个人投资 战略分析'}
               </h2>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
                 {language === 'en' 
