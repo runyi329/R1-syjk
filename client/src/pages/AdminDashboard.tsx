@@ -18,6 +18,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import WalletAddressesManagement from "@/components/admin/WalletAddressesManagement";
 import StocksManagement from "@/components/admin/StocksManagement";
 import SiteConfigManagement from "@/components/admin/SiteConfigManagement";
+import { Logo } from "@/components/Logo";
 
 
 
@@ -392,7 +393,7 @@ export default function AdminDashboard() {
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-sm z-50">
         <div className="container mx-auto flex items-center justify-between py-4">
           <button onClick={() => setLocation("/")} className="flex items-center gap-2">
-            <img src={siteConfig?.logoUrl || "/logo.png"} alt="数金研投 Logo" className="w-10 h-10 rounded" />
+            <Logo size={40} className="flex-shrink-0" />
             <div>
               <div className="text-[#D4AF37] font-bold text-lg">管理员后台</div>
               <div className="text-xs text-white/60">ADMIN DASHBOARD</div>
