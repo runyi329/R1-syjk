@@ -520,37 +520,6 @@ export default function StockClientView() {
                   </>
                 )}
                 
-                {/* 资金曲线图 */}
-                {stockUserStats && stockUserStats.dailyProfits && stockUserStats.dailyProfits.length > 0 && (
-                  <div className="mt-6">
-                    <div className="mb-3">
-                      <h3 className="text-lg font-medium text-white mb-1">
-                        {viewMode === "balance" 
-                          ? "余额变化曲线" 
-                          : profitPeriod === "day" 
-                            ? "日盈亏曲线" 
-                            : profitPeriod === "month" 
-                              ? "月盈亏曲线" 
-                              : "年盈亏曲线"
-                        }
-                      </h3>
-                      <p className="text-sm text-white/60">
-                        {viewMode === "balance" 
-                          ? "展示账户余额随时间的变化趋势" 
-                          : "展示盈亏金额随时间的变化趋势"
-                        }
-                      </p>
-                    </div>
-                    <FundsCurveChart 
-                      data={stockUserStats.dailyProfits}
-                      viewMode={viewMode}
-                      profitPeriod={profitPeriod}
-                      currentYear={currentYear}
-                      currentMonth={currentMonth}
-                    />
-                  </div>
-                )}
-                
                 {/* 月盈亏视角：显示12个月的收益 */}
                 {viewMode === "profit" && profitPeriod === "month" && (
                   <div className="space-y-4">
@@ -621,6 +590,23 @@ export default function StockClientView() {
                           </div>
                         );
                       })}
+                    
+                    {/* 月盈亏曲线图 */}
+                    {stockUserStats && stockUserStats.dailyProfits && stockUserStats.dailyProfits.length > 0 && (
+                      <div className="mt-6">
+                        <div className="mb-3">
+                          <h3 className="text-lg font-medium text-white mb-1">月盈亏曲线</h3>
+                          <p className="text-sm text-white/60">展示盈亏金额随时间的变化趋势</p>
+                        </div>
+                        <FundsCurveChart 
+                          data={stockUserStats.dailyProfits}
+                          viewMode={viewMode}
+                          profitPeriod={profitPeriod}
+                          currentYear={currentYear}
+                          currentMonth={currentMonth}
+                        />
+                      </div>
+                    )}
                     </div>
                   </div>
                 )}
@@ -684,6 +670,23 @@ export default function StockClientView() {
                           </div>
                         );
                       })}
+                    
+                    {/* 年盈亏曲线图 */}
+                    {stockUserStats && stockUserStats.dailyProfits && stockUserStats.dailyProfits.length > 0 && (
+                      <div className="mt-6">
+                        <div className="mb-3">
+                          <h3 className="text-lg font-medium text-white mb-1">年盈亏曲线</h3>
+                          <p className="text-sm text-white/60">展示盈亏金额随时间的变化趋势</p>
+                        </div>
+                        <FundsCurveChart 
+                          data={stockUserStats.dailyProfits}
+                          viewMode={viewMode}
+                          profitPeriod={profitPeriod}
+                          currentYear={currentYear}
+                          currentMonth={currentMonth}
+                        />
+                      </div>
+                    )}
                     </div>
                   </div>
                 )}
