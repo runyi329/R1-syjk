@@ -517,6 +517,27 @@ export default function StockClientView() {
                         );
                       })}
                     </div>
+                    
+                    {/* 日盈亏曲线图 */}
+                    {stockUserStats && stockUserStats.dailyProfits && stockUserStats.dailyProfits.length > 0 && (
+                      <div className="mt-6">
+                        <div className="mb-3">
+                          <h3 className="text-lg font-medium text-white mb-1">
+                            {viewMode === "balance" ? "余额变化曲线" : "日盈亏曲线"}
+                          </h3>
+                          <p className="text-sm text-white/60">
+                            {viewMode === "balance" ? "展示账户余额随时间的变化趋势" : "展示盈亏金额随时间的变化趋势"}
+                          </p>
+                        </div>
+                        <FundsCurveChart 
+                          data={stockUserStats.dailyProfits}
+                          viewMode={viewMode}
+                          profitPeriod={profitPeriod}
+                          currentYear={currentYear}
+                          currentMonth={currentMonth}
+                        />
+                      </div>
+                    )}
                   </>
                 )}
                 
