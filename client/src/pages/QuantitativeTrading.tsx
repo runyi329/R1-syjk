@@ -546,8 +546,19 @@ export default function QuantitativeTrading() {
 
               <div className="flex justify-end gap-4 pt-4">
                 {!isAuthenticated ? (
-                  <Button asChild variant="default" size="lg">
-                    <a href={getLoginUrl()}>登录后开始回测</a>
+                  <Button
+                    onClick={() => {
+                      try {
+                        window.location.href = getLoginUrl();
+                      } catch (error) {
+                        console.error('登录 URL 生成失败:', error);
+                        toast.error('无法生成登录链接，请稍后重试');
+                      }
+                    }}
+                    variant="default"
+                    size="lg"
+                  >
+                    登录后开始回测
                   </Button>
                 ) : (
                   <Button
