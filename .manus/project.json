@@ -1,0 +1,19 @@
+{
+  "name": "baccarat-house-edge",
+  "displayName": "数金研投",
+  "description": "百家乐投注类型庄家优势数据分析与量化交易系统",
+  "version": "1.0.0",
+  "features": ["db", "server", "user"],
+  "template": "web-db-user",
+  "paths": {
+    "root": "/home/ubuntu/baccarat-house-edge",
+    "client": "/home/ubuntu/baccarat-house-edge/client",
+    "server": "/home/ubuntu/baccarat-house-edge/server",
+    "drizzle": "/home/ubuntu/baccarat-house-edge/drizzle"
+  },
+  "env": {
+    "DATABASE_URL": "mysql://XTqR3P9v8tSgKnm.root:K8QY1lPVu2ESLyh9b89m@gateway03.us-east-1.prod.aws.tidbcloud.com:4000/jHCPjtWAoWrQh3F8kPBEFC"
+  },
+  "createdAt": "2026-01-15T00:00:00Z",
+  "updatedAt": "2026-01-22T03:46:00Z"
+}
