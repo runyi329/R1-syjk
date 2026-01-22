@@ -15,6 +15,7 @@ import { stocksRouter } from "./routes/stocks";
 import { adminPermissionsRouterWithStockPermissions } from "./routes/adminPermissions";
 import { backupRouter } from "./routes/backup";
 import { siteConfigRouter } from "./routes/siteConfig";
+import { quantitativeRouter } from "./routes/quantitative";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -44,6 +45,8 @@ export const appRouter = router({
   adminPermissions: adminPermissionsRouterWithStockPermissions,
   backup: backupRouter,
   siteConfig: siteConfigRouter,
+  market: quantitativeRouter.market,
+  backtest: quantitativeRouter.backtest,
 });
 
 export type AppRouter = typeof appRouter;
