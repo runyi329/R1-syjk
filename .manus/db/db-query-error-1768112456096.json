@@ -1,8 +1,0 @@
-{
-  "query": "SELECT * FROM staffStockPermissions WHERE staff_id = 1350350;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT * FROM staffStockPermissions WHERE staff_id = 1350350;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'staff_id' in 'where clause'"
-  ]
-}

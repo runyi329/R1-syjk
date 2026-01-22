@@ -1,8 +1,0 @@
-{
-  "query": "\n-- 查询WHY用户的基本信息\nSELECT id, username, name, role, status FROM users WHERE username = 'WHY';\n\n-- 查询WHY用户的股票权限\nSELECT \n  ssp.id,\n  ssp.staffUserId,\n  ssp.stockUserId,\n  su.name as stockUserName\nFROM staffStockPermissions ssp\nJOIN stockUsers su ON ssp.stockUserId = su.id\nWHERE ssp.staffUserId = (SELECT id FROM users WHERE username = 'WHY');\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询WHY用户的基本信息\nSELECT id, username, name, role, status FROM users WHERE username = 'WHY';\n\n-- 查询WHY用户的股票权限\nSELECT \n  ssp.id,\n  ssp.staffUserId,\n  ssp.stockUserId,\n  su.name as stockUserName\nFROM staffStockPermissions ssp\nJOIN stockUsers su ON ssp.stockUserId = su.id\nWHERE ssp.staffUserId = (SELECT id FROM users WHERE username = 'WHY');\n",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 3: Unknown column 'status' in 'field list'"
-  ]
-}

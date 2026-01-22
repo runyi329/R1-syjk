@@ -1,9 +1,0 @@
-{
-  "query": "SELECT id, amount, network, adminNotes, CONCAT(id, amount, network, adminNotes) as all_content FROM deposits WHERE CONCAT(id, amount, network, adminNotes) LIKE '%Admin%' OR CONCAT(id, amount, network, adminNotes) LIKE '%Migration%';",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, amount, network, adminNotes, CONCAT(id, amount, network, adminNotes) as all_content FROM deposits WHERE CONCAT(id, amount, network, adminNotes) LIKE '%Admin%' OR CONCAT(id, amount, network, adminNotes) LIKE '%Migration%';",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 402
-}

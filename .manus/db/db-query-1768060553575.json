@@ -1,9 +1,0 @@
-{
-  "query": "\n-- 查询张三的股票客户ID\nSELECT id, name, initialBalance FROM stockUsers WHERE name = '张三';\n\n-- 查询张三的授权记录\nSELECT * FROM stockUserPermissions WHERE stockUserId = (SELECT id FROM stockUsers WHERE name = '张三' LIMIT 1);\n\n-- 查询张三的所有余额记录\nSELECT date, balance FROM stockBalances WHERE stockUserId = (SELECT id FROM stockUsers WHERE name = '张三' LIMIT 1) ORDER BY date ASC;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \n-- 查询张三的股票客户ID\nSELECT id, name, initialBalance FROM stockUsers WHERE name = '张三';\n\n-- 查询张三的授权记录\nSELECT * FROM stockUserPermissions WHERE stockUserId = (SELECT id FROM stockUsers WHERE name = '张三' LIMIT 1);\n\n-- 查询张三的所有余额记录\nSELECT date, balance FROM stockBalances WHERE stockUserId = (SELECT id FROM stockUsers WHERE name = '张三' LIMIT 1) ORDER BY date ASC;\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 504
-}

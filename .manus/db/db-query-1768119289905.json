@@ -1,9 +1,0 @@
-{
-  "query": "\nINSERT INTO adminPermissions (userId, balanceManagement, userManagement, permissionManagement, memberManagement, staffManagement, status, createdBy)\nSELECT u.id, 1, 1, 0, 1, 0, 'active', 1\nFROM users u \nLEFT JOIN adminPermissions ap ON u.id = ap.userId \nWHERE u.role = 'staff_admin' AND ap.id IS NULL;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute \nINSERT INTO adminPermissions (userId, balanceManagement, userManagement, permissionManagement, memberManagement, staffManagement, status, createdBy)\nSELECT u.id, 1, 1, 0, 1, 0, 'active', 1\nFROM users u \nLEFT JOIN adminPermissions ap ON u.id = ap.userId \nWHERE u.role = 'staff_admin' AND ap.id IS NULL;\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 59
-}
