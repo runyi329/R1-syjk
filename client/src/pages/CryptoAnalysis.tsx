@@ -342,9 +342,11 @@ export default function CryptoAnalysis() {
                     <p className="font-bold text-sm">1年</p>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full h-8 text-xs">
-                  了解详情
-                </Button>
+                <Link href="/weekly-win">
+                  <Button variant="outline" className="w-full h-8 text-xs">
+                    了解详情
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

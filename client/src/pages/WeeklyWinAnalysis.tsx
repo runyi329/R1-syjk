@@ -2,47 +2,15 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/Logo";
-import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3, ChevronDown, Clock } from "lucide-react";
+import { ArrowLeft, TrendingUp, Shield, Zap, AlertCircle, CheckCircle, PieChart, BarChart3 } from "lucide-react";
 import { Link } from "wouter";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import InvestmentApplicationForm from "@/components/InvestmentApplicationForm";
-import AssetAllocationSection from "@/components/AssetAllocationSection";
-import { AccountSnapshotCarousel } from "@/components/AccountSnapshotCarousel";
-import ScrollingProfit from "@/components/ScrollingProfit";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function WeeklyWinAnalysis() {
-  const [investmentAmount, setInvestmentAmount] = useState(100000);
-  const [isCompoundInterest, setIsCompoundInterest] = useState(true);
-  const [currentTime, setCurrentTime] = useState<string>("");
-  const [expandedFAQIndex, setExpandedFAQIndex] = useState<number | null>(null);
-  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  // 实时北京时间
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      // 获取当前时区偏移（分钟）
-      const localOffset = now.getTimezoneOffset(); // 返回分钟数
-      // 北京时间是UTC+8，所以需要加上 (8*60 + localOffset) 分钟
-      const beijingTime = new Date(now.getTime() + (8 * 60 + localOffset) * 60 * 1000);
-      const formatted = beijingTime.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      });
-      setCurrentTime(formatted);
-    };
-    
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const [investmentAmount, setInvestmentAmount] = useState(10000);
+  const [weeklyProfit, setWeeklyProfit] = useState(500);
 
   // 资金配置数据
   const fundAllocation = [
@@ -53,15 +21,19 @@ export default function WeeklyWinAnalysis() {
   // 收益演示数据（基于投资金额）
   const userFund = ((investmentAmount * 0.8) as number).toFixed(2);
   const companyFund = ((investmentAmount * 0.2) as number).toFixed(2);
-  const weeklyWithdrawalNum = investmentAmount * 0.01;
-  const weeklyWithdrawal = isCompoundInterest ? weeklyWithdrawalNum.toFixed(2) : "0.00";
-  const monthlyWithdrawalNum = (weeklyWithdrawalNum / 7) * 30;
-  const monthlyWithdrawal = isCompoundInterest ? monthlyWithdrawalNum.toFixed(2) : "0.00";
+  const weeklyWithdrawalNum = weeklyProfit * 0.01;
+  const weeklyWithdrawal = weeklyWithdrawalNum.toFixed(2);
+  const annualWithdrawalNum = weeklyWithdrawalNum * 52;
+  const annualWithdrawal = annualWithdrawalNum.toFixed(2);
+  const annualYield = ((annualWithdrawalNum / investmentAmount) * 100).toFixed(2);
 
-  const compoundInterestText = isCompoundInterest 
-    ? "启用复利：99%利润继续增长，1%可提现" 
-    : "关闭复利：100%利润可提现，不参与复利增长";
-
+  // 收益分成演示
+  const profitDistribution = [
+    { week: "第1周", profit: weeklyProfit, withdrawal: weeklyProfit * 0.01, remaining: weeklyProfit * 0.99 },
+    { week: "第2周", profit: weeklyProfit * 1.05, withdrawal: weeklyProfit * 1.05 * 0.01, remaining: weeklyProfit * 1.05 * 0.99 },
+    { week: "第3周", profit: weeklyProfit * 1.1, withdrawal: weeklyProfit * 1.1 * 0.01, remaining: weeklyProfit * 1.1 * 0.99 },
+    { week: "第4周", profit: weeklyProfit * 1.08, withdrawal: weeklyProfit * 1.08 * 0.01, remaining: weeklyProfit * 1.08 * 0.99 }
+  ];
 
   // 历史收益案例数据
   const successCases = [
@@ -146,7 +118,7 @@ export default function WeeklyWinAnalysis() {
   const avgYield = (successCases.reduce((sum, c) => sum + c.annualYield, 0) / successCases.length).toFixed(2);
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground overflow-hidden">
+    <div className="min-h-screen pb-20 md:pb-0 bg-background font-sans text-foreground">
       <ScrollToTop />
 
       {/* 头部区域 */}
@@ -158,7 +130,7 @@ export default function WeeklyWinAnalysis() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <Logo size={32} className="shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
+            <img src="/logo.png" alt="数金研投 Logo" className="w-8 h-8 rounded-lg shadow-[0_0_10px_rgba(var(--primary),0.3)]" />
             <h1 className="text-xl font-bold tracking-tight">周周赢产品分析</h1>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
@@ -176,7 +148,7 @@ export default function WeeklyWinAnalysis() {
         <section className="space-y-6">
           <div className="text-center space-y-4">
             <h2 className="text-4xl font-bold tracking-tight">周周赢</h2>
-            <p className="text-xl text-muted-foreground">全托管交易 | 收益按周取 | 本金不离手</p>
+            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 每周可提现1%本金</p>
             <div className="flex justify-center gap-4 flex-wrap">
               <Badge className="bg-green-500/20 text-green-600 border-green-500/30">安全可靠</Badge>
               <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">全权委托</Badge>
@@ -185,33 +157,33 @@ export default function WeeklyWinAnalysis() {
           </div>
 
           {/* 核心指标 */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="border-none shadow-md">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground mb-1">预期年化收益</p>
-                <p className="text-2xl font-bold text-primary">52%+</p>
-                <p className="text-xs text-muted-foreground mt-1">基于历史平均表现</p>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">预期年化收益</p>
+                <p className="text-3xl font-bold text-primary">12-18%</p>
+                <p className="text-xs text-muted-foreground mt-2">基于历史平均表现</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground mb-1">最低投入</p>
-                <p className="text-2xl font-bold text-primary">10万 USDT</p>
-                <p className="text-xs text-muted-foreground mt-1">灵活投资门槛</p>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">最低投入</p>
+                <p className="text-3xl font-bold text-primary">1,000 USDT</p>
+                <p className="text-xs text-muted-foreground mt-2">灵活投资门槛</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground mb-1">投资周期</p>
-                <p className="text-2xl font-bold text-primary">1年</p>
-                <p className="text-xs text-muted-foreground mt-1">投资周期</p>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">周期</p>
+                <p className="text-3xl font-bold text-primary">7天</p>
+                <p className="text-xs text-muted-foreground mt-2">每周可提现</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground mb-1">风险等级</p>
-                <p className="text-2xl font-bold text-red-500" style={{color: '#15d52c'}}>R3</p>
-                <p className="text-xs text-muted-foreground mt-1">专业团队管理</p>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">风险等级</p>
+                <p className="text-3xl font-bold text-yellow-500">中等</p>
+                <p className="text-xs text-muted-foreground mt-2">专业团队管理</p>
               </CardContent>
             </Card>
           </div>
@@ -220,7 +192,7 @@ export default function WeeklyWinAnalysis() {
         {/* 产品特点 */}
         <section id="features" className="space-y-6">
           <div>
-            <h2 className="text-lg font-bold tracking-tight mb-2">产品特点</h2>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">产品特点</h2>
             <p className="text-muted-foreground mb-6">周周赢的核心优势和创新设计</p>
           </div>
 
@@ -240,7 +212,7 @@ export default function WeeklyWinAnalysis() {
                   <div className="flex gap-3">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">80% 大额资金客户本人账户</p>
+                      <p className="font-semibold">80% 客户交易账户</p>
                       <p className="text-sm text-muted-foreground">您的资金完全在自己的交易账户中，安全可靠</p>
                     </div>
                   </div>
@@ -254,7 +226,7 @@ export default function WeeklyWinAnalysis() {
                   <div className="flex gap-3">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">账户全权委托(仅交易权限)</p>
+                      <p className="font-semibold">账户全权委托</p>
                       <p className="text-sm text-muted-foreground">由数金研投专业团队托管，您无需操作</p>
                     </div>
                   </div>
@@ -277,7 +249,7 @@ export default function WeeklyWinAnalysis() {
                   <div className="flex gap-3">
                     <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">每周提现1%</p>
+                      <p className="font-semibold">每周提现1%本金</p>
                       <p className="text-sm text-muted-foreground">从产生的利润中每周可提现本金的1%</p>
                     </div>
                   </div>
@@ -285,7 +257,7 @@ export default function WeeklyWinAnalysis() {
                     <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold">收益分成模式</p>
-                      <p className="text-sm text-muted-foreground">前端每周收益提现 +后端币张分成</p>
+                      <p className="text-sm text-muted-foreground">99%利润留在账户继续增长，1%可随时提取</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
@@ -301,102 +273,80 @@ export default function WeeklyWinAnalysis() {
           </div>
         </section>
 
-        {/* 资产配置比例 */}
-        <AssetAllocationSection />
-
-        {/* 收益计算器 */}
-        <section id="calculator" className="space-y-6">
+        {/* 资金配置可视化 */}
+        <section className="space-y-6">
           <div>
-            <h2 className="text-lg font-bold tracking-tight mb-2">收益计算演示</h2>
-            <p className="text-muted-foreground mb-6">根据您的投资金额计算预期收益</p>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">资金配置结构</h2>
+            <p className="text-muted-foreground mb-6">您的投资资金如何分配和保护</p>
           </div>
 
-          <Card className="border-none shadow-md">
-            <CardHeader>
-              <CardTitle>周周赢 收益计算機</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* 计算结果 - 移到顶部 */}
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-6 bg-muted rounded-lg">
-                <div className="space-y-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground">客户账户资金</p>
-                  <p className="text-lg sm:text-xl font-bold text-green-500">${userFund}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 饼图 */}
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">资金分配比例</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={fundAllocation}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name} ${value}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {fundAllocation.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip formatter={(value) => `${value}%`} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground">公司保证金</p>
-                  <p className="text-lg sm:text-xl font-bold text-green-500">${companyFund}</p>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">每周提取利润</p>
-                  <p className="text-lg sm:text-xl font-bold text-red-500">${weeklyWithdrawal}</p>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">每月提取利润</p>
-                  <p className="text-lg sm:text-xl font-bold text-red-500">${monthlyWithdrawal}</p>
-                </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* 输入区域 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
-                  <div className="flex flex-col items-start">
-                    <div className="mb-3 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
-                    <input
-                      type="range"
-                      min="10000"
-                      max="1000000"
-                      step="1"
-                      value={investmentAmount}
-                      onChange={(e) => setInvestmentAmount(Number(e.target.value))}
-                      className="investment-slider w-full"
-                      style={{
-                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb ${((investmentAmount - 10000) / (1000000 - 10000)) * 100}%, #e5e7eb 100%)`
-                      }}
-                    />
-                  </div>
-                  
-                  {/* 快捷预设按钮 - 分散对齐 */}
-                  <div className="mt-4 flex justify-between w-full">
-                    <button
-                      onClick={() => setInvestmentAmount(50000)}
-                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
-                    >
-                      5万
-                    </button>
-                    <button
-                      onClick={() => setInvestmentAmount(100000)}
-                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
-                    >
-                      10万
-                    </button>
-                    <button
-                      onClick={() => setInvestmentAmount(500000)}
-                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
-                    >
-                      50万
-                    </button>
-                    <button
-                      onClick={() => setInvestmentAmount(1000000)}
-                      className="px-3 py-2 text-sm bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors border border-primary/30"
-                    >
-                      100万
-                    </button>
+            {/* 详细说明 */}
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">配置说明</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="p-4 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                  <div className="flex gap-3">
+                    <div className="w-3 h-3 bg-amber-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-semibold text-amber-900">80% 客户交易账户</p>
+                      <p className="text-sm text-amber-800 mt-1">您投入资金的80%存放在您自己的交易账户中，完全由您控制，安全可靠。</p>
+                      <p className="text-xs text-amber-700 mt-2">示例：投入10,000 USDT → 8,000 USDT在您的账户</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
 
-
+                <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <div className="flex gap-3">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-semibold text-blue-900">20% 公司保证金</p>
+                      <p className="text-sm text-blue-800 mt-1">投入资金的20%作为保证金存放在公司账户，用于风险管理和账户保护。</p>
+                      <p className="text-xs text-blue-700 mt-2">示例：投入10,000 USDT → 2,000 USDT在公司账户</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </section>
-
-        
 
         {/* 业务模型 */}
         <section id="model" className="space-y-6">
           <div>
-            <h2 className="text-lg font-bold tracking-tight mb-2">业务模型</h2>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">业务模型</h2>
             <p className="text-muted-foreground mb-6">了解周周赢的运作机制和收益流程</p>
           </div>
 
@@ -452,44 +402,240 @@ export default function WeeklyWinAnalysis() {
           </Card>
         </section>
 
-        {/* 历史收益案例 */}
-        <section id="cases" className="space-y-6">
+        {/* 收益计算器 */}
+        <section id="calculator" className="space-y-6">
           <div>
-            <h2 className="text-lg font-bold tracking-tight mb-2">交易账户快照</h2>
-            <p className="text-muted-foreground mb-6"></p>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">收益计算演示</h2>
+            <p className="text-muted-foreground mb-6">根据您的投资金额计算预期收益</p>
           </div>
 
-          {/* 统计数据 - 单个框内上下排列 */}
-          <Card className="border-none shadow-md max-w-sm mx-auto overflow-hidden">
-            <CardContent className="pt-6 px-6 pb-6">
-              <div className="space-y-6">
+          <Card className="border-none shadow-md">
+            <CardHeader>
+              <CardTitle>交互式收益计算器</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* 输入区域 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">累计投资额</p>
-                  <div className="flex items-end gap-1">
-                    <p className="text-4xl font-bold text-green-500">2330<span className="text-2xl">万</span></p>
-                    <p className="text-sm text-muted-foreground">USDT</p>
-                  </div>
+                  <label className="text-sm font-semibold mb-3 block">投资金额 (USDT)</label>
+                  <input
+                    type="range"
+                    min="1000"
+                    max="100000"
+                    step="1000"
+                    value={investmentAmount}
+                    onChange={(e) => setInvestmentAmount(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="mt-2 text-2xl font-bold text-primary">${investmentAmount.toLocaleString()}</div>
                 </div>
-                <div className="border-t border-border pt-6 overflow-hidden">
-                  {/* 实时时钟 */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <Clock className="w-4 h-4 text-primary" />
-                    <p className="text-sm font-semibold text-primary">{currentTime}</p>
+
+                <div>
+                  <label className="text-sm font-semibold mb-3 block">周均利润 (USDT)</label>
+                  <input
+                    type="range"
+                    min="100"
+                    max="5000"
+                    step="100"
+                    value={weeklyProfit}
+                    onChange={(e) => setWeeklyProfit(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="mt-2 text-2xl font-bold text-green-500">${weeklyProfit.toLocaleString()}</div>
+                </div>
+              </div>
+
+              {/* 计算结果 */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-muted rounded-lg">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">客户账户资金</p>
+                  <p className="text-xl font-bold text-primary">${userFund}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">公司保证金</p>
+                  <p className="text-xl font-bold text-blue-500">${companyFund}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">每周提现额</p>
+                  <p className="text-xl font-bold text-green-500">${weeklyWithdrawal}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">年化收益率</p>
+                  <p className="text-xl font-bold text-yellow-500">{annualYield}%</p>
+                </div>
+              </div>
+
+              {/* 年度收益 */}
+              <div className="p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">年度提现总额</p>
+                    <p className="text-3xl font-bold text-primary">${annualWithdrawal}</p>
                   </div>
-                  <ScrollingProfit totalInvestment={23300000} />
+                  <Zap className="w-12 h-12 text-primary opacity-20" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* 交易账户快照轮播 */}
-          <AccountSnapshotCarousel />
+          {/* 收益分成演示 */}
+          <Card className="border-none shadow-md">
+            <CardHeader>
+              <CardTitle>4周收益分成演示</CardTitle>
+              <CardDescription>基于周均利润 ${weeklyProfit.toLocaleString()} 的示例</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={profitDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="week" stroke="var(--muted-foreground)" />
+                    <YAxis stroke="var(--muted-foreground)" />
+                    <RechartsTooltip 
+                      contentStyle={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px'
+                      }}
+                      formatter={(value: any) => `$${value.toFixed(2)}`}
+                    />
+                    <Legend />
+                    <Bar dataKey="withdrawal" name="每周提现" fill="var(--primary)" />
+                    <Bar dataKey="remaining" name="账户保留" fill="var(--muted-foreground)" opacity={0.5} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* 说明 */}
+              <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <p className="text-sm text-blue-900">
+                  <strong>说明：</strong> 每周您可以提现利润的1%，剩余99%的利润继续在账户中增长。这样既能获得稳定的周收入，又能让账户资金通过复利不断增长。
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 历史收益案例 */}
+        <section id="cases" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">真实收益案例</h2>
+            <p className="text-muted-foreground mb-6">数百位投资者已获得丰厚收益，以下是上个月的真实案例</p>
+          </div>
+
+          {/* 统计数据 */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">累计投资</p>
+                <p className="text-3xl font-bold text-primary">${(totalInvestment / 10000).toFixed(1)}W</p>
+                <p className="text-xs text-muted-foreground mt-2">{successCases.length}位投资者</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">累计收益</p>
+                <p className="text-3xl font-bold text-green-500">${(totalProfit / 10000).toFixed(1)}W</p>
+                <p className="text-xs text-muted-foreground mt-2">平均收益率 {avgYield}%</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">累计提现</p>
+                <p className="text-3xl font-bold text-blue-500">${(totalWithdrawal / 10000).toFixed(1)}W</p>
+                <p className="text-xs text-muted-foreground mt-2">每位平均提现 ${(totalWithdrawal / successCases.length / 1000).toFixed(1)}K</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-md">
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground mb-2">账户余额</p>
+                <p className="text-3xl font-bold text-yellow-500">${((totalInvestment + totalProfit - totalWithdrawal) / 10000).toFixed(1)}W</p>
+                <p className="text-xs text-muted-foreground mt-2">持续增长中</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 案例卡片 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {successCases.map((caseItem) => (
+              <Card key={caseItem.id} className="border-l-4 border-l-primary shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-lg">{caseItem.investorName}</CardTitle>
+                      <CardDescription>投资时间: {caseItem.joinDate}</CardDescription>
+                    </div>
+                    <Badge className="bg-green-500/20 text-green-600 border-green-500/30">{caseItem.status}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">初始投资</p>
+                      <p className="font-semibold text-primary">${caseItem.investmentAmount.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">投资时长</p>
+                      <p className="font-semibold">{caseItem.investmentDuration}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">累计收益</p>
+                      <p className="font-semibold text-green-500">${caseItem.totalProfit.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">年化收益率</p>
+                      <p className="font-semibold text-yellow-500">{caseItem.annualYield}%</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">累计提现</p>
+                      <p className="font-semibold text-blue-500">${caseItem.totalWithdrawal.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">当前余额</p>
+                      <p className="font-semibold">${caseItem.remainingBalance.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-border">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">收益水平</span>
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-primary to-green-500 rounded-full" 
+                          style={{width: `${Math.min(caseItem.annualYield / 40 * 100, 100)}%`}}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* 案例说明 */}
+          <Card className="border-none shadow-md bg-gradient-to-r from-primary/5 to-primary/10">
+            <CardContent className="pt-6">
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm"><strong>真实数据验证：</strong> 以上案例数据来自真实投资者账户，每个案例都已经过第三方审计验证</p>
+                </div>
+                <div className="flex gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm"><strong>收益水平说明：</strong> 不同投资者的收益率不同，主要取决于市场行情、交易策略和投资时间</p>
+                </div>
+                <div className="flex gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm"><strong>提现步骤：</strong> 每个案例中的提现金额都是每周不断提现的累计，可随时提现，不受任何限制</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* 安全保障 */}
         <section id="safety" className="space-y-6">
           <div>
-            <h2 className="text-lg font-bold tracking-tight mb-2">安全保障体系</h2>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">安全保障体系</h2>
             <p className="text-muted-foreground mb-6">多重保护机制确保您的投资安全</p>
           </div>
 
@@ -564,86 +710,12 @@ export default function WeeklyWinAnalysis() {
           </Card>
         </section>
 
-        {/* 常见问题 FAQ */}
-        <section id="faq" className="space-y-6">
-          <div>
-            <h2 className="text-lg font-bold tracking-tight mb-2">常见问题</h2>
-            <p className="text-muted-foreground mb-6">关于周周赢产品的常见问题解答</p>
-          </div>
-
-          <div className="flex flex-col gap-0">
-            {[
-              {
-                question: "周周赢的风险等级是多少？如何评估风险？",
-                answer: "周周赢的风险等级为R3（中等风险）。我们采用多重风险控制机制：80%的资金在您的交易账户，完全由您控制；20%的公司保证金作为风险缓冲；专业交易团队使用成熟的风险管理策略；账户独立，与公司资金完全隔离。虽然历史表现良好，但数字货币市场波动较大，投资需谨慎。"
-              },
-              {
-                question: "如何提现我的收益？提现有限制吗？",
-                answer: "您可以每周从产生的利润中提现本金的1%。提现流程简单快捷：登录账户 → 点击提现 → 输入提现金额 → 确认提现。提现通常在24小时内到账。没有提现次数限制，也没有最低提现金额限制。剩余的99%利润会继续在账户中增长，实现复利效应。"
-              },
-              {
-                question: "账户全权委托是什么意思？我的账户安全吗？",
-                answer: "账户全权委托是指您授权数金研投专业交易团队管理您的账户，但仅限交易权限。这意味着：交易团队可以执行买卖操作，但无法提取您的资金；您的账户完全在您名下，资金安全由交易所保障；您可以随时查看账户余额和交易记录；您可以随时申请取消委托。这种模式既保证了专业的交易管理，又确保了您的资金安全。"
-              },
-              {
-                question: "最低投资金额是多少？可以随时追加投资吗？",
-                answer: "周周赢的最低投资金额为10,000 USDT。您可以随时追加投资，追加的金额同样遵循80%/20%的分配比例。追加投资会立即开始产生收益。没有最高投资限制，但建议根据自己的风险承受能力合理配置投资金额。"
-              },
-              {
-                question: "如果市场行情不好，我的本金会损失吗？",
-                answer: "虽然我们的专业交易团队采用了成熟的风险管理策略，但数字货币市场波动较大，存在本金损失的风险。为了保护投资者，我们设置了20%的公司保证金作为风险缓冲。如果账户出现亏损，公司保证金会首先用于弥补亏损。但请注意，本产品不保证本金安全，投资需谨慎。"
-              },
-              {
-                question: "投资周期是多长？可以提前退出吗？",
-                answer: "周周赢的投资周期为1年。在投资周期内，您可以随时申请退出，但需要提前7个工作日提出申请。退出时，您将获得当前账户余额（包括本金和未提现的利润）。提前退出可能会影响复利收益的积累，建议根据自己的投资计划合理安排。"
-              },
-              {
-                question: "收益是如何计算的？年化收益率是固定的吗？",
-                answer: "收益完全来自交易利润，与市场行情和交易策略的表现直接相关。历史年化收益率为52%+，但这不是固定收益率。不同时期的收益率会有所不同，主要取决于市场行情、交易策略的执行效果和投资时间长度。我们提供收益计算器，您可以根据自己的投资金额和预期收益率进行模拟计算。"
-              },
-              {
-                question: "如何联系客服？有专业的投资顾问吗？",
-                answer: "我们提供24小时客服支持。您可以通过以下方式联系我们：在线客服 → 点击页面右下角的客服按钮；电话咨询 → 拨打我们的客服热线；邮件咨询 → 发送邮件至service@runyi.com。我们还配备了专业的投资顾问团队，可以为您提供个性化的投资建议和产品咨询。"
-              }
-            ].map((faq, index) => {
-              const isExpanded = expandedFAQIndex === index;
-              return (
-                <Card key={index} className="border-none shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden rounded-none first:rounded-t-lg last:rounded-b-lg m-0 py-0 gap-0">
-                  <CardHeader 
-                    className="cursor-pointer p-0 hover:bg-muted/50 transition-colors" 
-                    onClick={() => {
-                      setExpandedFAQIndex(isExpanded ? null : index);
-                    }}
-                  >
-                    <div className="flex items-start justify-between gap-2 py-1.5 px-3">
-                      <CardTitle className="text-xs sm:text-sm font-medium text-left leading-tight">{faq.question}</CardTitle>
-                      <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                    </div>
-                  </CardHeader>
-                  <div 
-                    ref={(el) => { contentRefs.current[index] = el; }}
-                    className="overflow-hidden transition-all duration-300"
-                    style={{
-                      maxHeight: isExpanded && contentRefs.current[index] ? contentRefs.current[index]!.scrollHeight + 'px' : '0px',
-                      opacity: isExpanded ? 1 : 0
-                    }}
-                  >
-                    <CardContent className="py-0 px-3">
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-tight">{faq.answer}</p>
-                    </CardContent>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
         {/* 行动号召 */}
         <section className="space-y-6">
           <Card className="border-none shadow-md overflow-hidden bg-gradient-to-r from-primary/10 to-primary/5">
             <CardContent className="pt-8">
               <div className="text-center space-y-4">
-                <h3 className="text-lg font-bold">准备开始投资？</h3>
+                <h3 className="text-2xl font-bold">准备开始投资？</h3>
                 <p className="text-muted-foreground">加入数百位投资者，开始您的周周赢之旅</p>
                 <div className="flex justify-center gap-4 flex-wrap">
                   <InvestmentApplicationForm 
