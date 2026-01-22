@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Zap } from "lucide-react";
+import { ArrowLeft, Zap, TrendingUp, BarChart3 } from "lucide-react";
 import { Link } from "wouter";
 import AssetAllocationSection from "@/components/AssetAllocationSection";
 
@@ -30,6 +30,38 @@ export default function CryptoAnalysis() {
 
         {/* 资产配置比例 */}
         <AssetAllocationSection />
+
+        {/* 量化交易计算机入口 */}
+        <section className="mb-8">
+          <Card className="border-l-4 border-l-accent shadow-md overflow-hidden bg-gradient-to-br from-accent/10 to-accent/5 hover:shadow-lg transition-shadow cursor-pointer">
+            <Link href="/quantitative-trading">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center">
+                      <BarChart3 className="w-6 h-6 text-accent" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold">量化交易计算机</CardTitle>
+                      <CardDescription>专业的加密货币交易策略回测与模拟交易系统</CardDescription>
+                    </div>
+                  </div>
+                  <TrendingUp className="w-6 h-6 text-accent" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  配置交易策略、选择量化因子、进行历史回测，验证您的交易策略表现。支持实时数据、专业回测和 AI 辅助。
+                </p>
+                <div className="flex gap-2 text-sm text-muted-foreground">
+                  <span className="px-2 py-1 bg-accent/10 rounded text-accent">实时数据</span>
+                  <span className="px-2 py-1 bg-accent/10 rounded text-accent">专业回测</span>
+                  <span className="px-2 py-1 bg-accent/10 rounded text-accent">AI 辅助</span>
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+        </section>
 
         {/* 周周赢产品卡片 */}
         <section className="space-y-6">
