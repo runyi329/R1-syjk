@@ -194,13 +194,30 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
     setIsScrolling(true);
   };
 
-  // 无缝循环动画
+  // 无缝循环动画 - 使用动态计算的实际宽度
   useEffect(() => {
-    if (!isScrolling || isDragging || !trackRef.current) return;
+    if (!isScrolling || isDragging || !trackRef.current || markets.length === 0) return;
 
     const track = trackRef.current;
-    const itemWidth = 140 + 16; // min-w-[140px] + gap 1rem
-    const totalWidth = itemWidth * markets.length;
+    // 根据实际DOM计算实际宽度
+    const getActualWidth = () => {
+      const children = track.querySelectorAll('[data-market-item]');
+      if (children.length === 0) return 0;
+      
+      // 计算第一个周期的实际宽度（所有markets的宽度）
+      let totalWidth = 0;
+      for (let i = 0; i < markets.length; i++) {
+        const rect = children[i]?.getBoundingClientRect();
+        if (rect) {
+          totalWidth += rect.width + 16; // 加上gap
+        }
+      }
+      return totalWidth;
+    };
+    
+    const singleCycleWidth = getActualWidth();
+    if (singleCycleWidth === 0) return;
+    
     const ANIMATION_DURATION = 40000; // 40 秒
 
     const animate = (currentTime: number) => {
@@ -213,11 +230,11 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
 
       if (direction === 'left') {
         // 从右向左滚动
-        const offset = -(progress * totalWidth);
+        const offset = -(progress * singleCycleWidth);
         setScrollOffset(offset);
       } else {
         // 从左向右滚动
-        const offset = progress * totalWidth;
+        const offset = progress * singleCycleWidth;
         setScrollOffset(offset);
       }
 
@@ -233,7 +250,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
       }
       lastTimeRef.current = 0;
     };
-  }, [isScrolling, isDragging, markets.length, direction]);
+  }, [isScrolling, isDragging, markets, direction]);
 
   return (
     <div className="w-full overflow-hidden">
@@ -258,7 +275,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
         >
           {/* 原始数据 + 循环复制，形成无缝循环 */}
           {[...markets, ...markets].map((market, index) => (
-            <div key={`${market.symbol}-${index}`}>
+            <div key={`${market.symbol}-${index}`} data-market-item>
               <MarketCard market={market} />
             </div>
           ))}
