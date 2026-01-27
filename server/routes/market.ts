@@ -9,45 +9,42 @@ import { eq, and, gt } from "drizzle-orm";
 const CACHE_DURATION_MINUTES = 30;
 
 /**
- * 从 CoinGecko API 获取加密货币数据
+ * 从欧易 API 获取加密货币数据
  */
 async function getBinanceCryptoData(symbols: string[]): Promise<any[]> {
   try {
-    // 映射符号到 CoinGecko ID
-    const idMap: Record<string, string> = {
-      btc: 'bitcoin',
-      eth: 'ethereum',
-      bnb: 'binancecoin',
-      sol: 'solana',
-      xrp: 'ripple',
-      ada: 'cardano',
-      doge: 'dogecoin',
+    // 映射符号到欧易交易对
+    const instIdMap: Record<string, string> = {
+      btc: 'BTC-USDT',
+      eth: 'ETH-USDT',
+      bnb: 'BNB-USDT',
+      sol: 'SOL-USDT',
+      xrp: 'XRP-USDT',
+      ada: 'ADA-USDT',
+      doge: 'DOGE-USDT',
     };
 
-    // 构建 CoinGecko API 请求
-    const coinIds = symbols.map(s => {
-      const base = s.split('-')[0].toLowerCase();
-      return idMap[base] || base;
-    }).join(',');
-
+    // 获取所有交易对的数据
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd&include_24hr_change=true`
+      'https://www.okx.com/api/v5/market/tickers?instType=SPOT'
     );
     
-    if (!response.ok) throw new Error('CoinGecko API error');
+    if (!response.ok) throw new Error('OKX API error');
     
-    const data = await response.json();
+    const result = await response.json();
+    const allData = result.data || [];
     
     return symbols.map((symbol) => {
       const base = symbol.split('-')[0].toLowerCase();
-      const coinId = idMap[base] || base;
-      const coinData = data[coinId];
+      const instId = instIdMap[base] || `${base.toUpperCase()}-USDT`;
+      const tickerData = allData.find((t: any) => t.instId === instId);
       
-      if (!coinData) return null;
+      if (!tickerData) return null;
       
-      const price = coinData.usd || 0;
-      const changePercent = coinData.usd_24h_change || 0;
-      const change = (price * changePercent) / 100;
+      const price = parseFloat(tickerData.last) || 0;
+      const open24h = parseFloat(tickerData.open24h) || price;
+      const changePercent = ((price - open24h) / open24h) * 100;
+      const change = price - open24h;
 
       return {
         symbol: symbol,
@@ -59,274 +56,36 @@ async function getBinanceCryptoData(symbols: string[]): Promise<any[]> {
       };
     }).filter(r => r !== null);
   } catch (error) {
-    console.error("Error fetching CoinGecko data:", error);
+    console.error("Error fetching OKX data:", error);
     return [];
   }
 }
 
-/**
- * 从缓存中获取市场数据
- */
-async function getCachedMarketData(symbol: string) {
-  try {
-    const db = await getDb();
-    if (!db) return null;
-
-    const cached = await db
-      .select()
-      .from(marketDataCache)
-      .where(
-        and(
-          eq(marketDataCache.symbol, symbol),
-          gt(marketDataCache.expiresAt, new Date())
-        )
-      )
-      .limit(1);
-
-    if (cached.length > 0) {
-      const data = cached[0];
-      return {
-        symbol: data.symbol,
-        name: data.name,
-        price: parseFloat(data.price.toString()),
-        change: parseFloat(data.change.toString()),
-        changePercent: parseFloat(data.changePercent.toString()),
-        fromCache: true,
-      };
-    }
-  } catch (error) {
-    console.error("Error reading from cache:", error);
-  }
-  return null;
-}
-
-/**
- * 保存市场数据到缓存
- */
-async function cacheMarketData(
-  symbol: string,
-  name: string,
-  price: number,
-  change: number,
-  changePercent: number,
-  region: string
-) {
-  try {
-    const db = await getDb();
-    if (!db) return;
-
-    const expiresAt = new Date(Date.now() + CACHE_DURATION_MINUTES * 60 * 1000);
-
-    // 先删除旧的缓存
-    await db
-      .delete(marketDataCache)
-      .where(eq(marketDataCache.symbol, symbol));
-
-    // 插入新的缓存
-    await db.insert(marketDataCache).values({
-      symbol,
-      name,
-      price: price.toString(),
-      change: change.toString(),
-      changePercent: changePercent.toString(),
-      region,
-      expiresAt,
-    });
-  } catch (error) {
-    console.error("Error writing to cache:", error);
-  }
-}
-
 export const marketRouter = router({
-  // 获取股票数据（优先使用缓存）
-  getStockData: publicProcedure
-    .input(z.object({
-      symbol: z.string(),
-      region: z.string().default("US"),
-      interval: z.string().default("1d"),
-      range: z.string().default("1d"),
-    }))
-    .query(async ({ input }) => {
-      // 先尝试从缓存获取
-      const cachedData = await getCachedMarketData(input.symbol);
-      if (cachedData) {
-        return cachedData;
-      }
-
-      // 缓存不存在或已过期，从 API 获取
-      try {
-        const result = await callDataApi("YahooFinance/get_stock_chart", {
-          query: {
-            symbol: input.symbol,
-            region: input.region,
-            interval: input.interval,
-            range: input.range,
-            includeAdjustedClose: "true",
-          },
-        });
-
-        if (!result || !(result as any).chart || !(result as any).chart.result || (result as any).chart.result.length === 0) {
-          throw new Error("No data found");
-        }
-
-        const chartResult = (result as any).chart.result[0];
-        const meta = chartResult.meta;
-        const timestamps = chartResult.timestamp;
-        const quotes = chartResult.indicators.quote[0];
-
-        // 获取最新的价格数据
-        const latestIndex = timestamps.length - 1;
-        const latestPrice = quotes.close[latestIndex] || meta.regularMarketPrice;
-        const previousClose = meta.previousClose || quotes.close[Math.max(0, latestIndex - 1)];
-        const change = latestPrice - previousClose;
-        const changePercent = ((change / previousClose) * 100);
-
-        const responseData = {
-          symbol: meta.symbol,
-          name: meta.longName || meta.symbol,
-          price: latestPrice,
-          change: parseFloat(change.toFixed(2)),
-          changePercent: parseFloat(changePercent.toFixed(2)),
-          currency: meta.currency,
-          exchange: meta.exchangeName,
-          regularMarketPrice: meta.regularMarketPrice,
-          fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh,
-          fiftyTwoWeekLow: meta.fiftyTwoWeekLow,
-          marketCap: meta.marketCap,
-          volume: meta.regularMarketVolume,
-          fromCache: false,
-        };
-
-        // 保存到缓存
-        await cacheMarketData(
-          meta.symbol,
-          meta.longName || meta.symbol,
-          latestPrice,
-          parseFloat(change.toFixed(2)),
-          parseFloat(changePercent.toFixed(2)),
-          input.region
-        );
-
-        return responseData;
-      } catch (error) {
-        console.error("Error fetching stock data:", error);
-        throw new Error(`Failed to fetch stock data for ${input.symbol}`);
-      }
-    }),
-
-  // 获取多个股票数据（优先使用缓存）
   getMultipleStocks: publicProcedure
-    .input(z.object({
-      symbols: z.array(z.string()),
-      region: z.string().default("US"),
-      interval: z.string().default("1d"),
-      range: z.string().default("1d"),
-    }))
+    .input(z.object({ symbols: z.array(z.string()) }))
     .query(async ({ input }) => {
-      try {
-        // 先从缓存获取所有可用的数据
-        const cachedResults: any[] = [];
-        const symbolsToFetch: string[] = [];
-
-        for (const symbol of input.symbols) {
-          const cached = await getCachedMarketData(symbol);
-          if (cached) {
-            cachedResults.push(cached);
-          } else {
-            symbolsToFetch.push(symbol);
+      const { symbols } = input;
+      
+      const results = await Promise.all(
+        symbols.map(async (symbol) => {
+          try {
+            const data = await callDataApi(`market/quote/${symbol}`);
+            return data;
+          } catch (error) {
+            console.error(`Error fetching ${symbol}:`, error);
+            return null;
           }
-        }
-
-        // 如果所有数据都在缓存中，直接返回
-        if (symbolsToFetch.length === 0) {
-          return cachedResults;
-        }
-
-        // 从 API 获取缺失的数据
-        const apiResults = await Promise.all(
-          symbolsToFetch.map(symbol =>
-            callDataApi("YahooFinance/get_stock_chart", {
-              query: {
-                symbol,
-                region: input.region,
-                interval: input.interval,
-                range: input.range,
-                includeAdjustedClose: "true",
-              },
-            }).catch(err => {
-              console.error(`Error fetching ${symbol}:`, err);
-              return null;
-            })
-          )
-        );
-
-        const newResults = apiResults
-          .filter((r): r is NonNullable<typeof r> => r && (r as any).chart && (r as any).chart.result && (r as any).chart.result.length > 0)
-          .map(result => {
-            const chartResult = (result as any).chart.result[0];
-            const meta = chartResult.meta;
-            const timestamps = chartResult.timestamp;
-            const quotes = chartResult.indicators.quote[0];
-
-            const latestIndex = timestamps.length - 1;
-            const latestPrice = quotes.close[latestIndex] || meta.regularMarketPrice;
-            const previousClose = meta.previousClose || quotes.close[Math.max(0, latestIndex - 1)];
-            const change = latestPrice - previousClose;
-            const changePercent = ((change / previousClose) * 100);
-
-            // 保存到缓存
-            cacheMarketData(
-              meta.symbol,
-              meta.longName || meta.symbol,
-              latestPrice,
-              parseFloat(change.toFixed(2)),
-              parseFloat(changePercent.toFixed(2)),
-              input.region
-            ).catch(err => console.error("Error caching data:", err));
-
-            return {
-              symbol: meta.symbol,
-              name: meta.longName || meta.symbol,
-              price: latestPrice,
-              change: parseFloat(change.toFixed(2)),
-              changePercent: parseFloat(changePercent.toFixed(2)),
-              currency: meta.currency,
-              exchange: meta.exchangeName,
-              fromCache: false,
-            };
-          });
-
-        return [...cachedResults, ...newResults];
-      } catch (error) {
-        console.error("Error fetching multiple stocks:", error);
-        throw new Error("Failed to fetch stock data");
-      }
+        })
+      );
+      
+      return results.filter(r => r !== null);
     }),
 
-  // 获取币安加密货币数据
   getBinanceCrypto: publicProcedure
-    .input(z.object({
-      symbols: z.array(z.string()),
-    }))
+    .input(z.object({ symbols: z.array(z.string()) }))
     .query(async ({ input }) => {
-      return await getBinanceCryptoData(input.symbols);
-    }),
-
-  // 清除过期的缓存数据
-  clearExpiredCache: publicProcedure
-    .query(async () => {
-      try {
-        const db = await getDb();
-        if (!db) throw new Error("Database not available");
-        const result = await db
-          .delete(marketDataCache)
-          .where(
-            gt(marketDataCache.expiresAt, new Date())
-          );
-        return { success: true, message: "Expired cache cleared" };
-      } catch (error) {
-        console.error("Error clearing cache:", error);
-        throw new Error("Failed to clear cache");
-      }
+      const { symbols } = input;
+      return await getBinanceCryptoData(symbols);
     }),
 });
