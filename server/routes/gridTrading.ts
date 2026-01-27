@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { getKlineDataByYears } from "../db";
-import { backtestSpotGrid } from "../gridTradingBacktest";
+import { streamKlineDataByDays } from "../db-streaming";
+import { initBacktestState, processBatch, finalizeBacktest } from "../gridTradingBacktestStreaming";
 
 /**
  * 网格交易回测路由
  */
 export const gridTradingRouter = router({
   /**
-   * 执行网格交易回测
+   * 执行网格交易回测（流式处理版本）
    */
   backtest: protectedProcedure
     .input(
@@ -48,30 +48,78 @@ export const gridTradingRouter = router({
       // 转换交易对符号（BTC -> BTCUSDT）
       const binanceSymbol = `${symbol}USDT`;
 
-      // 查询K线数据
-      const klines = await getKlineDataByYears(binanceSymbol, "1m", years);
+      // 记录开始时间
+      const startTime = Date.now();
+      console.log(`[回测开始] 交易对: ${binanceSymbol}, 年份: ${years.join(", ")}`);
 
-      if (klines.length === 0) {
+      // 初始化回测状态
+      let state: any = null;
+      let totalKlines = 0;
+      let processedDays = 0;
+
+      // 按天流式处理K线数据
+      const { totalRecords, totalDays } = await streamKlineDataByDays(
+        binanceSymbol,
+        "1m",
+        years,
+        async (batch, dayIndex, totalDaysCount, currentDate) => {
+          if (batch.length === 0) {
+            return;
+          }
+
+          // 第一批数据：初始化状态
+          if (state === null) {
+            state = initBacktestState(
+              {
+                minPrice,
+                maxPrice,
+                gridCount,
+                investment,
+                type,
+                leverage,
+              },
+              batch[0]
+            );
+            console.log(`[回测初始化] 起始价格: ${state.startPrice}, 网格数量: ${gridCount}`);
+          }
+
+          // 处理这批数据
+          processBatch(state, batch);
+          totalKlines += batch.length;
+          processedDays++;
+
+          // 计算进度百分比
+          const progress = ((dayIndex + 1) / totalDaysCount * 100).toFixed(1);
+          const dateStr = currentDate.toISOString().split('T')[0];
+          console.log(`[回测进度] ${progress}% | ${dateStr} | 已处理 ${totalKlines} 条K线 (${processedDays}/${totalDaysCount} 天)`);
+        }
+      );
+
+      // 检查是否有数据
+      if (totalRecords === 0 || state === null) {
         throw new Error(`未找到${years.join(", ")}年的K线数据，请先获取历史数据`);
       }
 
-      // 执行回测
-      const result = backtestSpotGrid(
-        {
-          minPrice,
-          maxPrice,
-          gridCount,
-          investment,
-          type,
-          leverage,
-        },
-        klines
-      );
+      // 完成回测并计算最终结果
+      const result = finalizeBacktest(state, {
+        minPrice,
+        maxPrice,
+        gridCount,
+        investment,
+        type,
+        leverage,
+      }, totalDays);
+
+      // 记录结束时间
+      const endTime = Date.now();
+      const duration = ((endTime - startTime) / 1000).toFixed(2);
+      console.log(`[回测完成] 耗时: ${duration}秒, 处理了 ${totalKlines} 条K线, 分 ${processedDays} 天`);
+      console.log(`[回测结果] 总收益: ¥${result.totalProfit.toFixed(2)}, 收益率: ${result.profitRate.toFixed(2)}%`);
 
       return {
         success: true,
         data: result,
-        message: `回测完成，共分析${klines.length}条K线数据`,
+        message: `回测完成，共分析${totalKlines}条K线数据（${processedDays}天），耗时${duration}秒`,
       };
     }),
 });
