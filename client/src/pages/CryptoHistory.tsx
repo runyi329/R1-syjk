@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Database, Sparkles, TrendingUp, Calendar } from "lucide-react";
+import { ArrowLeft, Database, Sparkles, Calendar, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -60,124 +59,191 @@ export default function CryptoHistory() {
 
             {/* 历史数据分析内容 */}
             <TabsContent value="historical" className="space-y-8">
-              {/* 加密货币选择 */}
+              {/* 加密货币按钮选择 */}
               <Card className="border-primary/20 bg-card/50 backdrop-blur">
-                <CardContent className="space-y-6 pt-6">
-                  <div className="space-y-2">
-                    <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-                      <SelectTrigger id="crypto-select" className="h-12">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="BTC">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-orange-500/10 rounded-full flex items-center justify-center">
-                              <span className="text-orange-500 font-bold text-sm">₿</span>
-                            </div>
-                            <div>
-                              <div className="font-semibold">比特币 (Bitcoin)</div>
-                              <div className="text-xs text-muted-foreground">BTC</div>
-                            </div>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="ETH">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center">
-                              <span className="text-blue-500 font-bold text-sm">Ξ</span>
-                            </div>
-                            <div>
-                              <div className="font-semibold">以太坊 (Ethereum)</div>
-                              <div className="text-xs text-muted-foreground">ETH</div>
-                            </div>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <CardContent className="pt-6">
+                  <div className="flex flex-wrap gap-3">
+                    {/* 比特币按钮 */}
+                    <Button
+                      variant={selectedCrypto === "BTC" ? "default" : "outline"}
+                      size="lg"
+                      onClick={() => setSelectedCrypto("BTC")}
+                      className={`flex items-center gap-3 h-auto py-3 px-5 ${
+                        selectedCrypto === "BTC" 
+                          ? "bg-orange-500 hover:bg-orange-600 text-white border-orange-500" 
+                          : "border-orange-500/30 hover:bg-orange-500/10"
+                      }`}
+                    >
+                      <img src="/crypto-logos/btc.png" alt="Bitcoin" className="w-8 h-8 rounded-full" />
+                      <div className="text-left">
+                        <div className="font-semibold">比特币</div>
+                        <div className="text-xs opacity-80">Bitcoin (BTC)</div>
+                      </div>
+                    </Button>
 
-                  {/* 币种信息 */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                    {selectedCrypto === "BTC" && (
-                      <>
-                        <Card className="border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-500/5">
-                          <CardHeader className="pb-3">
-                            <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-2">
-                              <span className="text-orange-500 font-bold text-xl">₿</span>
-                            </div>
-                            <CardTitle className="text-base">比特币 (BTC)</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">当前价格</span>
-                              <span className="font-semibold">~$88,500</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">市值排名</span>
-                              <span className="font-semibold">#1</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">数据可用性</span>
-                              <span className="font-semibold text-green-500">2017 至今</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="border-border/50">
-                          <CardHeader className="pb-3">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
-                              <Calendar className="w-6 h-6 text-primary" />
-                            </div>
-                            <CardTitle className="text-base">数据说明</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-2 text-sm text-muted-foreground">
-                            <p>• 提供开盘、收盘、最高、最低价格</p>
-                            <p>• 支持多种时间粒度（1分钟-1月）</p>
-                            <p>• 包含交易量和市值数据</p>
-                          </CardContent>
-                        </Card>
-                      </>
-                    )}
-                    {selectedCrypto === "ETH" && (
-                      <>
-                        <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-                          <CardHeader className="pb-3">
-                            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-2">
-                              <span className="text-blue-500 font-bold text-xl">Ξ</span>
-                            </div>
-                            <CardTitle className="text-base">以太坊 (ETH)</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">当前价格</span>
-                              <span className="font-semibold">~$2,950</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">市值排名</span>
-                              <span className="font-semibold">#2</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">数据可用性</span>
-                              <span className="font-semibold text-green-500">2017 至今</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="border-border/50">
-                          <CardHeader className="pb-3">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
-                              <Calendar className="w-6 h-6 text-primary" />
-                            </div>
-                            <CardTitle className="text-base">数据说明</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-2 text-sm text-muted-foreground">
-                            <p>• 提供开盘、收盘、最高、最低价格</p>
-                            <p>• 支持多种时间粒度（1分钟-1月）</p>
-                            <p>• 包含交易量和市值数据</p>
-                          </CardContent>
-                        </Card>
-                      </>
-                    )}
+                    {/* 以太坊按钮 */}
+                    <Button
+                      variant={selectedCrypto === "ETH" ? "default" : "outline"}
+                      size="lg"
+                      onClick={() => setSelectedCrypto("ETH")}
+                      className={`flex items-center gap-3 h-auto py-3 px-5 ${
+                        selectedCrypto === "ETH" 
+                          ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-500" 
+                          : "border-blue-500/30 hover:bg-blue-500/10"
+                      }`}
+                    >
+                      <img src="/crypto-logos/eth.png" alt="Ethereum" className="w-8 h-8 rounded-full" />
+                      <div className="text-left">
+                        <div className="font-semibold">以太坊</div>
+                        <div className="text-xs opacity-80">Ethereum (ETH)</div>
+                      </div>
+                    </Button>
+
+                    {/* 索拉纳按钮 */}
+                    <Button
+                      variant={selectedCrypto === "SOL" ? "default" : "outline"}
+                      size="lg"
+                      onClick={() => setSelectedCrypto("SOL")}
+                      className={`flex items-center gap-3 h-auto py-3 px-5 ${
+                        selectedCrypto === "SOL" 
+                          ? "bg-purple-500 hover:bg-purple-600 text-white border-purple-500" 
+                          : "border-purple-500/30 hover:bg-purple-500/10"
+                      }`}
+                    >
+                      <img src="/crypto-logos/sol.png" alt="Solana" className="w-8 h-8 rounded-full" />
+                      <div className="text-left">
+                        <div className="font-semibold">索拉纳</div>
+                        <div className="text-xs opacity-80">Solana (SOL)</div>
+                      </div>
+                    </Button>
+
+                    {/* 添加币种按钮 */}
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="flex items-center gap-2 h-auto py-3 px-5 border-dashed border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span className="font-semibold">添加币种</span>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* 币种信息 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {selectedCrypto === "BTC" && (
+                  <>
+                    <Card className="border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-500/5">
+                      <CardHeader className="pb-3">
+                        <img src="/crypto-logos/btc.png" alt="Bitcoin" className="w-12 h-12 rounded-lg mb-2" />
+                        <CardTitle className="text-base">比特币 (BTC)</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">当前价格</span>
+                          <span className="font-semibold">~$88,500</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">市值排名</span>
+                          <span className="font-semibold">#1</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">数据可用性</span>
+                          <span className="font-semibold text-green-500">2017 至今</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-border/50">
+                      <CardHeader className="pb-3">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
+                          <Calendar className="w-6 h-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-base">数据说明</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm text-muted-foreground">
+                        <p>• 提供开盘、收盘、最高、最低价格</p>
+                        <p>• 支持多种时间粒度（1分钟-1月）</p>
+                        <p>• 包含交易量和市值数据</p>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+                {selectedCrypto === "ETH" && (
+                  <>
+                    <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5">
+                      <CardHeader className="pb-3">
+                        <img src="/crypto-logos/eth.png" alt="Ethereum" className="w-12 h-12 rounded-lg mb-2" />
+                        <CardTitle className="text-base">以太坊 (ETH)</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">当前价格</span>
+                          <span className="font-semibold">~$2,950</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">市值排名</span>
+                          <span className="font-semibold">#2</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">数据可用性</span>
+                          <span className="font-semibold text-green-500">2017 至今</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-border/50">
+                      <CardHeader className="pb-3">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
+                          <Calendar className="w-6 h-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-base">数据说明</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm text-muted-foreground">
+                        <p>• 提供开盘、收盘、最高、最低价格</p>
+                        <p>• 支持多种时间粒度（1分钟-1月）</p>
+                        <p>• 包含交易量和市值数据</p>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+                {selectedCrypto === "SOL" && (
+                  <>
+                    <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-500/5">
+                      <CardHeader className="pb-3">
+                        <img src="/crypto-logos/sol.png" alt="Solana" className="w-12 h-12 rounded-lg mb-2" />
+                        <CardTitle className="text-base">索拉纳 (SOL)</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">当前价格</span>
+                          <span className="font-semibold">~$185</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">市值排名</span>
+                          <span className="font-semibold">#5</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">数据可用性</span>
+                          <span className="font-semibold text-green-500">2020 至今</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-border/50">
+                      <CardHeader className="pb-3">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
+                          <Calendar className="w-6 h-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-base">数据说明</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm text-muted-foreground">
+                        <p>• 提供开盘、收盘、最高、最低价格</p>
+                        <p>• 支持多种时间粒度（1分钟-1月）</p>
+                        <p>• 包含交易量和市值数据</p>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+              </div>
 
               {/* 功能预告 */}
               <Card className="border-yellow-500/20 bg-yellow-500/5">
@@ -230,7 +296,7 @@ export default function CryptoHistory() {
               <Card className="border-primary/20 bg-card/50 backdrop-blur">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
+                    <Sparkles className="w-5 h-5 text-primary" />
                     AI预测功能
                   </CardTitle>
                   <CardDescription>
