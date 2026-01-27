@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ArrowUp, ArrowDown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { trpc } from '@/lib/trpc';
@@ -92,9 +92,10 @@ interface MarketTickerRowProps {
   markets: MarketData[];
   direction?: 'left' | 'right';
   rowId: string;
+  source?: string;
 }
 
-function MarketCard({ market }: { market: MarketData }) {
+function MarketCard({ market, source = '' }: { market: MarketData; source?: string }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const prevPriceRef = useRef(market.price);
 
@@ -132,31 +133,36 @@ function MarketCard({ market }: { market: MarketData }) {
       )}>
         {market.price.toFixed(2)}
       </div>
-      {isMarketClosed(market.symbol) ? (
-        <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
-          <Clock className="w-3 h-3" />
-          <span>休市</span>
-        </div>
-      ) : (
-        <div
-          className={cn(
-            'flex items-center justify-end text-xs font-medium',
-            market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-          )}
-        >
-          {market.change >= 0 ? (
-            <ArrowUp className="w-3 h-3 mr-0.5" />
-          ) : (
-            <ArrowDown className="w-3 h-3 mr-0.5" />
-          )}
-          <span>{Math.abs(market.change).toFixed(2)}</span>
-        </div>
-      )}
+      <div className="flex items-center justify-between mt-1">
+        {isMarketClosed(market.symbol) ? (
+          <div className="flex items-center text-xs font-medium text-muted-foreground gap-1">
+            <Clock className="w-3 h-3" />
+            <span>休市</span>
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'flex items-center text-xs font-medium',
+              market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
+            )}
+          >
+            {market.change >= 0 ? (
+              <ArrowUp className="w-3 h-3 mr-0.5" />
+            ) : (
+              <ArrowDown className="w-3 h-3 mr-0.5" />
+            )}
+            <span>{Math.abs(market.change).toFixed(2)}</span>
+          </div>
+        )}
+        {source && (
+          <span className="text-[10px] text-muted-foreground/60">{source}</span>
+        )}
+      </div>
     </div>
   );
 }
 
-function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRowProps) {
+function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: MarketTickerRowProps) {
   const [isScrolling, setIsScrolling] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -179,8 +185,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
-    const touchCurrentX = e.touches[0].clientX;
-    const diff = touchCurrentX - touchStartX.current;
+    const diff = e.touches[0].clientX - touchStartX.current;
     setScrollOffset(touchStartOffset.current + diff);
   };
 
@@ -200,7 +205,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || e.buttons !== 1) return;
+    if (!isDragging) return;
     const diff = e.clientX - touchStartX.current;
     setScrollOffset(touchStartOffset.current + diff);
   };
@@ -210,33 +215,13 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
     setIsScrolling(true);
   };
 
-  // 无缝循环动画 - 使用动态计算的实际宽度
+  // 计算滚动周期
   useEffect(() => {
-    if (!isScrolling || isDragging || !trackRef.current || markets.length === 0) return;
+    if (!trackRef.current || !isScrolling || isDragging) return;
 
     const track = trackRef.current;
-    // 根据实际DOM计算实际宽度
-    const getActualWidth = () => {
-      const children = track.querySelectorAll('[data-market-item]');
-      if (children.length === 0) return 0;
-      
-      // 计算第一个周期的实际宽度（所有markets的宽度 + 所有gaps）
-      let totalWidth = 0;
-      for (let i = 0; i < markets.length; i++) {
-        const rect = children[i]?.getBoundingClientRect();
-        if (rect) {
-          totalWidth += rect.width;
-          // 每个元素后面都加gap（包括最后一个，因为它后面是第一个元素的复制）
-          totalWidth += 16;
-        }
-      }
-      return totalWidth;
-    };
-    
-    const singleCycleWidth = getActualWidth();
-    if (singleCycleWidth === 0) return;
-    
-    const ANIMATION_DURATION = 40000; // 40 秒
+    const totalWidth = track.scrollWidth / 2; // 因为数据被复制了一份
+    const scrollDuration = 40000; // 40 秒完成一个周期
 
     const animate = (currentTime: number) => {
       if (lastTimeRef.current === 0) {
@@ -244,233 +229,148 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
       }
 
       const elapsed = currentTime - lastTimeRef.current;
-      const progress = (elapsed % ANIMATION_DURATION) / ANIMATION_DURATION;
+      let newOffset = (elapsed / scrollDuration) * totalWidth;
 
-      if (direction === 'left') {
-        // 从右向左滚动
-        const offset = -(progress * singleCycleWidth);
-        setScrollOffset(offset);
-      } else {
-        // 从左向右滚动（向左滚动，需要负值偏移）
-        const offset = -(singleCycleWidth - (progress * singleCycleWidth));
-        setScrollOffset(offset);
+      if (direction === 'right') {
+        newOffset = -newOffset;
       }
 
+      if (Math.abs(newOffset) >= totalWidth) {
+        lastTimeRef.current = 0;
+        newOffset = 0;
+      }
+
+      setScrollOffset(newOffset);
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    lastTimeRef.current = 0;
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
-      lastTimeRef.current = 0;
     };
-  }, [isScrolling, isDragging, markets, direction]);
+  }, [isScrolling, isDragging, direction]);
+
+  const displayMarkets = [...markets, ...markets];
 
   return (
-    <div className="w-full overflow-hidden">
-      <div 
-        ref={containerRef}
-        className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+    <div
+      ref={containerRef}
+      className="w-full overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <div
+        ref={trackRef}
+        className={cn(
+          'flex gap-4 transition-transform',
+          isDragging ? '' : 'transition-transform duration-[50ms]'
+        )}
+        style={{
+          transform: `translateX(${scrollOffset}px)`,
+        }}
       >
-        <div 
-          ref={trackRef}
-          className="flex gap-4 px-1"
-          style={{
-            transform: `translateX(${scrollOffset}px)`,
-            transition: isDragging ? 'none' : 'transform 0.05s linear',
-          }}
-        >
-          {/* 原始数据 + 循环复制，形成无缝循环 */}
-          {[...markets, ...markets].map((market, index) => (
-            <div key={`${market.symbol}-${index}`} data-market-item>
-              <MarketCard market={market} />
-            </div>
-          ))}
-        </div>
+        {displayMarkets.map((market, index) => (
+          <MarketCard key={`${market.symbol}-${index}`} market={market} source={source} />
+        ))}
       </div>
     </div>
   );
 }
 
-function MarketTickerStocks() {
-  const [markets, setMarkets] = useState<MarketData[]>(INITIAL_DATA);
-  const [cryptoMarkets, setCryptoMarkets] = useState<MarketData[]>(CRYPTO_DATA);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const stocksByRegion = {
-    US: STOCK_SYMBOLS.filter(s => s.region === 'US').map(s => s.symbol),
-    HK: STOCK_SYMBOLS.filter(s => s.region === 'HK').map(s => s.symbol),
-    CN: STOCK_SYMBOLS.filter(s => s.region === 'CN').map(s => s.symbol),
-    JP: STOCK_SYMBOLS.filter(s => s.region === 'JP').map(s => s.symbol),
-    DE: STOCK_SYMBOLS.filter(s => s.region === 'DE').map(s => s.symbol),
-  };
-
-  const usStocksQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: stocksByRegion.US,
-      region: 'US',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: stocksByRegion.US.length > 0,
-    }
-  );
-
-  const hkStocksQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: stocksByRegion.HK,
-      region: 'HK',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: stocksByRegion.HK.length > 0,
-    }
-  );
-
-  const cnStocksQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: stocksByRegion.CN,
-      region: 'CN',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: stocksByRegion.CN.length > 0,
-    }
-  );
-
-  const jpStocksQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: stocksByRegion.JP,
-      region: 'JP',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: stocksByRegion.JP.length > 0,
-    }
-  );
-
-  const deStocksQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: stocksByRegion.DE,
-      region: 'DE',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: stocksByRegion.DE.length > 0,
-    }
-  );
-
-  const cryptoSymbols = CRYPTO_SYMBOLS.map(s => s.symbol);
-  const cryptoQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: cryptoSymbols,
-      region: 'US',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: cryptoSymbols.length > 0,
-    }
-  );
-
-  useEffect(() => {
-    const allData = [
-      ...(cnStocksQuery.data || []),
-      ...(hkStocksQuery.data || []),
-      ...(usStocksQuery.data || []),
-      ...(jpStocksQuery.data || []),
-      ...(deStocksQuery.data || []),
-    ];
-
-    if (allData.length > 0) {
-      setMarkets(allData);
-      setIsLoading(false);
-    }
-  }, [usStocksQuery.data, hkStocksQuery.data, cnStocksQuery.data, jpStocksQuery.data, deStocksQuery.data]);
-
-  useEffect(() => {
-    if (cryptoQuery.data && cryptoQuery.data.length > 0) {
-      setCryptoMarkets(cryptoQuery.data);
-    }
-  }, [cryptoQuery.data]);
+export function MarketTickerStocks() {
+  const [stocks, setStocks] = useState<MarketData[]>(INITIAL_DATA);
 
   return (
-    <MarketTickerRow 
-      markets={markets} 
+    <MarketTickerRow
+      markets={stocks}
       direction="left"
-      rowId="row1"
+      rowId="stocks"
+      source="Mock"
     />
   );
 }
 
-function MarketTickerCrypto() {
-  const [cryptoMarkets, setCryptoMarkets] = useState<MarketData[]>(CRYPTO_DATA);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function MarketTickerCrypto() {
+  const [cryptos, setCryptos] = useState<MarketData[]>(CRYPTO_DATA);
 
-  const cryptoSymbols = CRYPTO_SYMBOLS.map(s => s.symbol);
-  const cryptoQuery = trpc.market.getBinanceCrypto.useQuery(
-    {
-      symbols: cryptoSymbols,
-    },
-    {
-      refetchInterval: 5000,
-      retry: 2,
-      enabled: cryptoSymbols.length > 0,
-    }
-  );
-
+  // 获取欧易加密货币数据
   useEffect(() => {
-    if (cryptoQuery.data && cryptoQuery.data.length > 0) {
-      setCryptoMarkets(cryptoQuery.data);
-    }
-  }, [cryptoQuery.data]);
+    const fetchCryptoData = async () => {
+      try {
+        const response = await fetch('https://www.okx.com/api/v5/market/tickers?instType=SPOT');
+        if (!response.ok) throw new Error('OKX API error');
+
+        const result = await response.json();
+        const allData = result.data || [];
+
+        const symbols = ['BTC-USDT', 'ETH-USDT', 'BNB-USDT', 'SOL-USDT', 'XRP-USDT', 'ADA-USDT', 'DOGE-USDT'];
+        const nameMap: Record<string, string> = {
+          'BTC-USDT': '比特币',
+          'ETH-USDT': '以太坊',
+          'BNB-USDT': '币安币',
+          'SOL-USDT': '索拉纳',
+          'XRP-USDT': '瑞波币',
+          'ADA-USDT': 'Cardano',
+          'DOGE-USDT': 'Dogecoin',
+        };
+
+        const updatedCryptos = symbols.map((instId) => {
+          const tickerData = allData.find((t: any) => t.instId === instId);
+
+          if (!tickerData) {
+            return CRYPTO_DATA.find(c => c.name === nameMap[instId]) || CRYPTO_DATA[0];
+          }
+
+          const price = parseFloat(tickerData.last) || 0;
+          const open24h = parseFloat(tickerData.open24h) || price;
+          const changePercent = ((price - open24h) / open24h) * 100;
+          const change = price - open24h;
+
+          return {
+            symbol: instId,
+            name: nameMap[instId],
+            price: parseFloat(price.toFixed(2)),
+            change: parseFloat(change.toFixed(2)),
+            changePercent: parseFloat(changePercent.toFixed(2)),
+            isOpen: true,
+          };
+        });
+
+        setCryptos(updatedCryptos);
+      } catch (error) {
+        console.error('Error fetching OKX data:', error);
+      }
+    };
+
+    fetchCryptoData();
+    const interval = setInterval(fetchCryptoData, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <MarketTickerRow 
-      markets={cryptoMarkets} 
+    <MarketTickerRow
+      markets={cryptos}
       direction="right"
-      rowId="row2"
+      rowId="crypto"
+      source="OKX"
     />
   );
 }
 
 export function MarketTicker() {
   return (
-    <div className="space-y-3">
+    <div className="w-full space-y-4">
       <MarketTickerStocks />
       <MarketTickerCrypto />
     </div>
   );
 }
-
-export { MarketTickerStocks, MarketTickerCrypto };
