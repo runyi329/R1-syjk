@@ -267,6 +267,7 @@ function MarketTickerStocks() {
 // 第2行：加密货币（向右滚动）
 function MarketTickerCrypto() {
   const [cryptos, setCryptos] = useState<MarketData[]>(CRYPTO_DATA);
+  const [displayCryptos, setDisplayCryptos] = useState<MarketData[]>(CRYPTO_DATA); // 用于显示的数据（带模拟波动）
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isScrolling, setIsScrolling] = useState(true);
@@ -386,26 +387,68 @@ function MarketTickerCrypto() {
           return {
             symbol: instId,
             name: nameMap[instId],
-            price: parseFloat(price.toFixed(2)),
+            price: parseFloat(price.toFixed(4)), // 保留 4 位小数，让变化更明显
             change: parseFloat(change.toFixed(2)),
             changePercent: parseFloat(changePercent.toFixed(2)),
             isOpen: true,
           };
         });
 
+        console.log('[MarketTicker] Updated crypto prices:', updatedCryptos.map(c => `${c.name}: ${c.price}`));
         setCryptos(updatedCryptos);
+        setDisplayCryptos(updatedCryptos); // 同步更新显示数据
       } catch (error) {
         console.error('Error fetching OKX data:', error);
       }
     };
 
     fetchCryptoData();
-    const interval = setInterval(fetchCryptoData, 5000);
+    const interval = setInterval(fetchCryptoData, 2000); // 2 秒更新一次
 
     return () => clearInterval(interval);
   }, []);
 
-  const displayMarkets = [...cryptos, ...cryptos];
+  // 模拟价格波动效果（每 0.5-1 秒随机更新一次）
+  useEffect(() => {
+    const simulateFluctuation = () => {
+      setDisplayCryptos(prevDisplay => 
+        prevDisplay.map((crypto, index) => {
+          const baseCrypto = cryptos[index];
+          if (!baseCrypto) return crypto;
+
+          // 在真实价格基础上增加 ±0.3% 的随机波动
+          const fluctuation = (Math.random() - 0.5) * 0.006; // ±0.3%
+          const newPrice = baseCrypto.price * (1 + fluctuation);
+          const priceChange = newPrice - baseCrypto.price;
+
+          return {
+            ...baseCrypto,
+            price: parseFloat(newPrice.toFixed(4)),
+            change: parseFloat((baseCrypto.change + priceChange).toFixed(2)),
+          };
+        })
+      );
+    };
+
+    // 随机间隔 500-1000ms
+    const scheduleNext = () => {
+      const delay = 500 + Math.random() * 500;
+      return setTimeout(() => {
+        simulateFluctuation();
+        timeoutRef.current = scheduleNext();
+      }, delay);
+    };
+
+    const timeoutRef = { current: scheduleNext() };
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [cryptos]);
+
+  const displayMarkets = [...displayCryptos, ...displayCryptos];
 
   return (
     <div
