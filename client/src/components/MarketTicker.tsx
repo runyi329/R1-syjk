@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ArrowUp, ArrowDown, Clock, AlertCircle } from 'lucide-react';
+import { ArrowUp, ArrowDown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { trpc } from '@/lib/trpc';
 
@@ -65,7 +65,7 @@ function isMarketClosed(symbol: string): boolean {
   const hours = chinaTime.getHours() + chinaTime.getMinutes() / 60;
   const dayOfWeek = chinaTime.getDay();
 
-  // 检查是否是需日一至需日五 (0 = 星期日, 6 = 星期六)
+  // 检查是否是工作日一至工作日五 (0 = 星期日, 6 = 星期六)
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
   
   // 检查是否在交易时间内
@@ -90,50 +90,61 @@ function isMarketClosed(symbol: string): boolean {
   return false;
 }
 
-function MarketTickerRow({ markets, direction = 'left' }: { markets: MarketData[], direction?: 'left' | 'right' }) {
+interface MarketTickerRowProps {
+  markets: MarketData[];
+  direction?: 'left' | 'right';
+  rowId: string; // 用于区分不同的行
+}
+
+function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRowProps) {
   const [isScrolling, setIsScrolling] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchStartOffset = useRef(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsScrolling(false);
+    setIsDragging(true);
     touchStartX.current = e.touches[0].clientX;
     touchStartOffset.current = scrollOffset;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
     const touchCurrentX = e.touches[0].clientX;
     const diff = touchCurrentX - touchStartX.current;
     setScrollOffset(touchStartOffset.current + diff);
   };
 
   const handleTouchEnd = () => {
+    setIsDragging(false);
     setIsScrolling(true);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsScrolling(false);
+    setIsDragging(true);
     touchStartX.current = e.clientX;
     touchStartOffset.current = scrollOffset;
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (e.buttons === 1) {
-      const diff = e.clientX - touchStartX.current;
-      setScrollOffset(touchStartOffset.current + diff);
-    }
+    if (!isDragging || e.buttons !== 1) return;
+    const diff = e.clientX - touchStartX.current;
+    setScrollOffset(touchStartOffset.current + diff);
   };
 
   const handleMouseUp = () => {
+    setIsDragging(false);
     setIsScrolling(true);
   };
 
   return (
     <div className="w-full overflow-hidden">
       <style>{`
-        @keyframes scroll-left {
+        @keyframes scroll-left-${rowId} {
           0% {
             transform: translateX(100%);
           }
@@ -141,7 +152,7 @@ function MarketTickerRow({ markets, direction = 'left' }: { markets: MarketData[
             transform: translateX(-100%);
           }
         }
-        @keyframes scroll-right {
+        @keyframes scroll-right-${rowId} {
           0% {
             transform: translateX(-100%);
           }
@@ -149,16 +160,18 @@ function MarketTickerRow({ markets, direction = 'left' }: { markets: MarketData[
             transform: translateX(100%);
           }
         }
-        .market-ticker-scroll-left {
-          animation: ${isScrolling ? 'scroll-left' : 'none'} 40s linear infinite;
+        .market-ticker-scroll-left-${rowId} {
+          animation: ${isScrolling ? `scroll-left-${rowId}` : 'none'} 40s linear infinite;
           display: flex;
           gap: 1rem;
+          transition: ${isDragging ? 'none' : 'transform 0.1s ease-out'};
           ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
         }
-        .market-ticker-scroll-right {
-          animation: ${isScrolling ? 'scroll-right' : 'none'} 40s linear infinite;
+        .market-ticker-scroll-right-${rowId} {
+          animation: ${isScrolling ? `scroll-right-${rowId}` : 'none'} 40s linear infinite;
           display: flex;
           gap: 1rem;
+          transition: ${isDragging ? 'none' : 'transform 0.1s ease-out'};
           ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
         }
       `}</style>
@@ -175,7 +188,7 @@ function MarketTickerRow({ markets, direction = 'left' }: { markets: MarketData[
       >
         <div className={cn(
           'flex gap-4 px-1',
-          direction === 'left' ? 'market-ticker-scroll-left' : 'market-ticker-scroll-right'
+          direction === 'left' ? `market-ticker-scroll-left-${rowId}` : `market-ticker-scroll-right-${rowId}`
         )}>
           {markets.map((market) => (
             <div
@@ -310,119 +323,33 @@ export function MarketTicker() {
     ];
 
     if (allData.length > 0) {
-      const updatedMarkets = allData.map((stock: any) => {
-        const symbolInfo = STOCK_SYMBOLS.find(s => s.symbol === stock.symbol);
-        return {
-          symbol: stock.symbol,
-          name: symbolInfo?.name || stock.name,
-          price: stock.price,
-          change: stock.change,
-          changePercent: stock.changePercent,
-          isOpen: true,
-        };
-      });
-      setMarkets(updatedMarkets);
+      setMarkets(allData);
       setIsLoading(false);
-      setError(null);
     }
   }, [usStocksQuery.data, hkStocksQuery.data, cnStocksQuery.data]);
 
-  // 当获取到加密货币数据时，更新加密货币数据
+  // 更新加密货币数据
   useEffect(() => {
     if (cryptoQuery.data && cryptoQuery.data.length > 0) {
-      const updatedCrypto = cryptoQuery.data.map((crypto: any) => {
-        const symbolInfo = CRYPTO_SYMBOLS.find(s => s.symbol === crypto.symbol);
-        return {
-          symbol: crypto.symbol,
-          name: symbolInfo?.name || crypto.name,
-          price: crypto.price,
-          change: crypto.change,
-          changePercent: crypto.changePercent,
-          isOpen: true,
-        };
-      });
-      setCryptoMarkets(updatedCrypto);
+      setCryptoMarkets(cryptoQuery.data);
     }
-  }, [cryptoQuery.data]);
-
-  // 处理错误
-  useEffect(() => {
-    if (usStocksQuery.error || hkStocksQuery.error || cnStocksQuery.error) {
-      console.error('Failed to fetch stock data:', usStocksQuery.error || hkStocksQuery.error || cnStocksQuery.error);
-      setError('无法获取实时数据');
-      setIsLoading(false);
-    }
-  }, [usStocksQuery.error, hkStocksQuery.error, cnStocksQuery.error]);
-
-  // 模拟实时价格波动（仅当没有实时数据时）
-  useEffect(() => {
-    const isLoading = usStocksQuery.isLoading || hkStocksQuery.isLoading || cnStocksQuery.isLoading;
-    const hasData = usStocksQuery.data || hkStocksQuery.data || cnStocksQuery.data;
-    if (isLoading || hasData) return;
-
-    const interval = setInterval(() => {
-      setMarkets(prevMarkets =>
-        prevMarkets.map(market => {
-          if (!market.isOpen) return market;
-
-          const volatility = market.price * 0.0005;
-          const change = (Math.random() - 0.5) * volatility;
-          const newPrice = market.price + change;
-          const newChange = market.change + change;
-          const newChangePercent = (newChange / (market.price - market.change)) * 100;
-
-          return {
-            ...market,
-            price: newPrice,
-            change: newChange,
-            changePercent: newChangePercent,
-          };
-        })
-      );
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [usStocksQuery.isLoading, usStocksQuery.data, hkStocksQuery.isLoading, hkStocksQuery.data, cnStocksQuery.isLoading, cnStocksQuery.data]);
-
-  // 模拟加密货币价格波动
-  useEffect(() => {
-    if (cryptoQuery.data && cryptoQuery.data.length > 0) return;
-
-    const interval = setInterval(() => {
-      setCryptoMarkets(prevMarkets =>
-        prevMarkets.map(market => {
-          const volatility = market.price * 0.001; // 加密货币波动更大
-          const change = (Math.random() - 0.5) * volatility;
-          const newPrice = market.price + change;
-          const newChange = market.change + change;
-          const newChangePercent = (newChange / (market.price - market.change)) * 100;
-
-          return {
-            ...market,
-            price: newPrice,
-            change: newChange,
-            changePercent: newChangePercent,
-          };
-        })
-      );
-    }, 2000);
-
-    return () => clearInterval(interval);
   }, [cryptoQuery.data]);
 
   return (
-    <div className="w-full space-y-3 pb-4 md:pb-0">
-      {error && (
-        <div className="flex items-center gap-2 px-1 mb-2 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-500">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
-      {/* 第一行：从右向左滚动 */}
-      <MarketTickerRow markets={markets} direction="left" />
+    <div className="space-y-3">
+      {/* 第一行：股票指数（从右向左滚动） */}
+      <MarketTickerRow 
+        markets={markets} 
+        direction="left"
+        rowId="row1"
+      />
       
-      {/* 第二行：从左向右滚动 */}
-      <MarketTickerRow markets={cryptoMarkets} direction="right" />
+      {/* 第二行：加密货币（从左向右滚动） */}
+      <MarketTickerRow 
+        markets={cryptoMarkets} 
+        direction="right"
+        rowId="row2"
+      />
     </div>
   );
 }

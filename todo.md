@@ -498,6 +498,16 @@
 - [x] 修复CoinGecko API访问失败问题
 - [x] 添加CORS代理或使用备用API
 - [x] 实现本地模拟数据作为后备方案
+
+## 市场行情栏优化 - 独立滚动行
+- [x] 重构 MarketTicker 组件，使上下两行完全独立
+- [x] 为每一行添加独立的 isScrolling 和 scrollOffset 状态
+- [x] 为每一行添加独立的 CSS 动画（scroll-left-row1、scroll-right-row2）
+- [x] 为每一行添加独立的触摸和鼠标事件处理
+- [x] 第一行（股票指数）从右向左滚动
+- [x] 第二行（加密货币）从左向右滚动
+- [x] 两行互不影响，可以独立滑动
+- [x] 测试独立滚动效果
 - [x] 改进错误提示和重试机制
 
 
@@ -1896,3 +1906,11 @@
 
 ## 修复后台管理LOGO显示
 - [x] 修复后台管理页面左上角LOGO显示问题 - 使用Logo组件替代img标签
+
+## 修复滚动跳动问题
+- [x] 添加 isDragging 状态，区分"正在拖动"和"已停止拖动"
+- [x] 当正在拖动时（isDragging=true），不使用 transition，直接更新位置（没有跳动）
+- [x] 当放开时（isDragging=false），使用 transition: transform 0.1s ease-out 平滑恢复
+- [x] 按住时内容立即停止，完全没有跳动
+- [x] 放开时平滑地恢复自动滚动
+- [x] 测试修复效果
