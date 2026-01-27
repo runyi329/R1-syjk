@@ -422,14 +422,14 @@ function MarketTickerCrypto() {
           const baseCrypto = cryptos[index];
           if (!baseCrypto) return crypto;
 
-          // 在真实价格基础上增加 ±0.3% 的随机波动
-          const fluctuation = (Math.random() - 0.5) * 0.006; // ±0.3%
+          // 在真实价格基础上增加 ±0.5% 的随机波动
+          const fluctuation = (Math.random() - 0.5) * 0.01; // ±0.5%
           const newPrice = baseCrypto.price * (1 + fluctuation);
           const priceChange = newPrice - baseCrypto.price;
 
           return {
             ...baseCrypto,
-            price: parseFloat(newPrice.toFixed(4)),
+            price: parseFloat(newPrice.toFixed(2)), // 保留2位小数，确保变化明显
             change: parseFloat((baseCrypto.change + priceChange).toFixed(2)),
           };
         })
