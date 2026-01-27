@@ -166,13 +166,12 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
   const [isScrolling, setIsScrolling] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [singleCycleWidth, setSingleCycleWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchStartOffset = useRef(0);
   const animationRef = useRef<number | null>(null);
-  const lastTimeRef = useRef<number>(0);
+  const startTimeRef = useRef<number>(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsScrolling(false);
@@ -216,38 +215,29 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
     setIsScrolling(true);
   };
 
-  // 计算单个周期的宽度（第一组卡片的实际宽度）
-  useEffect(() => {
-    if (!trackRef.current) return;
-    
-    const track = trackRef.current;
-    // 总宽度 / 2 = 单个周期的宽度
-    const cycleWidth = track.scrollWidth / 2;
-    setSingleCycleWidth(cycleWidth);
-  }, [markets.length]);
-
   // 滚动动画
   useEffect(() => {
-    if (!trackRef.current || !isScrolling || isDragging || singleCycleWidth === 0) return;
+    if (!trackRef.current || !isScrolling || isDragging) return;
 
+    const track = trackRef.current;
+    const singleCycleWidth = track.scrollWidth / 2; // 单个周期的宽度
     const scrollDuration = 40000; // 40 秒完成一个周期
 
     const animate = (currentTime: number) => {
-      if (lastTimeRef.current === 0) {
-        lastTimeRef.current = currentTime;
+      if (startTimeRef.current === 0) {
+        startTimeRef.current = currentTime;
       }
 
-      const elapsed = currentTime - lastTimeRef.current;
-      let newOffset = (elapsed / scrollDuration) * singleCycleWidth;
-
-      if (direction === 'right') {
-        newOffset = -newOffset;
-      }
-
-      // 当滚动距离达到一个完整周期时，重置为 0
-      if (Math.abs(newOffset) >= singleCycleWidth) {
-        lastTimeRef.current = currentTime;
-        newOffset = 0;
+      const elapsed = currentTime - startTimeRef.current;
+      const progress = (elapsed % scrollDuration) / scrollDuration; // 0 到 1 的循环进度
+      
+      let newOffset: number;
+      if (direction === 'left') {
+        // 从左向右滚动（实际上是向左移动，所以是负值）
+        newOffset = -progress * singleCycleWidth;
+      } else {
+        // 从右向左滚动（实际上是向右移动，所以是正值）
+        newOffset = progress * singleCycleWidth;
       }
 
       setScrollOffset(newOffset);
@@ -261,7 +251,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isScrolling, isDragging, direction, singleCycleWidth]);
+  }, [isScrolling, isDragging, direction]);
 
   const displayMarkets = [...markets, ...markets];
 
@@ -280,7 +270,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
       <div
         ref={trackRef}
         className={cn(
-          'flex gap-4 transition-transform',
+          'flex gap-4',
           isDragging ? '' : 'transition-transform duration-[50ms]'
         )}
         style={{
