@@ -204,12 +204,14 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
       const children = track.querySelectorAll('[data-market-item]');
       if (children.length === 0) return 0;
       
-      // 计算第一个周期的实际宽度（所有markets的宽度）
+      // 计算第一个周期的实际宽度（所有markets的宽度 + 所有gaps）
       let totalWidth = 0;
       for (let i = 0; i < markets.length; i++) {
         const rect = children[i]?.getBoundingClientRect();
         if (rect) {
-          totalWidth += rect.width + 16; // 加上gap
+          totalWidth += rect.width;
+          // 每个元素后面都加gap（包括最后一个，因为它后面是第一个元素的复制）
+          totalWidth += 16;
         }
       }
       return totalWidth;
