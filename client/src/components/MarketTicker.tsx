@@ -220,7 +220,8 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
     if (!trackRef.current || !isScrolling || isDragging) return;
 
     const track = trackRef.current;
-    const totalWidth = track.scrollWidth / 2; // 因为数据被复制了一份
+    // 计算单个周期的宽度（一半的总宽度）
+    const totalWidth = track.scrollWidth / 2;
     const scrollDuration = 40000; // 40 秒完成一个周期
 
     const animate = (currentTime: number) => {
@@ -235,8 +236,9 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
         newOffset = -newOffset;
       }
 
+      // 当滚动距离达到一个周期时，重置为 0
       if (Math.abs(newOffset) >= totalWidth) {
-        lastTimeRef.current = 0;
+        lastTimeRef.current = currentTime; // 重置时间基准，而不是设为 0
         newOffset = 0;
       }
 
@@ -251,7 +253,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isScrolling, isDragging, direction]);
+  }, [isScrolling, isDragging, direction, markets.length]);
 
   const displayMarkets = [...markets, ...markets];
 
