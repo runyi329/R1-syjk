@@ -35,6 +35,7 @@ import FixedIncomeBondsAnalysis from "./pages/FixedIncomeBondsAnalysis";
 import FixedIncomePublicAnalysis from "./pages/FixedIncomePublicAnalysis";
 import StockClientView from "./pages/StockClientView";
 import QuantitativeTrading from "./pages/QuantitativeTrading";
+import CryptoHistory from "./pages/CryptoHistory";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -46,6 +47,7 @@ function Router() {
         <Route path="/football" component={FootballAnalysis} />
         <Route path="/crypto" component={CryptoAnalysis} />
         <Route path="/quantitative-trading" component={QuantitativeTrading} />
+        <Route path="/crypto-history" component={CryptoHistory} />
         <Route path="/crypto-analysis" component={CryptoAnalysis} />
         <Route path="/weekly-win" component={WeeklyWinAnalysis} />
         <Route path="/lottery" component={Lottery} />

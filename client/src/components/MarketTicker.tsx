@@ -82,7 +82,7 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
       const timer = setTimeout(() => {
         setIsUpdating(false);
         setPriceDirection(null);
-      }, 200);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [market.price]);
@@ -260,8 +260,14 @@ function MarketTickerStocks() {
 // 第2行：加密货币（向右滚动）
 function MarketTickerCrypto() {
   const [cryptos, setCryptos] = useState<MarketData[]>(CRYPTO_DATA);
-  const [displayCryptos, setDisplayCryptos] = useState<MarketData[]>(CRYPTO_DATA); // 用于显示的数据（带模拟波动）
-  const [dataLoaded, setDataLoaded] = useState(false); // 标记真实数据是否已加载
+  const [displayCryptos, setDisplayCryptos] = useState<MarketData[]>(CRYPTO_DATA);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const cryptosRef = useRef<MarketData[]>(cryptos);
+  
+  // 更新 cryptosRef
+  useEffect(() => {
+    cryptosRef.current = cryptos;
+  }, [cryptos]);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isScrolling, setIsScrolling] = useState(true);
@@ -417,11 +423,11 @@ function MarketTickerCrypto() {
     const simulateFluctuation = () => {
       setDisplayCryptos(prevDisplay => 
         prevDisplay.map((crypto, index) => {
-          const baseCrypto = cryptos[index];
+          const baseCrypto = cryptosRef.current[index];
           if (!baseCrypto) return crypto;
 
-          // 在真实价格基础上增加 ±0.5% 的随机波动
-          const fluctuation = (Math.random() - 0.5) * 0.01; // ±0.5%
+          // 在真实价格基础上增加 ±1% 的随机波动
+          const fluctuation = (Math.random() - 0.5) * 0.02; // ±1%
           const newPrice = baseCrypto.price * (1 + fluctuation);
           const priceChange = newPrice - baseCrypto.price;
 
@@ -450,7 +456,7 @@ function MarketTickerCrypto() {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [cryptos, dataLoaded]);
+  }, [dataLoaded]); // 只依赖 dataLoaded，避免 cryptos 更新时重置定时器
 
   const displayMarkets = [...displayCryptos, ...displayCryptos];
 

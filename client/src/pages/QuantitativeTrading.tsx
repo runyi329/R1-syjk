@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Activity, BarChart3, Sparkles, TrendingUp, ArrowLeft, CheckCircle, Zap, Shield, AlertCircle, Code, Cpu, LineChart } from "lucide-react";
+import { Activity, BarChart3, Sparkles, TrendingUp, ArrowLeft, CheckCircle, Zap, Shield, AlertCircle, Code, Cpu, LineChart, Database } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -414,7 +414,12 @@ export default function QuantitativeTrading() {
             </Button>
           </Link>
           <h1 className="text-xl md:text-2xl font-bold text-center flex-1">量化交易</h1>
-          <div className="w-10" />
+          <Link href="/crypto-history">
+            <Button variant="outline" size="sm" className="flex items-center gap-2 border-primary/50 text-primary hover:bg-primary/10">
+              <Database className="w-4 h-4" />
+              <span className="hidden sm:inline">历史数据</span>
+            </Button>
+          </Link>
         </div>
       </header>
 
