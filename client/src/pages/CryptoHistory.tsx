@@ -62,18 +62,8 @@ export default function CryptoHistory() {
             <TabsContent value="historical" className="space-y-8">
               {/* 加密货币选择 */}
               <Card className="border-primary/20 bg-card/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                    选择加密货币
-                  </CardTitle>
-                  <CardDescription>选择您想要查询历史数据的加密货币</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 pt-6">
                   <div className="space-y-2">
-                    <label htmlFor="crypto-select" className="text-sm font-medium">
-                      加密货币
-                    </label>
                     <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
                       <SelectTrigger id="crypto-select" className="h-12">
                         <SelectValue />
