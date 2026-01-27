@@ -233,10 +233,10 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
       
       let newOffset: number;
       if (direction === 'left') {
-        // 从右向左滚动（内容向左移动，所以是负值）
+        // 向左滚动（内容向左移动，所以是负值）
         newOffset = -progress * singleCycleWidth;
       } else {
-        // 从左向右滚动（内容向右移动，所以是正值）
+        // 向右滚动（内容向右移动，所以是正值）
         newOffset = progress * singleCycleWidth;
       }
 
