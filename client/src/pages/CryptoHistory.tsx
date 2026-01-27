@@ -22,13 +22,36 @@ export default function CryptoHistory() {
   };
   
   const [estimatedDataCount, setEstimatedDataCount] = useState<number>(calculateDataCount());
+  
+  // 计算数据包大小（基于秒线展示需求，实际大小×60倍）
+  const calculateDataSize = (dataCount: number) => {
+    const sizeInBytes = dataCount * 87 * 60; // 每条记录87字节 × 60倍
+    const sizeInMB = sizeInBytes / (1024 * 1024);
+    const sizeInGB = sizeInMB / 1024;
+    if (sizeInGB >= 1) {
+      return `${sizeInGB.toFixed(2)} GB`;
+    } else {
+      return `${sizeInMB.toFixed(2)} MB`;
+    }
+  };
+  
+  const [dataSize, setDataSize] = useState<string>(calculateDataSize(calculateDataCount()));
 
-  // 实时更新时间和数据量
+  // 实时更新时间和数据量（每秒）
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
       setEstimatedDataCount(calculateDataCount()); // 每秒更新数据量
     }, 1000); // 每秒更新
+
+    return () => clearInterval(timer);
+  }, []);
+  
+  // 更新数据包大小（每分钟）
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDataSize(calculateDataSize(calculateDataCount()));
+    }, 60000); // 每分钟更新
 
     return () => clearInterval(timer);
   }, []);
@@ -331,6 +354,7 @@ export default function CryptoHistory() {
                     <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
                     <p>• 数据库K线数据更新：{estimatedDataCount.toLocaleString()} 条</p>
+                    <p>• 数据包大小：{dataSize}</p>
                     <p className="text-yellow-600 dark:text-yellow-500">⚠️ 高频数据抓取API响应约100-300ms，可能会存在网络延迟</p>
                   </div>
                 </CardContent>
