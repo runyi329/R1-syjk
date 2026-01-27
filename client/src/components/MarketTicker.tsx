@@ -96,19 +96,71 @@ interface MarketTickerRowProps {
   rowId: string;
 }
 
+function MarketCard({ market }: { market: MarketData }) {
+  return (
+    <div className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0">
+      <div className="flex justify-between items-start mb-1">
+        <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
+        <div className="flex items-center gap-1">
+          {!market.isOpen && (
+            <Clock className="w-3 h-3 text-muted-foreground" />
+          )}
+          <span
+            className={cn(
+              'text-xs font-medium',
+              market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
+            )}
+          >
+            ({Math.abs(market.changePercent).toFixed(2)}%)
+          </span>
+        </div>
+      </div>
+      <div className="text-lg font-bold font-mono tracking-tight text-right">
+        {market.price.toFixed(2)}
+      </div>
+      {isMarketClosed(market.symbol) ? (
+        <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
+          <Clock className="w-3 h-3" />
+          <span>休市</span>
+        </div>
+      ) : (
+        <div
+          className={cn(
+            'flex items-center justify-end text-xs font-medium',
+            market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
+          )}
+        >
+          {market.change >= 0 ? (
+            <ArrowUp className="w-3 h-3 mr-0.5" />
+          ) : (
+            <ArrowDown className="w-3 h-3 mr-0.5" />
+          )}
+          <span>{Math.abs(market.change).toFixed(2)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRowProps) {
   const [isScrolling, setIsScrolling] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchStartOffset = useRef(0);
+  const animationRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsScrolling(false);
     setIsDragging(true);
     touchStartX.current = e.touches[0].clientX;
     touchStartOffset.current = scrollOffset;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -128,6 +180,9 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
     setIsDragging(true);
     touchStartX.current = e.clientX;
     touchStartOffset.current = scrollOffset;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -141,40 +196,49 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
     setIsScrolling(true);
   };
 
+  // 无缝循环动画
+  useEffect(() => {
+    if (!isScrolling || isDragging || !trackRef.current) return;
+
+    const track = trackRef.current;
+    const itemWidth = 140 + 16; // min-w-[140px] + gap 1rem
+    const totalWidth = itemWidth * markets.length;
+    const ANIMATION_DURATION = 40000; // 40 秒
+
+    const animate = (currentTime: number) => {
+      if (lastTimeRef.current === 0) {
+        lastTimeRef.current = currentTime;
+      }
+
+      const elapsed = currentTime - lastTimeRef.current;
+      const progress = (elapsed % ANIMATION_DURATION) / ANIMATION_DURATION;
+
+      if (direction === 'left') {
+        // 从右向左滚动
+        const offset = -(progress * totalWidth);
+        setScrollOffset(offset);
+      } else {
+        // 从左向右滚动
+        const offset = progress * totalWidth;
+        setScrollOffset(offset);
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    lastTimeRef.current = 0;
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      lastTimeRef.current = 0;
+    };
+  }, [isScrolling, isDragging, markets.length, direction]);
+
   return (
     <div className="w-full overflow-hidden">
-      <style>{`
-        @keyframes scroll-left-${rowId} {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-50% - 0.5rem));
-          }
-        }
-        @keyframes scroll-right-${rowId} {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(50% + 0.5rem));
-          }
-        }
-        .market-ticker-scroll-left-${rowId} {
-          animation: ${isScrolling ? `scroll-left-${rowId}` : 'none'} 40s linear infinite;
-          display: flex;
-          gap: 1rem;
-          transition: ${isDragging ? 'none' : 'transform 0.1s ease-out'};
-          ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
-        }
-        .market-ticker-scroll-right-${rowId} {
-          animation: ${isScrolling ? `scroll-right-${rowId}` : 'none'} 40s linear infinite;
-          display: flex;
-          gap: 1rem;
-          transition: ${isDragging ? 'none' : 'transform 0.1s ease-out'};
-          ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
-        }
-      `}</style>
       <div 
         ref={containerRef}
         className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
@@ -186,102 +250,18 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div className={cn(
-          'flex gap-4 px-1',
-          direction === 'left' ? `market-ticker-scroll-left-${rowId}` : `market-ticker-scroll-right-${rowId}`
-        )}>
-          {/* 原始数据 */}
-          {markets.map((market) => (
-            <div
-              key={market.symbol}
-              className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0"
-            >
-              <div className="flex justify-between items-start mb-1">
-                <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
-                <div className="flex items-center gap-1">
-                  {!market.isOpen && (
-                    <Clock className="w-3 h-3 text-muted-foreground" />
-                  )}
-                  <span
-                    className={cn(
-                      'text-xs font-medium',
-                      market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-                    )}
-                  >
-                    ({Math.abs(market.changePercent).toFixed(2)}%)
-                  </span>
-                </div>
-              </div>
-              <div className="text-lg font-bold font-mono tracking-tight text-right">
-                {market.price.toFixed(2)}
-              </div>
-              {isMarketClosed(market.symbol) ? (
-                <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>休市</span>
-                </div>
-              ) : (
-                <div
-                  className={cn(
-                    'flex items-center justify-end text-xs font-medium',
-                    market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-                  )}
-                >
-                  {market.change >= 0 ? (
-                    <ArrowUp className="w-3 h-3 mr-0.5" />
-                  ) : (
-                    <ArrowDown className="w-3 h-3 mr-0.5" />
-                  )}
-                  <span>{Math.abs(market.change).toFixed(2)}</span>
-                </div>
-              )}
-            </div>
-          ))}
-          {/* 循环复制数据，实现无缝滚动 */}
-          {markets.map((market) => (
-            <div
-              key={`${market.symbol}-copy`}
-              className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0"
-            >
-              <div className="flex justify-between items-start mb-1">
-                <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
-                <div className="flex items-center gap-1">
-                  {!market.isOpen && (
-                    <Clock className="w-3 h-3 text-muted-foreground" />
-                  )}
-                  <span
-                    className={cn(
-                      'text-xs font-medium',
-                      market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-                    )}
-                  >
-                    ({Math.abs(market.changePercent).toFixed(2)}%)
-                  </span>
-                </div>
-              </div>
-              <div className="text-lg font-bold font-mono tracking-tight text-right">
-                {market.price.toFixed(2)}
-              </div>
-              {isMarketClosed(market.symbol) ? (
-                <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>休市</span>
-                </div>
-              ) : (
-                <div
-                  className={cn(
-                    'flex items-center justify-end text-xs font-medium',
-                    market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-                  )}
-                >
-                  {market.change >= 0 ? (
-                    <ArrowUp className="w-3 h-3 mr-0.5" />
-                  ) : (
-                    <ArrowDown className="w-3 h-3 mr-0.5" />
-                  )}
-                  <span>{Math.abs(market.change).toFixed(2)}</span>
-                </div>
-              )}
+        <div 
+          ref={trackRef}
+          className="flex gap-4 px-1"
+          style={{
+            transform: `translateX(${scrollOffset}px)`,
+            transition: isDragging ? 'none' : 'transform 0.05s linear',
+          }}
+        >
+          {/* 原始数据 + 循环复制，形成无缝循环 */}
+          {[...markets, ...markets].map((market, index) => (
+            <div key={`${market.symbol}-${index}`}>
+              <MarketCard market={market} />
             </div>
           ))}
         </div>
