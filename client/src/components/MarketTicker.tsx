@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowUp, ArrowDown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { trpc } from '@/lib/trpc';
@@ -95,6 +95,18 @@ interface MarketTickerRowProps {
 }
 
 function MarketCard({ market }: { market: MarketData }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const prevPriceRef = useRef(market.price);
+
+  useEffect(() => {
+    if (prevPriceRef.current !== market.price) {
+      setIsUpdating(true);
+      prevPriceRef.current = market.price;
+      const timer = setTimeout(() => setIsUpdating(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [market.price]);
+
   return (
     <div className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0">
       <div className="flex justify-between items-start mb-1">
@@ -105,7 +117,8 @@ function MarketCard({ market }: { market: MarketData }) {
           )}
           <span
             className={cn(
-              'text-xs font-medium',
+              'text-xs font-medium transition-all',
+              isUpdating && 'animate-pulse',
               market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
             )}
           >
@@ -113,7 +126,10 @@ function MarketCard({ market }: { market: MarketData }) {
           </span>
         </div>
       </div>
-      <div className="text-lg font-bold font-mono tracking-tight text-right">
+      <div className={cn(
+        'text-lg font-bold font-mono tracking-tight text-right transition-all',
+        isUpdating && 'animate-pulse'
+      )}>
         {market.price.toFixed(2)}
       </div>
       {isMarketClosed(market.symbol) ? (
