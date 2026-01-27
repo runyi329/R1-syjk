@@ -32,7 +32,7 @@ export async function streamKlineDataByDays(
   let totalRecords = 0;
   let dayIndex = 0;
   
-  // 预先计算总天数（避免在循环中重复计算）
+  // 计算总天数（所有年份的总天数）- 提前计算避免重复
   const totalDays = years.reduce((sum, y) => {
     const start = new Date(`${y}-01-01T00:00:00Z`);
     const end = new Date(`${y + 1}-01-01T00:00:00Z`);
@@ -73,7 +73,7 @@ export async function streamKlineDataByDays(
         await onBatch(batch, dayIndex, totalDays, dayStart);
         dayIndex++;
         
-        // 显式清空 batch 数据，帮助垃圾回收
+        // 显式清空批次数据，帮助垃圾回收
         batch.length = 0;
       }
     }
