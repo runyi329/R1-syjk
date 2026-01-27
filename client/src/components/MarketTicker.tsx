@@ -97,8 +97,7 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
           )}
           <span
             className={cn(
-              'text-xs font-medium transition-all',
-              isUpdating && 'animate-pulse',
+              'text-xs font-medium',
               market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
             )}
           >
