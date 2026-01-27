@@ -12,6 +12,13 @@ interface MarketData {
   isOpen: boolean;
 }
 
+interface StockSymbol {
+  display: string;
+  symbol: string;
+  name: string;
+  region: 'US' | 'HK' | 'CN';
+}
+
 // 初始基准数据（备用）
 const INITIAL_DATA: MarketData[] = [
   { symbol: 'SSEC', name: '上证指数', price: 3058.25, change: 12.45, changePercent: 0.41, isOpen: true },
@@ -23,11 +30,11 @@ const INITIAL_DATA: MarketData[] = [
 
 // 股票符号映射（Yahoo Finance 符号）
 const STOCK_SYMBOLS = [
-  { display: '上证指数', symbol: '000001.SS', name: '上证指数' },
-  { display: '恒生指数', symbol: '0700.HK', name: '恒生指数' },
-  { display: '纳斯达克', symbol: '^IXIC', name: '纳斯达克' },
-  { display: '黄金', symbol: 'GC=F', name: '现货黄金' },
-  { display: '比特币', symbol: 'BTC-USD', name: '比特币' },
+  { display: '上证指数', symbol: '000001.SS', name: '上证指数', region: 'CN' },
+  { display: '恒生指数', symbol: '0700.HK', name: '恒生指数', region: 'HK' },
+  { display: '纳斯达克', symbol: '^IXIC', name: '纳斯达克', region: 'US' },
+  { display: '黄金', symbol: 'GC=F', name: '现货黄金', region: 'US' },
+  { display: '比特币', symbol: 'BTC-USD', name: '比特币', region: 'US' },
 ];
 
 export function MarketTicker() {
@@ -35,49 +42,96 @@ export function MarketTicker() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 获取多个股票数据
-  const { data: stocksData, isLoading: isLoadingStocks, error: stocksError } = trpc.market.getMultipleStocks.useQuery(
+  // 获取多个股票数据（分别按 region 获取）
+  const stocksByRegion = {
+    US: STOCK_SYMBOLS.filter(s => s.region === 'US').map(s => s.symbol),
+    HK: STOCK_SYMBOLS.filter(s => s.region === 'HK').map(s => s.symbol),
+    CN: STOCK_SYMBOLS.filter(s => s.region === 'CN').map(s => s.symbol),
+  };
+
+  // 分别获取不同地区的股票数据
+  const usStocksQuery = trpc.market.getMultipleStocks.useQuery(
     {
-      symbols: STOCK_SYMBOLS.map(s => s.symbol),
+      symbols: stocksByRegion.US,
       region: 'US',
       interval: '1d',
       range: '1d',
     },
     {
-      refetchInterval: 30000, // 每 30 秒刷新一次
+      refetchInterval: 30000,
       retry: 2,
+      enabled: stocksByRegion.US.length > 0,
+    }
+  );
+
+  const hkStocksQuery = trpc.market.getMultipleStocks.useQuery(
+    {
+      symbols: stocksByRegion.HK,
+      region: 'HK',
+      interval: '1d',
+      range: '1d',
+    },
+    {
+      refetchInterval: 30000,
+      retry: 2,
+      enabled: stocksByRegion.HK.length > 0,
+    }
+  );
+
+  const cnStocksQuery = trpc.market.getMultipleStocks.useQuery(
+    {
+      symbols: stocksByRegion.CN,
+      region: 'CN',
+      interval: '1d',
+      range: '1d',
+    },
+    {
+      refetchInterval: 30000,
+      retry: 2,
+      enabled: stocksByRegion.CN.length > 0,
     }
   );
 
   // 当获取到真实数据时，更新市场数据
   useEffect(() => {
-    if (stocksData && stocksData.length > 0) {
-      const updatedMarkets = stocksData.map((stock: any, index: number) => ({
-        symbol: stock.symbol,
-        name: STOCK_SYMBOLS[index]?.name || stock.name,
-        price: stock.price,
-        change: stock.change,
-        changePercent: stock.changePercent,
-        isOpen: true,
-      }));
+    const allData = [
+      ...(usStocksQuery.data || []),
+      ...(hkStocksQuery.data || []),
+      ...(cnStocksQuery.data || []),
+    ];
+
+    if (allData.length > 0) {
+      const updatedMarkets = allData.map((stock: any) => {
+        const symbolInfo = STOCK_SYMBOLS.find(s => s.symbol === stock.symbol);
+        return {
+          symbol: stock.symbol,
+          name: symbolInfo?.name || stock.name,
+          price: stock.price,
+          change: stock.change,
+          changePercent: stock.changePercent,
+          isOpen: true,
+        };
+      });
       setMarkets(updatedMarkets);
       setIsLoading(false);
       setError(null);
     }
-  }, [stocksData]);
+  }, [usStocksQuery.data, hkStocksQuery.data, cnStocksQuery.data]);
 
   // 处理错误
   useEffect(() => {
-    if (stocksError) {
-      console.error('Failed to fetch stock data:', stocksError);
+    if (usStocksQuery.error || hkStocksQuery.error || cnStocksQuery.error) {
+      console.error('Failed to fetch stock data:', usStocksQuery.error || hkStocksQuery.error || cnStocksQuery.error);
       setError('无法获取实时数据');
       setIsLoading(false);
     }
-  }, [stocksError]);
+  }, [usStocksQuery.error, hkStocksQuery.error, cnStocksQuery.error]);
 
   // 模拟实时价格波动（仅当没有实时数据时）
   useEffect(() => {
-    if (isLoadingStocks || stocksData) return;
+    const isLoading = usStocksQuery.isLoading || hkStocksQuery.isLoading || cnStocksQuery.isLoading;
+    const hasData = usStocksQuery.data || hkStocksQuery.data || cnStocksQuery.data;
+    if (isLoading || hasData) return;
 
     const interval = setInterval(() => {
       setMarkets(prevMarkets =>
@@ -101,7 +155,7 @@ export function MarketTicker() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [isLoadingStocks, stocksData]);
+  }, [usStocksQuery.isLoading, usStocksQuery.data, hkStocksQuery.isLoading, hkStocksQuery.data, cnStocksQuery.isLoading, cnStocksQuery.data]);
 
   return (
     <div className="w-full overflow-x-auto pb-4 md:pb-0">
