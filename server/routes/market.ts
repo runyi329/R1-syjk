@@ -9,6 +9,62 @@ import { eq, and, gt } from "drizzle-orm";
 const CACHE_DURATION_MINUTES = 30;
 
 /**
+ * 从 CoinGecko API 获取加密货币数据
+ */
+async function getBinanceCryptoData(symbols: string[]): Promise<any[]> {
+  try {
+    // 映射符号到 CoinGecko ID
+    const idMap: Record<string, string> = {
+      btc: 'bitcoin',
+      eth: 'ethereum',
+      bnb: 'binancecoin',
+      sol: 'solana',
+      xrp: 'ripple',
+      ada: 'cardano',
+      doge: 'dogecoin',
+    };
+
+    // 构建 CoinGecko API 请求
+    const coinIds = symbols.map(s => {
+      const base = s.split('-')[0].toLowerCase();
+      return idMap[base] || base;
+    }).join(',');
+
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd&include_24hr_change=true`
+    );
+    
+    if (!response.ok) throw new Error('CoinGecko API error');
+    
+    const data = await response.json();
+    
+    return symbols.map((symbol) => {
+      const base = symbol.split('-')[0].toLowerCase();
+      const coinId = idMap[base] || base;
+      const coinData = data[coinId];
+      
+      if (!coinData) return null;
+      
+      const price = coinData.usd || 0;
+      const changePercent = coinData.usd_24h_change || 0;
+      const change = (price * changePercent) / 100;
+
+      return {
+        symbol: symbol,
+        name: base.toUpperCase(),
+        price: parseFloat(price.toFixed(2)),
+        change: parseFloat(change.toFixed(2)),
+        changePercent: parseFloat(changePercent.toFixed(2)),
+        isOpen: true,
+      };
+    }).filter(r => r !== null);
+  } catch (error) {
+    console.error("Error fetching CoinGecko data:", error);
+    return [];
+  }
+}
+
+/**
  * 从缓存中获取市场数据
  */
 async function getCachedMarketData(symbol: string) {
@@ -240,12 +296,20 @@ export const marketRouter = router({
             };
           });
 
-        // 合并缓存结果和 API 结果
         return [...cachedResults, ...newResults];
       } catch (error) {
         console.error("Error fetching multiple stocks:", error);
         throw new Error("Failed to fetch stock data");
       }
+    }),
+
+  // 获取币安加密货币数据
+  getBinanceCrypto: publicProcedure
+    .input(z.object({
+      symbols: z.array(z.string()),
+    }))
+    .query(async ({ input }) => {
+      return await getBinanceCryptoData(input.symbols);
     }),
 
   // 清除过期的缓存数据
@@ -254,7 +318,6 @@ export const marketRouter = router({
       try {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
-
         const result = await db
           .delete(marketDataCache)
           .where(

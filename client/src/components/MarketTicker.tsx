@@ -438,15 +438,12 @@ function MarketTickerCrypto() {
   const [error, setError] = useState<string | null>(null);
 
   const cryptoSymbols = CRYPTO_SYMBOLS.map(s => s.symbol);
-  const cryptoQuery = trpc.market.getMultipleStocks.useQuery(
+  const cryptoQuery = trpc.market.getBinanceCrypto.useQuery(
     {
       symbols: cryptoSymbols,
-      region: 'US',
-      interval: '1d',
-      range: '1d',
     },
     {
-      refetchInterval: 30000,
+      refetchInterval: 5000,
       retry: 2,
       enabled: cryptoSymbols.length > 0,
     }
