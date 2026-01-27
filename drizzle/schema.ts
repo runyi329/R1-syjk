@@ -496,3 +496,80 @@ export const staffStockPermissions = mysqlTable("staffStockPermissions", {
 
 export type StaffStockPermission = typeof staffStockPermissions.$inferSelect;
 export type InsertStaffStockPermission = typeof staffStockPermissions.$inferInsert;
+
+
+/**
+ * K线数据表 - 存储加密货币历史K线数据
+ */
+export const klineData = mysqlTable("klineData", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 交易对符号，如 BTCUSDT */
+  symbol: varchar("symbol", { length: 20 }).notNull(),
+  /** K线时间间隔：1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M */
+  interval: varchar("interval", { length: 5 }).notNull(),
+  /** K线开盘时间（Unix时间戳，毫秒） */
+  openTime: timestamp("openTime").notNull(),
+  /** 开盘价 */
+  open: decimal("open", { precision: 20, scale: 8 }).notNull(),
+  /** 最高价 */
+  high: decimal("high", { precision: 20, scale: 8 }).notNull(),
+  /** 最低价 */
+  low: decimal("low", { precision: 20, scale: 8 }).notNull(),
+  /** 收盘价 */
+  close: decimal("close", { precision: 20, scale: 8 }).notNull(),
+  /** 成交量 */
+  volume: decimal("volume", { precision: 20, scale: 8 }).notNull(),
+  /** K线收盘时间（Unix时间戳，毫秒） */
+  closeTime: timestamp("closeTime").notNull(),
+  /** 成交额 */
+  quoteVolume: decimal("quoteVolume", { precision: 20, scale: 8 }).notNull(),
+  /** 成交笔数 */
+  trades: int("trades").notNull(),
+  /** 主动买入成交量 */
+  takerBuyVolume: decimal("takerBuyVolume", { precision: 20, scale: 8 }).notNull(),
+  /** 主动买入成交额 */
+  takerBuyQuoteVolume: decimal("takerBuyQuoteVolume", { precision: 20, scale: 8 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  // 复合唯一索引：确保同一交易对、同一时间间隔、同一开盘时间的数据唯一
+  symbolIntervalTimeIdx: unique("symbol_interval_time_idx").on(table.symbol, table.interval, table.openTime),
+  // 查询索引：优化按交易对和时间间隔查询
+  symbolIntervalIdx: index("symbol_interval_idx").on(table.symbol, table.interval),
+  // 时间索引：优化按时间范围查询
+  openTimeIdx: index("open_time_idx").on(table.openTime),
+}));
+
+export type KlineData = typeof klineData.$inferSelect;
+export type InsertKlineData = typeof klineData.$inferInsert;
+
+/**
+ * 数据抓取任务表 - 记录数据抓取进度和状态
+ */
+export const fetchTasks = mysqlTable("fetchTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 交易对符号 */
+  symbol: varchar("symbol", { length: 20 }).notNull(),
+  /** K线时间间隔 */
+  interval: varchar("interval", { length: 5 }).notNull(),
+  /** 开始时间（Unix时间戳，毫秒） */
+  startTime: timestamp("startTime").notNull(),
+  /** 结束时间（Unix时间戳，毫秒） */
+  endTime: timestamp("endTime").notNull(),
+  /** 任务状态：pending-待处理，running-进行中，completed-已完成，failed-失败 */
+  status: mysqlEnum("status", ["pending", "running", "completed", "failed"]).default("pending").notNull(),
+  /** 已抓取的数据条数 */
+  fetchedCount: int("fetchedCount").default(0).notNull(),
+  /** 预计总条数 */
+  totalCount: int("totalCount").default(0).notNull(),
+  /** 当前抓取到的时间点（Unix时间戳，毫秒） */
+  currentTime: timestamp("currentTime"),
+  /** 错误信息（如果失败） */
+  errorMessage: text("errorMessage"),
+  /** 创建人ID */
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FetchTask = typeof fetchTasks.$inferSelect;
+export type InsertFetchTask = typeof fetchTasks.$inferInsert;

@@ -141,6 +141,13 @@
       "when": 1769494537955,
       "tag": "0019_narrow_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1769498017373,
+      "tag": "0020_gigantic_felicia_hardy",
+      "breakpoints": true
     }
   ]
 }

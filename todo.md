@@ -2070,3 +2070,17 @@
 - [x] 调整文字大小
 - [x] 测试缩小后的按钮显示效果
 - [x] 确保移动端适配
+
+
+## 比特币1分钟K线历史数据抓取
+- [x] 设计K线数据表结构（symbol, interval, open_time, open, high, low, close, volume等字段）
+- [x] 创建数据库迁移，添加kline_data表
+- [x] 实现币安API调用函数（获取K线数据）
+- [x] 实现批量数据抓取逻辑（处理API限制，分批抓取）
+- [x] 创建tRPC接口：startFetchKlineData（开始抓取）
+- [x] 创建tRPC接口：getKlineDataProgress（查询抓取进度）
+- [x] 创建tRPC接口：getKlineData（查询K线数据）
+- [x] 前端添加“抓取历史数据”按钮
+- [x] 前端添加抓取进度显示
+- [x] 测试数据抓取功能
+- [ ] 优化大数据量查询性能

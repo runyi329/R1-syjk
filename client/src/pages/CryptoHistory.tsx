@@ -1,12 +1,91 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Database, Sparkles, Calendar, Plus } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Database, Sparkles, Calendar, Plus, Download, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 export default function CryptoHistory() {
   const [selectedCrypto, setSelectedCrypto] = useState<string>("BTC");
+  const [fetchingTaskId, setFetchingTaskId] = useState<number | null>(null);
+
+  // 查询抓取任务进度
+  const { data: taskProgress, isLoading: isLoadingProgress } = trpc.klines.getTaskProgress.useQuery(
+    { taskId: fetchingTaskId! },
+    {
+      enabled: fetchingTaskId !== null,
+      refetchInterval: 2000, // 每2秒刷新一次
+    }
+  );
+
+  // 查询所有抓取任务
+  const { data: allTasks, refetch: refetchTasks } = trpc.klines.getAllTasks.useQuery();
+
+  // 查询K线数据统计
+  const { data: klineStats } = trpc.klines.getKlineStats.useQuery({
+    symbol: `${selectedCrypto}USDT`,
+    interval: "1m",
+  });
+
+  // 开始抓取数据
+  const startFetchMutation = trpc.klines.startFetch.useMutation({
+    onSuccess: (data) => {
+      setFetchingTaskId(data.taskId);
+      toast.success("数据抓取已开始", {
+        description: `预计抓取 ${data.totalCount.toLocaleString()} 条数据`,
+      });
+      refetchTasks();
+    },
+    onError: (error) => {
+      toast.error("启动数据抓取失败", {
+        description: error.message,
+      });
+    },
+  });
+
+  const handleStartFetch = () => {
+    // BTC/USDT 开始时间：2017年8月17日 12:00 (UTC+8)
+    const startTime = new Date("2017-08-17T12:00:00+08:00").getTime();
+    const endTime = Date.now();
+
+    startFetchMutation.mutate({
+      symbol: `${selectedCrypto}USDT`,
+      interval: "1m",
+      startTime,
+      endTime,
+    });
+  };
+
+  // 当任务完成时，停止轮询
+  useEffect(() => {
+    if (taskProgress && (taskProgress.status === "completed" || taskProgress.status === "failed")) {
+      setTimeout(() => {
+        setFetchingTaskId(null);
+        refetchTasks();
+      }, 3000);
+    }
+  }, [taskProgress, refetchTasks]);
+
+  const cryptoInfo = {
+    BTC: {
+      name: "比特币",
+      symbol: "BTC",
+      description: "全球市值最大的加密货币，数字黄金",
+    },
+    ETH: {
+      name: "以太坊",
+      symbol: "ETH",
+      description: "智能合约平台，Web3基础设施",
+    },
+    SOL: {
+      name: "索拉纳",
+      symbol: "SOL",
+      description: "高性能区块链，低延迟高吞吐",
+    },
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
@@ -112,273 +191,222 @@ export default function CryptoHistory() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex items-center gap-1.5 h-auto py-1.5 px-2.5 text-xs border-dashed border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                      className="flex items-center gap-1.5 h-auto py-1.5 px-2.5 text-xs border-dashed border-muted-foreground/30 hover:bg-muted/50"
+                      onClick={() => toast.info("添加币种功能开发中")}
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="w-4 h-4" />
                       <span className="font-medium">添加币种</span>
                     </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* 币种信息 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {selectedCrypto === "BTC" && (
-                  <>
-                    <Card className="border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-500/5">
-                      <CardHeader className="pb-3">
-                        <img src="/crypto-logos/btc.png" alt="Bitcoin" className="w-12 h-12 rounded-lg mb-2" />
-                        <CardTitle className="text-base">比特币 (BTC)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">当前价格</span>
-                          <span className="font-semibold">~$88,500</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">市值排名</span>
-                          <span className="font-semibold">#1</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">数据可用性</span>
-                          <span className="font-semibold text-green-500">2017 至今</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
-                          <Calendar className="w-6 h-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-base">数据说明</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm text-muted-foreground">
-                        <p>• 提供开盘、收盘、最高、最低价格</p>
-                        <p>• 支持多种时间粒度（1分钟-1月）</p>
-                        <p>• 包含交易量和市值数据</p>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
-                {selectedCrypto === "ETH" && (
-                  <>
-                    <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-                      <CardHeader className="pb-3">
-                        <img src="/crypto-logos/eth.png" alt="Ethereum" className="w-12 h-12 rounded-lg mb-2" />
-                        <CardTitle className="text-base">以太坊 (ETH)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">当前价格</span>
-                          <span className="font-semibold">~$2,950</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">市值排名</span>
-                          <span className="font-semibold">#2</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">数据可用性</span>
-                          <span className="font-semibold text-green-500">2017 至今</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
-                          <Calendar className="w-6 h-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-base">数据说明</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm text-muted-foreground">
-                        <p>• 提供开盘、收盘、最高、最低价格</p>
-                        <p>• 支持多种时间粒度（1分钟-1月）</p>
-                        <p>• 包含交易量和市值数据</p>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
-                {selectedCrypto === "SOL" && (
-                  <>
-                    <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-                      <CardHeader className="pb-3">
-                        <img src="/crypto-logos/sol.png" alt="Solana" className="w-12 h-12 rounded-lg mb-2" />
-                        <CardTitle className="text-base">索拉纳 (SOL)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">当前价格</span>
-                          <span className="font-semibold">~$185</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">市值排名</span>
-                          <span className="font-semibold">#5</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">数据可用性</span>
-                          <span className="font-semibold text-green-500">2020 至今</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
-                          <Calendar className="w-6 h-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-base">数据说明</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm text-muted-foreground">
-                        <p>• 提供开盘、收盘、最高、最低价格</p>
-                        <p>• 支持多种时间粒度（1分钟-1月）</p>
-                        <p>• 包含交易量和市值数据</p>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
-              </div>
-
-              {/* 功能预告 */}
-              <Card className="border-yellow-500/20 bg-yellow-500/5">
+              {/* 币种信息卡片 */}
+              <Card className="border-primary/20 bg-card/50 backdrop-blur">
                 <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-yellow-500" />
-                    即将推出
-                  </CardTitle>
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={`/crypto-logos/${selectedCrypto.toLowerCase()}.png`} 
+                      alt={cryptoInfo[selectedCrypto as keyof typeof cryptoInfo].name}
+                      className="w-12 h-12 rounded-full"
+                    />
+                    <div>
+                      <CardTitle className="text-2xl">
+                        {cryptoInfo[selectedCrypto as keyof typeof cryptoInfo].name} ({cryptoInfo[selectedCrypto as keyof typeof cryptoInfo].symbol})
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        {cryptoInfo[selectedCrypto as keyof typeof cryptoInfo].description}
+                      </CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-2 text-sm text-muted-foreground">
-                  <p>• 自定义时间范围选择（开始日期 - 结束日期）</p>
-                  <p>• 多种数据粒度（1分钟、5分钟、15分钟、1小时、1天、1周、1月）</p>
-                  <p>• 数据可视化图表（K线图、折线图）</p>
-                  <p>• 数据导出功能（CSV、Excel）</p>
-                  <p>• 技术指标计算（MA、EMA、RSI、MACD等）</p>
+                <CardContent className="space-y-6">
+                  {/* 数据统计 */}
+                  {klineStats && klineStats.totalCount > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="text-sm text-muted-foreground mb-1">数据条数</div>
+                        <div className="text-2xl font-bold text-primary">
+                          {klineStats.totalCount.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="text-sm text-muted-foreground mb-1">最早数据</div>
+                        <div className="text-lg font-semibold">
+                          {klineStats.earliestTime ? new Date(klineStats.earliestTime).toLocaleDateString("zh-CN") : "-"}
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="text-sm text-muted-foreground mb-1">最新数据</div>
+                        <div className="text-lg font-semibold">
+                          {klineStats.latestTime ? new Date(klineStats.latestTime).toLocaleDateString("zh-CN") : "-"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 抓取进度卡片 */}
+                  {taskProgress && (
+                    <Card className="border-primary/30 bg-primary/5">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          {taskProgress.status === "running" && <Loader2 className="w-5 h-5 animate-spin" />}
+                          {taskProgress.status === "completed" && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                          {taskProgress.status === "failed" && <AlertCircle className="w-5 h-5 text-red-500" />}
+                          数据抓取进度
+                        </CardTitle>
+                        <CardDescription>
+                          {taskProgress.status === "running" && "正在从币安API抓取历史数据..."}
+                          {taskProgress.status === "completed" && "数据抓取已完成！"}
+                          {taskProgress.status === "failed" && "数据抓取失败"}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">进度</span>
+                            <span className="font-semibold">{taskProgress.progress.toFixed(2)}%</span>
+                          </div>
+                          <Progress value={taskProgress.progress} className="h-2" />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>已抓取: {taskProgress.fetchedCount.toLocaleString()} 条</span>
+                            <span>总计: {taskProgress.totalCount.toLocaleString()} 条</span>
+                          </div>
+                        </div>
+
+                        {taskProgress.status === "failed" && taskProgress.errorMessage && (
+                          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+                            错误信息: {taskProgress.errorMessage}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* 抓取按钮 */}
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleStartFetch}
+                      disabled={startFetchMutation.isPending || (taskProgress?.status === "running")}
+                      className="flex-1"
+                    >
+                      {startFetchMutation.isPending || taskProgress?.status === "running" ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          抓取中...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4 mr-2" />
+                          抓取历史数据
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* 说明文字 */}
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>• 数据时间范围：2017年8月17日 至 今天</p>
+                    <p>• 数据粒度：1分钟K线</p>
+                    <p>• 数据来源：币安（Binance）交易所</p>
+                    <p>• 预计数据量：约 440万 条（根据时间跨度计算）</p>
+                    <p className="text-yellow-600 dark:text-yellow-500">⚠️ 全量抓取需要较长时间（约2-3小时），请耐心等待</p>
+                  </div>
                 </CardContent>
               </Card>
 
-              {/* 数据来源 - 底部简洁展示 */}
-              <div className="flex items-center justify-center gap-6 py-4 border-t border-border/30">
-                <span className="text-xs text-muted-foreground">数据来源：</span>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
-                      <img 
-                        src="https://www.okx.com/cdn/assets/imgs/2211/7478C5D7B9D0EF7C.png" 
-                        alt="OKX" 
-                        className="w-full h-full object-contain"
-                      />
+              {/* 历史任务列表 */}
+              {allTasks && allTasks.length > 0 && (
+                <Card className="border-primary/20 bg-card/50 backdrop-blur">
+                  <CardHeader>
+                    <CardTitle>历史抓取任务</CardTitle>
+                    <CardDescription>查看所有数据抓取任务的历史记录</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {allTasks.slice(0, 5).map((task) => (
+                        <div 
+                          key={task.taskId}
+                          className="p-4 rounded-lg border border-border bg-card/50 hover:bg-card/80 transition-colors"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">{task.symbol}</span>
+                              <span className="text-xs text-muted-foreground">({task.interval})</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {task.status === "completed" && (
+                                <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">
+                                  已完成
+                                </span>
+                              )}
+                              {task.status === "running" && (
+                                <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center gap-1">
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                  进行中
+                                </span>
+                              )}
+                              {task.status === "failed" && (
+                                <span className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20">
+                                  失败
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {task.fetchedCount.toLocaleString()} / {task.totalCount.toLocaleString()} 条 ({task.progress.toFixed(1)}%)
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {new Date(task.createdAt).toLocaleString("zh-CN")}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-xs font-medium">OKX</span>
-                  </div>
-                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
-                      <img 
-                        src="https://public.bnbstatic.com/static/images/common/logo.png" 
-                        alt="Binance" 
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-xs font-medium">Binance</span>
-                  </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* 数据来源标识 */}
+              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+                <span>数据来源：</span>
+                <div className="flex items-center gap-2">
+                  <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance" className="w-3 h-3 opacity-60" />
+                  <span>Binance</span>
+                </div>
+                <span>·</span>
+                <div className="flex items-center gap-2">
+                  <img src="https://static.okx.com/cdn/assets/imgs/MjAyMQ/okx-favicon.ico" alt="OKX" className="w-3 h-3 opacity-60" />
+                  <span>OKX</span>
                 </div>
               </div>
             </TabsContent>
 
             {/* 未来数据预测内容 */}
             <TabsContent value="prediction" className="space-y-8">
-              {/* 预测功能说明 */}
               <Card className="border-primary/20 bg-card/50 backdrop-blur">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    AI预测功能
-                  </CardTitle>
+                  <CardTitle className="text-2xl">AI 数据预测</CardTitle>
                   <CardDescription>
-                    基于多个AI模型的综合预测，为您的投资决策提供参考
+                    使用先进的AI模型预测加密货币未来价格走势
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm">短期价格预测</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-xs text-muted-foreground">
-                        基于技术指标和市场情绪，预测未来1-7天的价格走势
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm">趋势分析</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-xs text-muted-foreground">
-                        识别当前市场趋势（上涨、下跌、震荡），提供支撑阻力位
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm">市场情绪分析</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-xs text-muted-foreground">
-                        分析社交媒体和新闻数据，评估市场整体情绪（乐观/悲观）
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/50">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm">风险评估</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-xs text-muted-foreground">
-                        评估当前投资风险等级，提供风险控制建议
-                      </CardContent>
-                    </Card>
+                <CardContent>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Sparkles className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">AI预测功能开发中...</p>
+                    <p className="text-sm mt-2">敬请期待</p>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* 功能开发中 */}
-              <Card className="border-yellow-500/20 bg-yellow-500/5">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-yellow-500" />
-                    功能开发中
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm text-muted-foreground">
-                  <p>• AI驱动的价格预测模型正在训练中</p>
-                  <p>• 市场情绪分析系统开发中</p>
-                  <p>• 多模型集成预测算法优化中</p>
-                  <p>• 预计将在未来几周内上线</p>
-                </CardContent>
-              </Card>
-
-              {/* AI模型来源 - 底部简洁展示 */}
-              <div className="flex items-center justify-center gap-6 py-4 border-t border-border/30">
-                <span className="text-xs text-muted-foreground">AI模型：</span>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" 
-                        alt="ChatGPT" 
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-xs font-medium">GPT-4</span>
-                  </div>
-                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
-                      <img 
-                        src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg" 
-                        alt="Gemini" 
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-xs font-medium">Gemini</span>
-                  </div>
-                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-blue-500 rounded flex items-center justify-center">
-                      <span className="text-white font-bold text-[10px]">DS</span>
-                    </div>
-                    <span className="text-xs font-medium">DeepSeek</span>
-                  </div>
-                </div>
+              {/* 数据来源标识 */}
+              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+                <span>AI模型：</span>
+                <span>GPT-4</span>
+                <span>·</span>
+                <span>Gemini</span>
+                <span>·</span>
+                <span>DeepSeek</span>
               </div>
             </TabsContent>
           </Tabs>
