@@ -661,3 +661,46 @@ export async function getUserByEmail(email: string) {
   
   return result.length > 0 ? result[0] : null;
 }
+
+// ========== K线数据查询 ==========
+
+/**
+ * 根据年份范围查询K线数据
+ * @param symbol 交易对符号（如BTCUSDT）
+ * @param interval K线时间间隔（如1m）
+ * @param years 年份数组（如[2024, 2025]）
+ * @returns K线数据数组
+ */
+export async function getKlineDataByYears(
+  symbol: string,
+  interval: string,
+  years: number[]
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { klineData } = await import("../drizzle/schema");
+  const { and: andOp, eq: eqOp, gte, lte } = await import("drizzle-orm");
+  
+  // 计算时间范围
+  const minYear = Math.min(...years);
+  const maxYear = Math.max(...years);
+  const startTime = new Date(`${minYear}-01-01T00:00:00Z`);
+  const endTime = new Date(`${maxYear + 1}-01-01T00:00:00Z`); // 下一年的1月1日
+  
+  // 查询数据
+  const result = await db
+    .select()
+    .from(klineData)
+    .where(
+      andOp(
+        eqOp(klineData.symbol, symbol),
+        eqOp(klineData.interval, interval),
+        gte(klineData.openTime, startTime),
+        lte(klineData.openTime, endTime)
+      )
+    )
+    .orderBy(klineData.openTime);
+  
+  return result;
+}

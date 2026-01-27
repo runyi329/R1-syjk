@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { TrendingUp, ArrowRight, ArrowLeft, X } from "lucide-react";
-import { useState } from "react";
+import { TrendingUp, ArrowRight, ArrowLeft, X, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 interface GridTradingBacktestProps {
   symbol: string;
@@ -20,6 +22,11 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   const [tradeType, setTradeType] = useState<"spot" | "contract">("spot");
   const [leverage, setLeverage] = useState<number>(1);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const [backtestResult, setBacktestResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // tRPC mutation
+  const backtestMutation = trpc.gridTrading.backtest.useMutation();
 
   // 生成年份列表（2017-2026）
   const years = Array.from({ length: 10 }, (_, i) => 2017 + i);
@@ -310,12 +317,43 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               上一步
             </Button>
             <Button
-              onClick={() => setStep(3)}
+              onClick={async () => {
+                setIsLoading(true);
+                try {
+                  const result = await backtestMutation.mutateAsync({
+                    symbol,
+                    minPrice: parseFloat(priceMin),
+                    maxPrice: parseFloat(priceMax),
+                    gridCount: parseInt(gridCount),
+                    investment: parseFloat(investment),
+                    type: tradeType,
+                    leverage: tradeType === "contract" ? leverage : undefined,
+                    years: selectedYears,
+                  });
+                  setBacktestResult(result.data);
+                  setStep(3);
+                  toast.success(result.message);
+                } catch (error: any) {
+                  toast.error(error.message || "回测失败，请重试");
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              disabled={isLoading}
               className="bg-[#c3ff00] hover:bg-[#b0e600] text-black font-semibold"
               size="lg"
             >
-              下一步
-              <ArrowRight className="w-4 h-4 ml-2" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  计算中...
+                </>
+              ) : (
+                <>
+                  开始回测
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
@@ -323,8 +361,35 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     );
   }
 
-  // 第3步：回测结果（占位符，后续实现）
+  // 第3步：回测结果
   if (step === 3) {
+    if (!backtestResult) {
+      return (
+        <Card className="border-primary/20 bg-card/50 backdrop-blur">
+          <CardContent className="py-12 text-center text-muted-foreground">
+            <Loader2 className="w-16 h-16 mx-auto mb-4 animate-spin" />
+            <p>正在加载回测结果...</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    const {
+      totalProfit,
+      gridProfit,
+      unpairedProfit,
+      profitRate,
+      annualizedReturn,
+      arbitrageTimes,
+      dailyArbitrageTimes,
+      maxDrawdown,
+      maxDrawdownRate,
+      minAsset,
+      maxAsset,
+      currentPrice,
+      startPrice,
+    } = backtestResult;
+
     return (
       <Card className="border-primary/20 bg-card/50 backdrop-blur">
         <CardHeader className="relative">
@@ -342,10 +407,68 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="text-center py-12 text-muted-foreground">
-            <TrendingUp className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg">正在计算回测结果...</p>
-            <p className="text-sm mt-2">请稍候</p>
+          {/* 收益统计 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">总收益 (USDT)</p>
+              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                {totalProfit >= 0 ? '+' : ''}{totalProfit.toFixed(2)}
+              </p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">收益率</p>
+              <p className={`text-2xl font-bold ${profitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                {profitRate >= 0 ? '+' : ''}{profitRate.toFixed(2)}%
+              </p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">网格收益 (USDT)</p>
+              <p className="text-lg font-semibold">{gridProfit.toFixed(2)}</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">未配对收益 (USDT)</p>
+              <p className="text-lg font-semibold">{unpairedProfit.toFixed(2)}</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">年化收益率</p>
+              <p className="text-lg font-semibold">{annualizedReturn.toFixed(2)}%</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">套利次数</p>
+              <p className="text-lg font-semibold">{arbitrageTimes}次</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">日均套利次数</p>
+              <p className="text-lg font-semibold">{dailyArbitrageTimes.toFixed(2)}次</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">最大回撤</p>
+              <p className="text-lg font-semibold text-orange-500">{maxDrawdownRate.toFixed(2)}%</p>
+            </div>
+          </div>
+
+          {/* 价格信息 */}
+          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">策略开启时价格</span>
+              <span className="font-semibold">{startPrice.toFixed(2)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">当前价格</span>
+              <span className="font-semibold">{currentPrice.toFixed(2)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">价格区间</span>
+              <span className="font-semibold">{priceMin} - {priceMax}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">最低资产</span>
+              <span className="font-semibold">{minAsset.toFixed(2)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">最高资产</span>
+              <span className="font-semibold">{maxAsset.toFixed(2)} USDT</span>
+            </div>
           </div>
 
           {/* 按钮组 */}
