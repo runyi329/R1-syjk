@@ -342,7 +342,7 @@ export default function CryptoHistory() {
                       ) : (
                         <>
                           <Download className="w-4 h-4 mr-2" />
-                          获取历史数据 ({dataSize})
+                          获取完整历史数据 ({dataSize})
                         </>
                       )}
                     </Button>
