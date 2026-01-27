@@ -480,14 +480,99 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                 </div>
               </div>
             ) : showDosResult ? (
-              // 回测完成：显示DOS命令行风格的结果
-              <div className="relative min-h-[400px] text-[#00ff00]">
-                <TypewriterLines
-                  lines={generateDosResultLines()}
-                  speed={20}
-                  lineDelay={50}
-                  className="leading-relaxed"
-                />
+              // 回测完成：显示回测结果报告
+              <div className="relative min-h-[300px] text-foreground space-y-4 py-4">
+                <div className="text-center mb-6">
+                  <CheckCircle2 className="w-12 h-12 mx-auto mb-2 text-green-500" />
+                  <h3 className="text-xl font-bold">回测完成</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {startDate} 至 {endDate}
+                  </p>
+                </div>
+
+                {backtestResult && (
+                  <div className="space-y-3 text-sm">
+                    {/* 回测数据量 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">回测数据量</span>
+                      <span className="font-medium">{backtestResult.dataCount || 0} 条K线</span>
+                    </div>
+
+                    {/* 最终余额 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">最终余额</span>
+                      <span className="font-medium text-lg">
+                        {(parseFloat(investment) + backtestResult.totalProfit).toFixed(2)} USDT
+                      </span>
+                    </div>
+
+                    {/* 总收益 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">总收益</span>
+                      <span className={`font-bold text-lg ${
+                        backtestResult.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'
+                      }`}>
+                        {backtestResult.totalProfit >= 0 ? '+' : ''}{backtestResult.totalProfit.toFixed(2)} USDT
+                      </span>
+                    </div>
+
+                    {/* 收益率 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">收益率</span>
+                      <span className={`font-bold text-lg ${
+                        backtestResult.profitRate >= 0 ? 'text-red-500' : 'text-green-500'
+                      }`}>
+                        {backtestResult.profitRate >= 0 ? '+' : ''}{backtestResult.profitRate.toFixed(2)}%
+                      </span>
+                    </div>
+
+                    {/* 年化收益率 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">年化收益率</span>
+                      <span className="font-medium">{backtestResult.annualizedReturn.toFixed(2)}%</span>
+                    </div>
+
+                    {/* 网格触发次数（套利次数） */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">网格触发次数</span>
+                      <span className="font-medium">{backtestResult.arbitrageTimes} 次</span>
+                    </div>
+
+                    {/* 日均套利 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">日均套利</span>
+                      <span className="font-medium">{backtestResult.dailyArbitrageTimes.toFixed(2)} 次/天</span>
+                    </div>
+
+                    {/* 网格利润 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">网格利润</span>
+                      <span className="font-medium">{backtestResult.gridProfit.toFixed(2)} USDT</span>
+                    </div>
+
+                    {/* 浮动盈亏 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">浮动盈亏</span>
+                      <span className="font-medium">{backtestResult.unpairedProfit.toFixed(2)} USDT</span>
+                    </div>
+
+                    {/* 最大回撤 */}
+                    <div className="flex justify-between items-center py-2 border-b border-border/50">
+                      <span className="text-muted-foreground">最大回撤</span>
+                      <span className="font-medium text-red-500">
+                        {backtestResult.maxDrawdown.toFixed(2)} USDT ({backtestResult.maxDrawdownRate.toFixed(2)}%)
+                      </span>
+                    </div>
+
+                    {/* 资产范围 */}
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-muted-foreground">资产范围</span>
+                      <span className="font-medium text-sm">
+                        {backtestResult.minAsset.toFixed(2)} - {backtestResult.maxAsset.toFixed(2)} USDT
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               // 回测中：显示实时进度
