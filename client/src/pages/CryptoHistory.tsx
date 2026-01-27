@@ -7,6 +7,7 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
+import { GridTradingBacktest } from "@/components/GridTradingBacktest";
 
 export default function CryptoHistory() {
   const [selectedCrypto, setSelectedCrypto] = useState<string>("BTC");
@@ -432,6 +433,9 @@ export default function CryptoHistory() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* 网格交易回测功能 */}
+              <GridTradingBacktest symbol={selectedCrypto} />
 
               {/* 数据来源标识 */}
               <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
