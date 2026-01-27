@@ -12,11 +12,22 @@ export default function CryptoHistory() {
   const [selectedCrypto, setSelectedCrypto] = useState<string>("BTC");
   const [fetchingTaskId, setFetchingTaskId] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState<string>(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
+  
+  // 计算理论数据量（基于1秒K线）
+  const calculateDataCount = () => {
+    const startTime = new Date("2017-08-17T12:00:00+08:00").getTime();
+    const currentTimeMs = Date.now();
+    const diffSeconds = Math.floor((currentTimeMs - startTime) / 1000);
+    return diffSeconds; // 1秒K线 = 1条数据/秒
+  };
+  
+  const [estimatedDataCount, setEstimatedDataCount] = useState<number>(calculateDataCount());
 
-  // 实时更新时间
+  // 实时更新时间和数据量
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
+      setEstimatedDataCount(calculateDataCount()); // 每秒更新数据量
     }, 1000); // 每秒更新
 
     return () => clearInterval(timer);
@@ -319,7 +330,7 @@ export default function CryptoHistory() {
                     <p>• 数据时间范围：2017年8月17日 12:00:00 至 {currentTime}</p>
                     <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
-                    <p>• 预计数据量：约 440万 条（根据时间跨度计算）</p>
+                    <p>• 预计数据量：{estimatedDataCount.toLocaleString()} 条</p>
                     <p className="text-yellow-600 dark:text-yellow-500">⚠️ 全量抓取需要较长时间（约2-3小时），请耐心等待</p>
                   </div>
                 </CardContent>
