@@ -330,7 +330,7 @@ export default function CryptoHistory() {
                     <p>• 数据时间范围：2017年8月17日 12:00:00 至 {currentTime}</p>
                     <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
-                    <p>• 预计数据量：{estimatedDataCount.toLocaleString()} 条</p>
+                    <p>• 数据库K线数据更新：{estimatedDataCount.toLocaleString()} 条</p>
                     <p className="text-yellow-600 dark:text-yellow-500">⚠️ 全量抓取需要较长时间（约2-3小时），请耐心等待</p>
                   </div>
                 </CardContent>
