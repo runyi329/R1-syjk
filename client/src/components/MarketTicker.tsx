@@ -88,11 +88,7 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
   }, [market.price]);
 
   return (
-    <div className={cn(
-      "flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-all flex-shrink-0",
-      isUpdating && priceDirection === 'up' && "bg-red-500/10 border-red-500/30",
-      isUpdating && priceDirection === 'down' && "bg-green-500/10 border-green-500/30"
-    )}>
+    <div className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0">
       <div className="flex justify-between items-start mb-1">
         <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
         <div className="flex items-center gap-1">
