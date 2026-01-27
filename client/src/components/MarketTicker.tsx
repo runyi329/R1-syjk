@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ArrowUp, ArrowDown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { trpc } from '@/lib/trpc';
 
 interface MarketData {
   symbol: string;
@@ -10,13 +9,6 @@ interface MarketData {
   change: number;
   changePercent: number;
   isOpen: boolean;
-}
-
-interface StockSymbol {
-  display: string;
-  symbol: string;
-  name: string;
-  region: 'US' | 'HK' | 'CN' | 'JP' | 'DE' | 'UK';
 }
 
 // 初始基准数据（备用）
@@ -49,17 +41,6 @@ const STOCK_SYMBOLS = [
   { display: '现货黄金', symbol: 'GC=F', name: '现货黄金', region: 'US' as const, marketHours: { start: 0, end: 24 } },
 ];
 
-// 加密货币符号
-const CRYPTO_SYMBOLS = [
-  { display: '比特币', symbol: 'BTC-USD', name: '比特币', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-  { display: '以太坊', symbol: 'ETH-USD', name: '以太坊', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-  { display: '币安币', symbol: 'BNB-USD', name: '币安币', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-  { display: '索拉纳', symbol: 'SOL-USD', name: '索拉纳', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-  { display: '瑞波币', symbol: 'XRP-USD', name: '瑞波币', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-  { display: 'Cardano', symbol: 'ADA-USD', name: 'Cardano', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-  { display: 'Dogecoin', symbol: 'DOGE-USD', name: 'Dogecoin', region: 'US' as const, marketHours: { start: 0, end: 24 } },
-];
-
 // 检查一个指数是否休市
 function isMarketClosed(symbol: string): boolean {
   const stockInfo = STOCK_SYMBOLS.find(s => s.symbol === symbol);
@@ -86,13 +67,6 @@ function isMarketClosed(symbol: string): boolean {
   }
   
   return false;
-}
-
-interface MarketTickerRowProps {
-  markets: MarketData[];
-  direction?: 'left' | 'right';
-  rowId: string;
-  source?: string;
 }
 
 function MarketCard({ market, source = '' }: { market: MarketData; source?: string }) {
@@ -162,10 +136,12 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
   );
 }
 
-function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: MarketTickerRowProps) {
-  const [isScrolling, setIsScrolling] = useState(true);
+// 第1行：股票指数（向左滚动）
+function MarketTickerStocks() {
+  const [stocks, setStocks] = useState<MarketData[]>(INITIAL_DATA);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
@@ -215,12 +191,12 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
     setIsScrolling(true);
   };
 
-  // 滚动动画
+  // 向左滚动动画
   useEffect(() => {
     if (!trackRef.current || !isScrolling || isDragging) return;
 
     const track = trackRef.current;
-    const singleCycleWidth = track.scrollWidth / 2; // 单个周期的宽度
+    const singleCycleWidth = track.scrollWidth / 2;
     const scrollDuration = 40000; // 40 秒完成一个周期
 
     const animate = (currentTime: number) => {
@@ -229,16 +205,8 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
       }
 
       const elapsed = currentTime - startTimeRef.current;
-      const progress = (elapsed % scrollDuration) / scrollDuration; // 0 到 1 的循环进度
-      
-      let newOffset: number;
-      if (direction === 'left') {
-        // 向左滚动（内容向左移动，所以是负值）
-        newOffset = -progress * singleCycleWidth;
-      } else {
-        // 向右滚动（内容向右移动，所以是正值）
-        newOffset = progress * singleCycleWidth;
-      }
+      const progress = (elapsed % scrollDuration) / scrollDuration;
+      const newOffset = -progress * singleCycleWidth;
 
       setScrollOffset(newOffset);
       animationRef.current = requestAnimationFrame(animate);
@@ -251,9 +219,9 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isScrolling, isDragging, direction]);
+  }, [isScrolling, isDragging]);
 
-  const displayMarkets = [...markets, ...markets];
+  const displayMarkets = [...stocks, ...stocks];
 
   return (
     <div
@@ -278,28 +246,98 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
         }}
       >
         {displayMarkets.map((market, index) => (
-          <MarketCard key={`${market.symbol}-${index}`} market={market} source={source} />
+          <MarketCard key={`${market.symbol}-${index}`} market={market} source="Mock" />
         ))}
       </div>
     </div>
   );
 }
 
-export function MarketTickerStocks() {
-  const [stocks, setStocks] = useState<MarketData[]>(INITIAL_DATA);
-
-  return (
-    <MarketTickerRow
-      markets={stocks}
-      direction="left"
-      rowId="stocks"
-      source="Mock"
-    />
-  );
-}
-
-export function MarketTickerCrypto() {
+// 第2行：加密货币（向右滚动）
+function MarketTickerCrypto() {
   const [cryptos, setCryptos] = useState<MarketData[]>(CRYPTO_DATA);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartOffset = useRef(0);
+  const animationRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number>(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsScrolling(false);
+    setIsDragging(true);
+    touchStartX.current = e.touches[0].clientX;
+    touchStartOffset.current = scrollOffset;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const diff = e.touches[0].clientX - touchStartX.current;
+    setScrollOffset(touchStartOffset.current + diff);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setIsScrolling(true);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsScrolling(false);
+    setIsDragging(true);
+    touchStartX.current = e.clientX;
+    touchStartOffset.current = scrollOffset;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const diff = e.clientX - touchStartX.current;
+    setScrollOffset(touchStartOffset.current + diff);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setIsScrolling(true);
+  };
+
+  // 向右滚动动画（从 -singleCycleWidth 开始，移动到 0）
+  useEffect(() => {
+    if (!trackRef.current || !isScrolling || isDragging) return;
+
+    const track = trackRef.current;
+    const singleCycleWidth = track.scrollWidth / 2;
+    const scrollDuration = 40000; // 40 秒完成一个周期
+
+    const animate = (currentTime: number) => {
+      if (startTimeRef.current === 0) {
+        startTimeRef.current = currentTime;
+      }
+
+      const elapsed = currentTime - startTimeRef.current;
+      const progress = (elapsed % scrollDuration) / scrollDuration;
+      // 从 -singleCycleWidth 开始，逐渐移动到 0
+      const newOffset = -singleCycleWidth + progress * singleCycleWidth;
+
+      setScrollOffset(newOffset);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isScrolling, isDragging]);
 
   // 获取欧易加密货币数据
   useEffect(() => {
@@ -356,13 +394,35 @@ export function MarketTickerCrypto() {
     return () => clearInterval(interval);
   }, []);
 
+  const displayMarkets = [...cryptos, ...cryptos];
+
   return (
-    <MarketTickerRow
-      markets={cryptos}
-      direction="left"
-      rowId="crypto"
-      source="OKX"
-    />
+    <div
+      ref={containerRef}
+      className="w-full overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <div
+        ref={trackRef}
+        className={cn(
+          'flex gap-4',
+          isDragging ? '' : 'transition-transform duration-[50ms]'
+        )}
+        style={{
+          transform: `translateX(${scrollOffset}px)`,
+        }}
+      >
+        {displayMarkets.map((market, index) => (
+          <MarketCard key={`${market.symbol}-${index}`} market={market} source="OKX" />
+        ))}
+      </div>
+    </div>
   );
 }
 
