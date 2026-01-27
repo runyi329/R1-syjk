@@ -26,7 +26,6 @@ const INITIAL_DATA: MarketData[] = [
   { symbol: 'IXIC', name: '纳斯达克', price: 16274.94, change: 82.15, changePercent: 0.51, isOpen: false },
   { symbol: 'N225', name: '日经225', price: 32850.50, change: 215.30, changePercent: 0.66, isOpen: true },
   { symbol: 'GDAXI', name: 'DAX', price: 18950.75, change: 125.40, changePercent: 0.67, isOpen: false },
-  { symbol: 'FTSE', name: 'FTSE 100', price: 7685.20, change: -45.60, changePercent: -0.59, isOpen: false },
   { symbol: 'XAU', name: '现货黄金', price: 2325.60, change: 15.20, changePercent: 0.66, isOpen: true },
 ];
 
@@ -47,7 +46,6 @@ const STOCK_SYMBOLS = [
   { display: '纳斯达克', symbol: '^IXIC', name: '纳斯达克', region: 'US' as const, marketHours: { start: 13.5, end: 20 } },
   { display: '日经225', symbol: '^N225', name: '日经225', region: 'JP' as const, marketHours: { start: 8, end: 15 } },
   { display: 'DAX', symbol: '^GDAXI', name: 'DAX', region: 'DE' as const, marketHours: { start: 15.5, end: 22 } },
-  { display: 'FTSE 100', symbol: '^FTSE', name: 'FTSE 100', region: 'UK' as const, marketHours: { start: 16, end: 23 } },
   { display: '现货黄金', symbol: 'GC=F', name: '现货黄金', region: 'US' as const, marketHours: { start: 0, end: 24 } },
 ];
 
@@ -282,7 +280,6 @@ function MarketTickerStocks() {
     CN: STOCK_SYMBOLS.filter(s => s.region === 'CN').map(s => s.symbol),
     JP: STOCK_SYMBOLS.filter(s => s.region === 'JP').map(s => s.symbol),
     DE: STOCK_SYMBOLS.filter(s => s.region === 'DE').map(s => s.symbol),
-    UK: STOCK_SYMBOLS.filter(s => s.region === 'UK').map(s => s.symbol),
   };
 
   const usStocksQuery = trpc.market.getMultipleStocks.useQuery(
@@ -355,20 +352,6 @@ function MarketTickerStocks() {
     }
   );
 
-  const ukStocksQuery = trpc.market.getMultipleStocks.useQuery(
-    {
-      symbols: stocksByRegion.UK,
-      region: 'UK',
-      interval: '1d',
-      range: '1d',
-    },
-    {
-      refetchInterval: 30000,
-      retry: 2,
-      enabled: stocksByRegion.UK.length > 0,
-    }
-  );
-
   const cryptoSymbols = CRYPTO_SYMBOLS.map(s => s.symbol);
   const cryptoQuery = trpc.market.getMultipleStocks.useQuery(
     {
@@ -391,14 +374,13 @@ function MarketTickerStocks() {
       ...(usStocksQuery.data || []),
       ...(jpStocksQuery.data || []),
       ...(deStocksQuery.data || []),
-      ...(ukStocksQuery.data || []),
     ];
 
     if (allData.length > 0) {
       setMarkets(allData);
       setIsLoading(false);
     }
-  }, [usStocksQuery.data, hkStocksQuery.data, cnStocksQuery.data, jpStocksQuery.data, deStocksQuery.data, ukStocksQuery.data]);
+  }, [usStocksQuery.data, hkStocksQuery.data, cnStocksQuery.data, jpStocksQuery.data, deStocksQuery.data]);
 
   useEffect(() => {
     if (cryptoQuery.data && cryptoQuery.data.length > 0) {
