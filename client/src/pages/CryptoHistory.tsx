@@ -11,6 +11,16 @@ import { Progress } from "@/components/ui/progress";
 export default function CryptoHistory() {
   const [selectedCrypto, setSelectedCrypto] = useState<string>("BTC");
   const [fetchingTaskId, setFetchingTaskId] = useState<number | null>(null);
+  const [currentTime, setCurrentTime] = useState<string>(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
+
+  // 实时更新时间
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
+    }, 1000); // 每秒更新
+
+    return () => clearInterval(timer);
+  }, []);
 
   // 查询抓取任务进度
   const { data: taskProgress, isLoading: isLoadingProgress } = trpc.klines.getTaskProgress.useQuery(
@@ -306,7 +316,7 @@ export default function CryptoHistory() {
 
                   {/* 说明文字 */}
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>• 数据时间范围：2017年8月17日 至 今天</p>
+                    <p>• 数据时间范围：2017年8月17日 12:00:00 至 {currentTime}</p>
                     <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
                     <p>• 预计数据量：约 440万 条（根据时间跨度计算）</p>
