@@ -30,12 +30,48 @@ const INITIAL_DATA: MarketData[] = [
 
 // 股票符号映射（Yahoo Finance 符号）
 const STOCK_SYMBOLS = [
-  { display: '上证指数', symbol: '000001.SS', name: '上证指数', region: 'CN' },
-  { display: '恒生指数', symbol: '0700.HK', name: '恒生指数', region: 'HK' },
-  { display: '纳斯达克', symbol: '^IXIC', name: '纳斯达克', region: 'US' },
-  { display: '黄金', symbol: 'GC=F', name: '现货黄金', region: 'US' },
-  { display: '比特币', symbol: 'BTC-USD', name: '比特币', region: 'US' },
+  { display: '上证指数', symbol: '000001.SS', name: '上证指数', region: 'CN', marketHours: { start: 9.5, end: 15 } }, // 9:30-15:00
+  { display: '恒生指数', symbol: '0700.HK', name: '恒生指数', region: 'HK', marketHours: { start: 9.5, end: 16 } }, // 9:30-16:00
+  { display: '纳斯达克', symbol: '^IXIC', name: '纳斯达克', region: 'US', marketHours: { start: 13.5, end: 20 } }, // 13:30-20:00 中国时间
+  { display: '黄金', symbol: 'GC=F', name: '现货黄金', region: 'US', marketHours: { start: 0, end: 24 } }, // 24/7
+  { display: '比特币', symbol: 'BTC-USD', name: '比特币', region: 'US', marketHours: { start: 0, end: 24 } }, // 24/7
 ];
+
+// 检查一个指数是否休市
+function isMarketClosed(symbol: string): boolean {
+  const stockInfo = STOCK_SYMBOLS.find(s => s.symbol === symbol);
+  if (!stockInfo || !stockInfo.marketHours) return false;
+
+  // 中国时区 (UTC+8)
+  const now = new Date();
+  const chinaTime = new Date(now.getTime() + (8 - now.getTimezoneOffset() / 60) * 60 * 60 * 1000);
+  const hours = chinaTime.getHours() + chinaTime.getMinutes() / 60;
+  const dayOfWeek = chinaTime.getDay();
+
+  // 检查是否是需日一至需日五 (0 = 星期日, 6 = 星期六)
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  
+  // 检查是否在交易时间内
+  const isInMarketHours = hours >= stockInfo.marketHours.start && hours < stockInfo.marketHours.end;
+  
+  // 中国上证指数仅在工作日交易
+  if (symbol === '000001.SS') {
+    return isWeekend || !isInMarketHours;
+  }
+  
+  // 恒生指数仅在工作日交易
+  if (symbol === '0700.HK') {
+    return isWeekend || !isInMarketHours;
+  }
+  
+  // 美股仅在工作日交易
+  if (symbol === '^IXIC') {
+    return isWeekend || !isInMarketHours;
+  }
+  
+  // 黄金和比特币 24/7 交易
+  return false;
+}
 
 export function MarketTicker() {
   const [markets, setMarkets] = useState<MarketData[]>(INITIAL_DATA);
@@ -190,19 +226,26 @@ export function MarketTicker() {
             <div className="text-lg font-bold font-mono tracking-tight text-right">
               {market.price.toFixed(2)}
             </div>
-            <div
-              className={cn(
-                'flex items-center justify-end text-xs font-medium',
-                market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-              )}
-            >
-              {market.change >= 0 ? (
-                <ArrowUp className="w-3 h-3 mr-0.5" />
-              ) : (
-                <ArrowDown className="w-3 h-3 mr-0.5" />
-              )}
-              <span>{Math.abs(market.change).toFixed(2)}</span>
-            </div>
+            {isMarketClosed(market.symbol) ? (
+              <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
+                <Clock className="w-3 h-3" />
+                <span>休市</span>
+              </div>
+            ) : (
+              <div
+                className={cn(
+                  'flex items-center justify-end text-xs font-medium',
+                  market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
+                )}
+              >
+                {market.change >= 0 ? (
+                  <ArrowUp className="w-3 h-3 mr-0.5" />
+                ) : (
+                  <ArrowDown className="w-3 h-3 mr-0.5" />
+                )}
+                <span>{Math.abs(market.change).toFixed(2)}</span>
+              </div>
+            )}
           </div>
         ))}
       </div>
