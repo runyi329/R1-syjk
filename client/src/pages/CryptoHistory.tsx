@@ -23,9 +23,9 @@ export default function CryptoHistory() {
   
   const [estimatedDataCount, setEstimatedDataCount] = useState<number>(calculateDataCount());
   
-  // 计算数据包大小（基于秒线展示需求，实际大小×60倍）
+  // 计算数据包大小（基于秒线理论数据量）
   const calculateDataSize = (dataCount: number) => {
-    const sizeInBytes = dataCount * 87 * 60; // 每条记录87字节 × 60倍
+    const sizeInBytes = dataCount * 87; // 每条记录87字节
     const sizeInMB = sizeInBytes / (1024 * 1024);
     const sizeInGB = sizeInMB / 1024;
     if (sizeInGB >= 1) {
