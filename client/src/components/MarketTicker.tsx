@@ -82,7 +82,7 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
       const timer = setTimeout(() => {
         setIsUpdating(false);
         setPriceDirection(null);
-      }, 800);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [market.price]);
@@ -106,10 +106,8 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
         </div>
       </div>
       <div className={cn(
-        'text-lg font-bold font-mono tracking-tight text-right transition-all duration-300',
-        isUpdating && 'scale-110',
-        isUpdating && priceDirection === 'up' && 'text-red-500',
-        isUpdating && priceDirection === 'down' && 'text-green-500'
+        'text-lg font-bold font-mono tracking-tight text-right transition-transform duration-100',
+        isUpdating && 'scale-105'
       )}>
         {market.price.toFixed(2)}
       </div>
@@ -436,9 +434,9 @@ function MarketTickerCrypto() {
       );
     };
 
-    // 随机间隔 500-1000ms
+    // 随机间隔 300-600ms，让跳动更频繁
     const scheduleNext = () => {
-      const delay = 500 + Math.random() * 500;
+      const delay = 300 + Math.random() * 300;
       return setTimeout(() => {
         simulateFluctuation();
         timeoutRef.current = scheduleNext();
