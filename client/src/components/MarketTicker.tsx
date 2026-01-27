@@ -270,7 +270,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
   );
 }
 
-export function MarketTicker() {
+function MarketTickerStocks() {
   const [markets, setMarkets] = useState<MarketData[]>(INITIAL_DATA);
   const [cryptoMarkets, setCryptoMarkets] = useState<MarketData[]>(CRYPTO_DATA);
   const [isLoading, setIsLoading] = useState(true);
@@ -407,18 +407,56 @@ export function MarketTicker() {
   }, [cryptoQuery.data]);
 
   return (
+    <MarketTickerRow 
+      markets={markets} 
+      direction="left"
+      rowId="row1"
+    />
+  );
+}
+
+function MarketTickerCrypto() {
+  const [cryptoMarkets, setCryptoMarkets] = useState<MarketData[]>(CRYPTO_DATA);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const cryptoSymbols = CRYPTO_SYMBOLS.map(s => s.symbol);
+  const cryptoQuery = trpc.market.getMultipleStocks.useQuery(
+    {
+      symbols: cryptoSymbols,
+      region: 'US',
+      interval: '1d',
+      range: '1d',
+    },
+    {
+      refetchInterval: 30000,
+      retry: 2,
+      enabled: cryptoSymbols.length > 0,
+    }
+  );
+
+  useEffect(() => {
+    if (cryptoQuery.data && cryptoQuery.data.length > 0) {
+      setCryptoMarkets(cryptoQuery.data);
+    }
+  }, [cryptoQuery.data]);
+
+  return (
+    <MarketTickerRow 
+      markets={cryptoMarkets} 
+      direction="right"
+      rowId="row2"
+    />
+  );
+}
+
+export function MarketTicker() {
+  return (
     <div className="space-y-3">
-      <MarketTickerRow 
-        markets={markets} 
-        direction="left"
-        rowId="row1"
-      />
-      
-      <MarketTickerRow 
-        markets={cryptoMarkets} 
-        direction="right"
-        rowId="row2"
-      />
+      <MarketTickerStocks />
+      <MarketTickerCrypto />
     </div>
   );
 }
+
+export { MarketTickerStocks, MarketTickerCrypto };
