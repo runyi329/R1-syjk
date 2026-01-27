@@ -359,7 +359,7 @@ export function MarketTickerCrypto() {
   return (
     <MarketTickerRow
       markets={cryptos}
-      direction="right"
+      direction="left"
       rowId="crypto"
       source="OKX"
     />
