@@ -352,7 +352,7 @@ export default function Home() {
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)] group-hover:scale-110 transition-transform duration-300">
                         <IconComponent className="w-5 h-5" />
                       </div>
-                      <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
+                      <CardTitle className="text-xl md:text-2xl font-bold group-hover:text-primary transition-colors">
                         {catData.name}
                       </CardTitle>
                     </div>
@@ -365,12 +365,12 @@ export default function Home() {
                     </button>
                   </CardHeader>
                   <CardContent className="px-5 pb-4 pt-2">
-                    <CardDescription className="line-clamp-1 text-xs mb-3 text-muted-foreground/80">
+                    <CardDescription className="line-clamp-1 text-sm md:text-base mb-3 text-muted-foreground/80">
                       {catData.description}
                     </CardDescription>
                     <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                       {category.projects.map((project: { id: string; name_key: string; url?: string }) => (
-                        <div key={project.id} className="flex items-center text-xs text-muted-foreground hover:text-primary transition-colors py-0.5">
+                        <div key={project.id} className="flex items-center text-sm md:text-base text-muted-foreground hover:text-primary transition-colors py-0.5">
                           <span className="w-1 h-1 rounded-full bg-primary mr-1.5 shadow-[0_0_5px_var(--primary)]" />
                           {project.url ? (
                             <Link href={project.url} className="truncate hover:underline cursor-pointer">
