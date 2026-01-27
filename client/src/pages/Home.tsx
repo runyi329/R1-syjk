@@ -140,7 +140,7 @@ export default function Home() {
                 {userData && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 hover:opacity-80 transition-opacity cursor-pointer">
+                      <button className="flex flex-row items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
                         <span className="font-semibold text-primary text-xs sm:text-sm">{userData.name}</span>
                         <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400/20 to-yellow-600/20 border border-amber-500/50 rounded-full px-2 py-0.5">
                           <img src="/vip-badge.png" alt="VIP" className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
