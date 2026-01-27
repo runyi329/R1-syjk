@@ -374,7 +374,6 @@ export default function CryptoHistory() {
                   {/* 说明文字 */}
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>• 数据时间范围：{getStartTimeDisplay()} 至 {currentTime}</p>
-                    <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
                     <p>• 数据库K线数据更新：{estimatedDataCount.toLocaleString()} 条</p>
                     <p>• 数据包大小：{dataSize}</p>
