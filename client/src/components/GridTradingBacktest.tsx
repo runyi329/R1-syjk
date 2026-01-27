@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, ArrowRight, ArrowLeft, X, Loader2, Calendar } from "lucide-react";
+import { TrendingUp, ArrowRight, ArrowLeft, X, Loader2, Calendar, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -26,10 +26,36 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   const [endDate, setEndDate] = useState<string>("");
   const [backtestResult, setBacktestResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [progressData, setProgressData] = useState<any>(null);
 
-  // tRPC mutation
+  // tRPC mutation and query
   const backtestMutation = trpc.gridTrading.backtest.useMutation();
+  const progressQuery = trpc.gridTrading.getProgress.useQuery(
+    { symbol },
+    { 
+      enabled: isLoading,
+      refetchInterval: isLoading ? 1000 : false, // 每秒轮询一次
+    }
+  );
+
+  // 监听进度更新
+  useEffect(() => {
+    if (progressQuery.data?.data) {
+      setProgressData(progressQuery.data.data);
+      
+      // 如果回测完成，自动跳转到结果页面
+      if (progressQuery.data.data.status === 'completed' && backtestResult) {
+        setIsLoading(false);
+        setStep(3);
+      }
+      
+      // 如果回测失败，显示错误
+      if (progressQuery.data.data.status === 'failed') {
+        setIsLoading(false);
+        toast.error(progressQuery.data.data.error || '回测失败');
+      }
+    }
+  }, [progressQuery.data, backtestResult]);
 
   // 快捷日期选择
   const setQuickDateRange = (range: string) => {
@@ -81,7 +107,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     setStartDate("");
     setEndDate("");
     setStep(0);
-    setProgress(0);
+    setProgressData(null);
+    setBacktestResult(null);
   };
 
   // 验证参数
@@ -114,20 +141,6 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     }
     return null;
   };
-
-  // 模拟进度更新
-  useEffect(() => {
-    if (isLoading) {
-      setProgress(0);
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 95) return prev;
-          return prev + Math.random() * 5;
-        });
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  }, [isLoading]);
 
   // 如果未开始，显示启动按钮
   if (step === 0) {
@@ -369,7 +382,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     );
   }
 
-  // 第2步：策略说明
+  // 第2步：策略说明和回测执行
   if (step === 2) {
     return (
       <Card className="border-primary/20 bg-card/50 backdrop-blur">
@@ -386,37 +399,72 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
           <CardDescription>了解网格交易的运作原理</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* 策略图表 */}
+          {/* 策略图表 / 实时进度显示区域 */}
           <div className="bg-muted/50 p-6 rounded-lg">
-            <div className="relative h-48 flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <TrendingUp className="w-16 h-16 mx-auto mb-2 opacity-50" />
-                <p>策略图表展示</p>
-                <p className="text-xs mt-1">低买高卖，循环套利，赚取网格利润</p>
+            {!isLoading ? (
+              // 未开始回测：显示策略图表
+              <div className="relative h-48 flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <TrendingUp className="w-16 h-16 mx-auto mb-2 opacity-50" />
+                  <p>策略图表展示</p>
+                  <p className="text-xs mt-1">低买高卖，循环套利，赚取网格利润</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              // 回测中：显示实时进度
+              <div className="relative h-48 flex flex-col items-center justify-center space-y-4">
+                {progressData ? (
+                  <>
+                    {/* 当前回测日期 */}
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">正在回测</p>
+                      <p className="text-2xl font-bold text-primary">
+                        {progressData.currentDate || '准备中...'}
+                      </p>
+                    </div>
+
+                    {/* 进度条 */}
+                    <div className="w-full space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {progressData.processedDays} / {progressData.totalDays} 天
+                        </span>
+                        <span className="text-primary font-medium">
+                          {Math.round(progressData.progress)}%
+                        </span>
+                      </div>
+                      <Progress value={progressData.progress} className="h-2" />
+                    </div>
+
+                    {/* 当前盈亏 */}
+                    {progressData.currentProfit !== undefined && (
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">当前盈亏</p>
+                        <p className={`text-lg font-bold ${progressData.currentProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {progressData.currentProfit >= 0 ? '+' : ''}{progressData.currentProfit.toFixed(2)} USDT
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // 等待进度数据
+                  <div className="text-center">
+                    <Loader2 className="w-16 h-16 mx-auto mb-4 animate-spin text-primary" />
+                    <p className="text-muted-foreground">正在初始化回测...</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 策略说明 */}
-          <div className="text-sm text-muted-foreground space-y-3">
-            <p className="font-semibold text-foreground">低买高卖，循环套利，赚取网格利润。</p>
-            <div className="space-y-2">
-              <p>• 当价格下跌至一个网格买单价格时，策略执行买入，并同时在该网格上方挂卖单。</p>
-              <p>• 当价格上涨至一个网格卖单价格时，策略执行卖出，并同时在该网格下方挂买单。</p>
-            </div>
-          </div>
-
-          {/* 进度条（回测中显示） */}
-          {isLoading && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">回测进度</span>
-                <span className="text-primary font-medium">{Math.round(progress)}%</span>
+          {!isLoading && (
+            <div className="text-sm text-muted-foreground space-y-3">
+              <p className="font-semibold text-foreground">低买高卖，循环套利，赚取网格利润。</p>
+              <div className="space-y-2">
+                <p>• 当价格下跌至一个网格买单价格时，策略执行买入，并同时在该网格上方挂卖单。</p>
+                <p>• 当价格上涨至一个网格卖单价格时，策略执行卖出，并同时在该网格下方挂买单。</p>
               </div>
-              <Progress value={progress} className="h-2" />
-              <p className="text-xs text-muted-foreground text-center">
-                正在分析历史数据，请稍候...
-              </p>
             </div>
           )}
 
@@ -435,7 +483,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
             <Button
               onClick={async () => {
                 setIsLoading(true);
-                setProgress(0);
+                setProgressData(null);
                 try {
                   const result = await backtestMutation.mutateAsync({
                     symbol,
@@ -448,14 +496,12 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                     startDate,
                     endDate,
                   });
-                  setProgress(100);
                   setBacktestResult(result.data);
-                  setStep(3);
                   toast.success(result.message);
+                  // 注意：不要立即跳转，等待进度查询检测到完成状态后自动跳转
                 } catch (error: any) {
-                  toast.error(error.message || "回测失败，请重试");
-                } finally {
                   setIsLoading(false);
+                  toast.error(error.message || "回测失败，请重试");
                 }
               }}
               disabled={isLoading}
@@ -465,7 +511,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  计算中...
+                  回测中...
                 </>
               ) : (
                 <>
@@ -521,7 +567,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
             <X className="w-4 h-4" />
           </Button>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary" />
+            <CheckCircle2 className="w-5 h-5 text-green-500" />
             回测结果
           </CardTitle>
           <CardDescription>

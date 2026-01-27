@@ -2,6 +2,12 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { streamKlineDataByDays } from "../db-streaming";
 import { initBacktestState, processBatch, finalizeBacktest } from "../gridTradingBacktestStreaming";
+import { 
+  initBacktestProgress, 
+  updateBacktestProgress, 
+  getBacktestProgress,
+  clearBacktestProgress 
+} from "../backtestProgressManager";
 
 /**
  * 网格交易回测路由
@@ -25,7 +31,7 @@ export const gridTradingRouter = router({
         endDate: z.string().optional(), // 结束日期 YYYY-MM-DD
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const {
         symbol,
         minPrice,
@@ -38,6 +44,8 @@ export const gridTradingRouter = router({
         startDate,
         endDate,
       } = input;
+
+      const userId = String(ctx.user.id);
 
       // 验证时间范围参数
       if (!years && (!startDate || !endDate)) {
@@ -62,80 +70,150 @@ export const gridTradingRouter = router({
       const timeRangeDesc = years 
         ? `年份: ${years.join(", ")}` 
         : `日期范围: ${startDate} 至 ${endDate}`;
-      console.log(`[回测开始] 交易对: ${binanceSymbol}, ${timeRangeDesc}`);
+      console.log(`[回测开始] 用户: ${userId}, 交易对: ${binanceSymbol}, ${timeRangeDesc}`);
 
       // 初始化回测状态
       let state: any = null;
       let totalKlines = 0;
       let processedDays = 0;
 
-      // 按天流式处理K线数据
-      const timeRange = years ? years : { startDate: startDate!, endDate: endDate! };
-      const { totalRecords, totalDays } = await streamKlineDataByDays(
-        binanceSymbol,
-        "1m",
-        timeRange,
-        async (batch, dayIndex, totalDaysCount, currentDate) => {
-          if (batch.length === 0) {
-            return;
+      try {
+        // 按天流式处理K线数据
+        const timeRange = years ? years : { startDate: startDate!, endDate: endDate! };
+        const { totalRecords, totalDays } = await streamKlineDataByDays(
+          binanceSymbol,
+          "1m",
+          timeRange,
+          async (batch, dayIndex, totalDaysCount, currentDate) => {
+            if (batch.length === 0) {
+              return;
+            }
+
+            // 第一批数据：初始化状态和进度
+            if (state === null) {
+              state = initBacktestState(
+                {
+                  minPrice,
+                  maxPrice,
+                  gridCount,
+                  investment,
+                  type,
+                  leverage,
+                },
+                batch[0]
+              );
+              console.log(`[回测初始化] 起始价格: ${state.startPrice}, 网格数量: ${gridCount}`);
+              
+              // 初始化进度
+              initBacktestProgress(userId, symbol, totalDaysCount);
+            }
+
+            // 处理这批数据
+            processBatch(state, batch);
+            totalKlines += batch.length;
+            processedDays++;
+
+            // 计算进度百分比
+            const progress = ((dayIndex + 1) / totalDaysCount * 100);
+            const dateStr = currentDate.toISOString().split('T')[0];
+            
+            // 更新进度
+            updateBacktestProgress(userId, symbol, {
+              currentDate: dateStr,
+              processedDays: dayIndex + 1,
+              totalDays: totalDaysCount,
+              progress,
+              currentProfit: state.totalProfit || 0,
+              status: 'running',
+            });
+            
+            console.log(`[回测进度] ${progress.toFixed(1)}% | ${dateStr} | 已处理 ${totalKlines} 条K线 (${processedDays}/${totalDaysCount} 天)`);
           }
+        );
 
-          // 第一批数据：初始化状态
-          if (state === null) {
-            state = initBacktestState(
-              {
-                minPrice,
-                maxPrice,
-                gridCount,
-                investment,
-                type,
-                leverage,
-              },
-              batch[0]
-            );
-            console.log(`[回测初始化] 起始价格: ${state.startPrice}, 网格数量: ${gridCount}`);
-          }
-
-          // 处理这批数据
-          processBatch(state, batch);
-          totalKlines += batch.length;
-          processedDays++;
-
-          // 计算进度百分比
-          const progress = ((dayIndex + 1) / totalDaysCount * 100).toFixed(1);
-          const dateStr = currentDate.toISOString().split('T')[0];
-          console.log(`[回测进度] ${progress}% | ${dateStr} | 已处理 ${totalKlines} 条K线 (${processedDays}/${totalDaysCount} 天)`);
+        // 检查是否有数据
+        if (totalRecords === 0 || state === null) {
+          const errorMsg = years 
+            ? `未找到${years.join(", ")}年的K线数据，请先获取历史数据`
+            : `未找到${startDate}至${endDate}的K线数据，请先获取历史数据`;
+          
+          // 标记失败
+          updateBacktestProgress(userId, symbol, {
+            status: 'failed',
+            error: errorMsg,
+          });
+          
+          throw new Error(errorMsg);
         }
-      );
 
-      // 检查是否有数据
-      if (totalRecords === 0 || state === null) {
-        const errorMsg = years 
-          ? `未找到${years.join(", ")}年的K线数据，请先获取历史数据`
-          : `未找到${startDate}至${endDate}的K线数据，请先获取历史数据`;
-        throw new Error(errorMsg);
+        // 完成回测并计算最终结果
+        const result = finalizeBacktest(state, {
+          minPrice,
+          maxPrice,
+          gridCount,
+          investment,
+          type,
+          leverage,
+        }, totalDays);
+
+        // 记录结束时间
+        const endTime = Date.now();
+        const duration = ((endTime - startTime) / 1000).toFixed(2);
+        console.log(`[回测完成] 耗时: ${duration}秒, 处理了 ${totalKlines} 条K线, 分 ${processedDays} 天`);
+        console.log(`[回测结果] 总收益: ¥${result.totalProfit.toFixed(2)}, 收益率: ${result.profitRate.toFixed(2)}%`);
+
+        // 标记完成
+        updateBacktestProgress(userId, symbol, {
+          status: 'completed',
+          currentProfit: result.totalProfit,
+        });
+
+        return {
+          success: true,
+          data: result,
+          message: `回测完成，共分析${totalKlines}条K线数据（${processedDays}天），耗时${duration}秒`,
+        };
+      } catch (error: any) {
+        // 标记失败
+        updateBacktestProgress(userId, symbol, {
+          status: 'failed',
+          error: error.message || '回测失败',
+        });
+        throw error;
       }
+    }),
 
-      // 完成回测并计算最终结果
-      const result = finalizeBacktest(state, {
-        minPrice,
-        maxPrice,
-        gridCount,
-        investment,
-        type,
-        leverage,
-      }, totalDays);
-
-      // 记录结束时间
-      const endTime = Date.now();
-      const duration = ((endTime - startTime) / 1000).toFixed(2);
-      console.log(`[回测完成] 耗时: ${duration}秒, 处理了 ${totalKlines} 条K线, 分 ${processedDays} 天`);
-      console.log(`[回测结果] 总收益: ¥${result.totalProfit.toFixed(2)}, 收益率: ${result.profitRate.toFixed(2)}%`);
-
+  /**
+   * 获取回测进度
+   */
+  getProgress: protectedProcedure
+    .input(
+      z.object({
+        symbol: z.string(),
+      })
+    )
+    .query(({ input, ctx }) => {
+      const progress = getBacktestProgress(String(ctx.user.id), input.symbol);
       return {
         success: true,
-        data: result,
-        message: `回测完成，共分析${totalKlines}条K线数据（${processedDays}天），耗时${duration}秒`,
+        data: progress,
+      };
+    }),
+
+  /**
+   * 清除回测进度
+   */
+  clearProgress: protectedProcedure
+    .input(
+      z.object({
+        symbol: z.string(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      clearBacktestProgress(String(ctx.user.id), input.symbol);
+      return {
+        success: true,
+        message: '进度已清除',
       };
     }),
 });
