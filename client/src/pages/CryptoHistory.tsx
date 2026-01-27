@@ -13,12 +13,29 @@ export default function CryptoHistory() {
   const [fetchingTaskId, setFetchingTaskId] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState<string>(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
   
+  // 不同币种的历史数据起始时间（北京时间 UTC+8）
+  const cryptoStartTimes: Record<string, string> = {
+    BTC: "2017-08-17T12:00:00+08:00",  // 比特币：2017年8月17日 12:00:00
+    ETH: "2017-08-17T08:00:00+08:00",  // 以太坊：2017年8月17日 08:00:00
+    SOL: "2020-08-11T10:00:00+08:00",  // 索拉纳：2020年8月11日 10:00:00
+  };
+  
   // 计算理论数据量（基于1秒K线）
-  const calculateDataCount = () => {
-    const startTime = new Date("2017-08-17T12:00:00+08:00").getTime();
+  const calculateDataCount = (crypto: string = selectedCrypto) => {
+    const startTime = new Date(cryptoStartTimes[crypto]).getTime();
     const currentTimeMs = Date.now();
     const diffSeconds = Math.floor((currentTimeMs - startTime) / 1000);
     return diffSeconds; // 1秒K线 = 1条数据/秒
+  };
+  
+  // 获取当前币种的起始时间显示
+  const getStartTimeDisplay = (crypto: string = selectedCrypto) => {
+    const timeMap: Record<string, string> = {
+      BTC: "2017年8月17日 12:00:00",
+      ETH: "2017年8月17日 08:00:00",
+      SOL: "2020年8月11日 10:00:00",
+    };
+    return timeMap[crypto];
   };
   
   const [estimatedDataCount, setEstimatedDataCount] = useState<number>(calculateDataCount());
@@ -41,20 +58,26 @@ export default function CryptoHistory() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
-      setEstimatedDataCount(calculateDataCount()); // 每秒更新数据量
+      setEstimatedDataCount(calculateDataCount(selectedCrypto)); // 每秒更新数据量
     }, 1000); // 每秒更新
 
     return () => clearInterval(timer);
-  }, []);
+  }, [selectedCrypto]);
   
   // 更新数据包大小（每分钟）
   useEffect(() => {
     const timer = setInterval(() => {
-      setDataSize(calculateDataSize(calculateDataCount()));
+      setDataSize(calculateDataSize(calculateDataCount(selectedCrypto)));
     }, 60000); // 每分钟更新
 
     return () => clearInterval(timer);
-  }, []);
+  }, [selectedCrypto]);
+  
+  // 当币种切换时，立即更新数据量和大小
+  useEffect(() => {
+    setEstimatedDataCount(calculateDataCount(selectedCrypto));
+    setDataSize(calculateDataSize(calculateDataCount(selectedCrypto)));
+  }, [selectedCrypto]);
 
   // 查询抓取任务进度
   const { data: taskProgress, isLoading: isLoadingProgress } = trpc.klines.getTaskProgress.useQuery(
@@ -350,7 +373,7 @@ export default function CryptoHistory() {
 
                   {/* 说明文字 */}
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>• 数据时间范围：2017年8月17日 12:00:00 至 {currentTime}</p>
+                    <p>• 数据时间范围：{getStartTimeDisplay()} 至 {currentTime}</p>
                     <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
                     <p>• 数据库K线数据更新：{estimatedDataCount.toLocaleString()} 条</p>
