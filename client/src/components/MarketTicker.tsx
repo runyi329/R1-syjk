@@ -36,7 +36,8 @@ const CRYPTO_DATA: MarketData[] = [
   { symbol: 'BNB-USD', name: '币安币', price: 625.80, change: 18.90, changePercent: 3.11, isOpen: true },
   { symbol: 'SOL-USD', name: '索拉纳', price: 185.50, change: 8.75, changePercent: 4.94, isOpen: true },
   { symbol: 'XRP-USD', name: '瑞波币', price: 2.45, change: 0.15, changePercent: 6.52, isOpen: true },
-  { symbol: 'BTC-USD', name: '比特币', price: 69420.50, change: 1250.00, changePercent: 1.83, isOpen: true },
+  { symbol: 'ADA-USD', name: 'Cardano', price: 1.08, change: 0.08, changePercent: 7.41, isOpen: true },
+  { symbol: 'DOGE-USD', name: 'Dogecoin', price: 0.42, change: 0.05, changePercent: 13.51, isOpen: true },
 ];
 
 // 股票符号映射（Yahoo Finance 符号）
@@ -57,6 +58,8 @@ const CRYPTO_SYMBOLS = [
   { display: '币安币', symbol: 'BNB-USD', name: '币安币', region: 'US' as const, marketHours: { start: 0, end: 24 } },
   { display: '索拉纳', symbol: 'SOL-USD', name: '索拉纳', region: 'US' as const, marketHours: { start: 0, end: 24 } },
   { display: '瑞波币', symbol: 'XRP-USD', name: '瑞波币', region: 'US' as const, marketHours: { start: 0, end: 24 } },
+  { display: 'Cardano', symbol: 'ADA-USD', name: 'Cardano', region: 'US' as const, marketHours: { start: 0, end: 24 } },
+  { display: 'Dogecoin', symbol: 'DOGE-USD', name: 'Dogecoin', region: 'US' as const, marketHours: { start: 0, end: 24 } },
 ];
 
 // 检查一个指数是否休市
