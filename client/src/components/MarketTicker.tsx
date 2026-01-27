@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ArrowUp, ArrowDown, Clock, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { trpc } from '@/lib/trpc';
@@ -91,6 +91,45 @@ function isMarketClosed(symbol: string): boolean {
 }
 
 function MarketTickerRow({ markets, direction = 'left' }: { markets: MarketData[], direction?: 'left' | 'right' }) {
+  const [isScrolling, setIsScrolling] = useState(true);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartOffset = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsScrolling(false);
+    touchStartX.current = e.touches[0].clientX;
+    touchStartOffset.current = scrollOffset;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touchCurrentX = e.touches[0].clientX;
+    const diff = touchCurrentX - touchStartX.current;
+    setScrollOffset(touchStartOffset.current + diff);
+  };
+
+  const handleTouchEnd = () => {
+    setIsScrolling(true);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsScrolling(false);
+    touchStartX.current = e.clientX;
+    touchStartOffset.current = scrollOffset;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (e.buttons === 1) {
+      const diff = e.clientX - touchStartX.current;
+      setScrollOffset(touchStartOffset.current + diff);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsScrolling(true);
+  };
+
   return (
     <div className="w-full overflow-hidden">
       <style>{`
@@ -111,70 +150,80 @@ function MarketTickerRow({ markets, direction = 'left' }: { markets: MarketData[
           }
         }
         .market-ticker-scroll-left {
-          animation: scroll-left 40s linear infinite;
+          animation: ${isScrolling ? 'scroll-left' : 'none'} 40s linear infinite;
           display: flex;
           gap: 1rem;
+          ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
         }
         .market-ticker-scroll-right {
-          animation: scroll-right 40s linear infinite;
+          animation: ${isScrolling ? 'scroll-right' : 'none'} 40s linear infinite;
           display: flex;
           gap: 1rem;
-        }
-        .market-ticker-scroll-left:hover,
-        .market-ticker-scroll-right:hover {
-          animation-play-state: paused;
+          ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
         }
       `}</style>
-      <div className={cn(
-        'flex gap-4 px-1',
-        direction === 'left' ? 'market-ticker-scroll-left' : 'market-ticker-scroll-right'
-      )}>
-        {markets.map((market) => (
-          <div
-            key={market.symbol}
-            className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0"
-          >
-            <div className="flex justify-between items-start mb-1">
-              <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
-              <div className="flex items-center gap-1">
-                {!market.isOpen && (
-                  <Clock className="w-3 h-3 text-muted-foreground" />
-                )}
-                <span
+      <div 
+        ref={containerRef}
+        className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div className={cn(
+          'flex gap-4 px-1',
+          direction === 'left' ? 'market-ticker-scroll-left' : 'market-ticker-scroll-right'
+        )}>
+          {markets.map((market) => (
+            <div
+              key={market.symbol}
+              className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0"
+            >
+              <div className="flex justify-between items-start mb-1">
+                <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
+                <div className="flex items-center gap-1">
+                  {!market.isOpen && (
+                    <Clock className="w-3 h-3 text-muted-foreground" />
+                  )}
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
+                    )}
+                  >
+                    ({Math.abs(market.changePercent).toFixed(2)}%)
+                  </span>
+                </div>
+              </div>
+              <div className="text-lg font-bold font-mono tracking-tight text-right">
+                {market.price.toFixed(2)}
+              </div>
+              {isMarketClosed(market.symbol) ? (
+                <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>休市</span>
+                </div>
+              ) : (
+                <div
                   className={cn(
-                    'text-xs font-medium',
+                    'flex items-center justify-end text-xs font-medium',
                     market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
                   )}
                 >
-                  ({Math.abs(market.changePercent).toFixed(2)}%)
-                </span>
-              </div>
+                  {market.change >= 0 ? (
+                    <ArrowUp className="w-3 h-3 mr-0.5" />
+                  ) : (
+                    <ArrowDown className="w-3 h-3 mr-0.5" />
+                  )}
+                  <span>{Math.abs(market.change).toFixed(2)}</span>
+                </div>
+              )}
             </div>
-            <div className="text-lg font-bold font-mono tracking-tight text-right">
-              {market.price.toFixed(2)}
-            </div>
-            {isMarketClosed(market.symbol) ? (
-              <div className="flex items-center justify-end text-xs font-medium text-muted-foreground gap-1">
-                <Clock className="w-3 h-3" />
-                <span>休市</span>
-              </div>
-            ) : (
-              <div
-                className={cn(
-                  'flex items-center justify-end text-xs font-medium',
-                  market.change >= 0 ? 'text-[var(--danger)]' : 'text-[var(--success)]'
-                )}
-              >
-                {market.change >= 0 ? (
-                  <ArrowUp className="w-3 h-3 mr-0.5" />
-                ) : (
-                  <ArrowDown className="w-3 h-3 mr-0.5" />
-                )}
-                <span>{Math.abs(market.change).toFixed(2)}</span>
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
