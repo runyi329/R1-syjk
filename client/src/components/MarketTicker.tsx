@@ -263,6 +263,7 @@ function MarketTickerStocks() {
 function MarketTickerCrypto() {
   const [cryptos, setCryptos] = useState<MarketData[]>(CRYPTO_DATA);
   const [displayCryptos, setDisplayCryptos] = useState<MarketData[]>(CRYPTO_DATA); // 用于显示的数据（带模拟波动）
+  const [dataLoaded, setDataLoaded] = useState(false); // 标记真实数据是否已加载
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isScrolling, setIsScrolling] = useState(true);
@@ -350,11 +351,17 @@ function MarketTickerCrypto() {
   useEffect(() => {
     const fetchCryptoData = async () => {
       try {
+        console.log('[MarketTicker] Fetching OKX data...');
         const response = await fetch('https://www.okx.com/api/v5/market/tickers?instType=SPOT');
-        if (!response.ok) throw new Error('OKX API error');
+        console.log('[MarketTicker] Response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          throw new Error(`OKX API error: ${response.status} ${response.statusText}`);
+        }
 
         const result = await response.json();
         const allData = result.data || [];
+        console.log('[MarketTicker] Received', allData.length, 'tickers from OKX');
 
         const symbols = ['BTC-USDT', 'ETH-USDT', 'BNB-USDT', 'SOL-USDT', 'XRP-USDT', 'ADA-USDT', 'DOGE-USDT'];
         const nameMap: Record<string, string> = {
@@ -389,22 +396,26 @@ function MarketTickerCrypto() {
           };
         });
 
-        console.log('[MarketTicker] Updated crypto prices:', updatedCryptos.map(c => `${c.name}: ${c.price}`));
+        console.log('[MarketTicker] Updated crypto prices:', updatedCryptos.map(c => `${c.name}: $${c.price.toLocaleString()}`));
         setCryptos(updatedCryptos);
         setDisplayCryptos(updatedCryptos); // 同步更新显示数据
+        setDataLoaded(true); // 标记数据已加载
       } catch (error) {
-        console.error('Error fetching OKX data:', error);
+        console.error('[MarketTicker] Error fetching OKX data:', error);
+        console.log('[MarketTicker] Using fallback CRYPTO_DATA');
       }
     };
 
     fetchCryptoData();
-    const interval = setInterval(fetchCryptoData, 2000); // 2 秒更新一次
+    const interval = setInterval(fetchCryptoData, 5000); // 5 秒更新一次
 
     return () => clearInterval(interval);
   }, []);
 
   // 模拟价格波动效果（每 0.5-1 秒随机更新一次）
   useEffect(() => {
+    // 只在真实数据加载后才开始模拟波动
+    if (!dataLoaded) return;
     const simulateFluctuation = () => {
       setDisplayCryptos(prevDisplay => 
         prevDisplay.map((crypto, index) => {
@@ -441,7 +452,7 @@ function MarketTickerCrypto() {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [cryptos]);
+  }, [cryptos, dataLoaded]);
 
   const displayMarkets = [...displayCryptos, ...displayCryptos];
 
