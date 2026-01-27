@@ -235,8 +235,8 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
         const offset = -(progress * singleCycleWidth);
         setScrollOffset(offset);
       } else {
-        // 从左向右滚动
-        const offset = progress * singleCycleWidth;
+        // 从左向右滚动（向左滚动，需要负值偏移）
+        const offset = -(singleCycleWidth - (progress * singleCycleWidth));
         setScrollOffset(offset);
       }
 
