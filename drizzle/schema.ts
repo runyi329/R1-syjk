@@ -281,6 +281,34 @@ export const passwordResets = mysqlTable("passwordResets", {
 export type PasswordReset = typeof passwordResets.$inferSelect;
 export type InsertPasswordReset = typeof passwordResets.$inferInsert;
 
+/**
+ * 市场数据缓存表 - 存储股票、指数等市场数据的缓存
+ */
+export const marketDataCache = mysqlTable("marketDataCache", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 股票符号（如：000001.SS、0700.HK、^IXIC 等） */
+  symbol: varchar("symbol", { length: 50 }).notNull(),
+  /** 股票名称 */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** 当前价格 */
+  price: decimal("price", { precision: 20, scale: 8 }).notNull(),
+  /** 价格变动值 */
+  change: decimal("change", { precision: 20, scale: 8 }).notNull(),
+  /** 价格变动百分比 */
+  changePercent: decimal("changePercent", { precision: 10, scale: 4 }).notNull(),
+  /** 市场区域：US、HK、CN */
+  region: varchar("region", { length: 10 }).notNull(),
+  /** 缓存过期时间 */
+  expiresAt: timestamp("expiresAt").notNull(),
+  /** 创建时间 */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  /** 更新时间 */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MarketDataCache = typeof marketDataCache.$inferSelect;
+export type InsertMarketDataCache = typeof marketDataCache.$inferInsert;
+
 
 /**
  * 累计收益表 - 存储全局累计收益数据，所有用户共享
