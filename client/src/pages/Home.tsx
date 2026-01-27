@@ -8,7 +8,7 @@ import { Globe, ArrowRight, TrendingUp, ShieldCheck, Users, BarChart3, Coins, Ge
 import { Link, useLocation } from "wouter";
 import contentData from "../data/investment-portal-content.json";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MarketTicker } from "@/components/MarketTicker";
+import { MarketTicker, MarketTickerStocks, MarketTickerCrypto } from "@/components/MarketTicker";
 import { trpc } from "@/lib/trpc";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useState } from "react";
@@ -276,10 +276,9 @@ export default function Home() {
           </div>
           
           {/* 实时行情栏 */}
-          <div className="container mx-auto px-4 mt-8 md:mt-12">
-            <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-2 shadow-sm">
-              <MarketTicker />
-            </div>
+          <div className="container mx-auto px-4 mt-8 md:mt-12 space-y-4">
+            <MarketTickerStocks />
+            <MarketTickerCrypto />
           </div>
         </section>
 
