@@ -66,65 +66,56 @@ export default function CryptoHistory() {
                     {/* 比特币按钮 */}
                     <Button
                       variant={selectedCrypto === "BTC" ? "default" : "outline"}
-                      size="lg"
+                      size="sm"
                       onClick={() => setSelectedCrypto("BTC")}
-                      className={`flex items-center gap-3 h-auto py-3 px-5 ${
+                      className={`flex items-center gap-1.5 h-auto py-1.5 px-2.5 text-xs ${
                         selectedCrypto === "BTC" 
                           ? "bg-orange-500 hover:bg-orange-600 text-white border-orange-500" 
                           : "border-orange-500/30 hover:bg-orange-500/10"
                       }`}
                     >
-                      <img src="/crypto-logos/btc.png" alt="Bitcoin" className="w-8 h-8 rounded-full" />
-                      <div className="text-left">
-                        <div className="font-semibold">比特币</div>
-                        <div className="text-xs opacity-80">Bitcoin (BTC)</div>
-                      </div>
+                      <img src="/crypto-logos/btc.png" alt="Bitcoin" className="w-4 h-4 rounded-full" />
+                      <span className="font-medium">比特币</span>
                     </Button>
 
                     {/* 以太坊按钮 */}
                     <Button
                       variant={selectedCrypto === "ETH" ? "default" : "outline"}
-                      size="lg"
+                      size="sm"
                       onClick={() => setSelectedCrypto("ETH")}
-                      className={`flex items-center gap-3 h-auto py-3 px-5 ${
+                      className={`flex items-center gap-1.5 h-auto py-1.5 px-2.5 text-xs ${
                         selectedCrypto === "ETH" 
                           ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-500" 
                           : "border-blue-500/30 hover:bg-blue-500/10"
                       }`}
                     >
-                      <img src="/crypto-logos/eth.png" alt="Ethereum" className="w-8 h-8 rounded-full" />
-                      <div className="text-left">
-                        <div className="font-semibold">以太坊</div>
-                        <div className="text-xs opacity-80">Ethereum (ETH)</div>
-                      </div>
+                      <img src="/crypto-logos/eth.png" alt="Ethereum" className="w-4 h-4 rounded-full" />
+                      <span className="font-medium">以太坊</span>
                     </Button>
 
                     {/* 索拉纳按钮 */}
                     <Button
                       variant={selectedCrypto === "SOL" ? "default" : "outline"}
-                      size="lg"
+                      size="sm"
                       onClick={() => setSelectedCrypto("SOL")}
-                      className={`flex items-center gap-3 h-auto py-3 px-5 ${
+                      className={`flex items-center gap-1.5 h-auto py-1.5 px-2.5 text-xs ${
                         selectedCrypto === "SOL" 
                           ? "bg-purple-500 hover:bg-purple-600 text-white border-purple-500" 
                           : "border-purple-500/30 hover:bg-purple-500/10"
                       }`}
                     >
-                      <img src="/crypto-logos/sol.png" alt="Solana" className="w-8 h-8 rounded-full" />
-                      <div className="text-left">
-                        <div className="font-semibold">索拉纳</div>
-                        <div className="text-xs opacity-80">Solana (SOL)</div>
-                      </div>
+                      <img src="/crypto-logos/sol.png" alt="Solana" className="w-4 h-4 rounded-full" />
+                      <span className="font-medium">索拉纳</span>
                     </Button>
 
                     {/* 添加币种按钮 */}
                     <Button
                       variant="outline"
-                      size="lg"
-                      className="flex items-center gap-2 h-auto py-3 px-5 border-dashed border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                      size="sm"
+                      className="flex items-center gap-1.5 h-auto py-1.5 px-2.5 text-xs border-dashed border-primary/30 hover:bg-primary/10 hover:border-primary/50"
                     >
-                      <Plus className="w-5 h-5" />
-                      <span className="font-semibold">添加币种</span>
+                      <Plus className="w-3 h-3" />
+                      <span className="font-medium">添加币种</span>
                     </Button>
                   </div>
                 </CardContent>
