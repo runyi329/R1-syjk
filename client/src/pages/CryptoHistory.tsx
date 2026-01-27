@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Database, Sparkles, TrendingUp, Calendar, BarChart3 } from "lucide-react";
+import { ArrowLeft, Database, Sparkles, TrendingUp, Calendar } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -60,88 +60,6 @@ export default function CryptoHistory() {
 
             {/* 历史数据分析内容 */}
             <TabsContent value="historical" className="space-y-8">
-              {/* 数据提供商 */}
-              <Card className="border-primary/20 bg-card/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-primary" />
-                    数据提供商
-                  </CardTitle>
-                  <CardDescription>
-                    我们从全球顶级加密货币交易所获取实时和历史数据
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* OKX */}
-                    <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5 hover:border-blue-500/40 transition-colors">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2">
-                            <img 
-                              src="https://www.okx.com/cdn/assets/imgs/2211/7478C5D7B9D0EF7C.png" 
-                              alt="OKX Logo" 
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">欧易 OKX</CardTitle>
-                            <p className="text-xs text-muted-foreground mt-1">全球领先的加密货币交易所</p>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          <span>实时现货价格数据</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          <span>历史K线数据（2017至今）</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          <span>24小时交易量数据</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Binance */}
-                    <Card className="border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 hover:border-yellow-500/40 transition-colors">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2">
-                            <img 
-                              src="https://public.bnbstatic.com/static/images/common/logo.png" 
-                              alt="Binance Logo" 
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">币安 Binance</CardTitle>
-                            <p className="text-xs text-muted-foreground mt-1">全球最大的加密货币交易平台</p>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          <span>实时现货价格数据</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          <span>历史K线数据（2017至今）</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          <span>深度市场数据</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* 加密货币选择 */}
               <Card className="border-primary/20 bg-card/50 backdrop-blur">
                 <CardHeader>
@@ -287,88 +205,37 @@ export default function CryptoHistory() {
                   <p>• 技术指标计算（MA、EMA、RSI、MACD等）</p>
                 </CardContent>
               </Card>
+
+              {/* 数据来源 - 底部简洁展示 */}
+              <div className="flex items-center justify-center gap-6 py-4 border-t border-border/30">
+                <span className="text-xs text-muted-foreground">数据来源：</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
+                      <img 
+                        src="https://www.okx.com/cdn/assets/imgs/2211/7478C5D7B9D0EF7C.png" 
+                        alt="OKX" 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-xs font-medium">OKX</span>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
+                      <img 
+                        src="https://public.bnbstatic.com/static/images/common/logo.png" 
+                        alt="Binance" 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-xs font-medium">Binance</span>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             {/* 未来数据预测内容 */}
             <TabsContent value="prediction" className="space-y-8">
-              {/* AI模型提供商 */}
-              <Card className="border-primary/20 bg-card/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    AI模型提供商
-                  </CardTitle>
-                  <CardDescription>
-                    我们使用全球领先的AI模型进行价格预测和趋势分析
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* ChatGPT-4 */}
-                    <Card className="border-green-500/20 bg-gradient-to-br from-green-500/10 to-green-500/5 hover:border-green-500/40 transition-colors">
-                      <CardHeader className="pb-3">
-                        <div className="flex flex-col items-center text-center gap-3">
-                          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2">
-                            <img 
-                              src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" 
-                              alt="ChatGPT Logo" 
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <CardTitle className="text-base">ChatGPT-4</CardTitle>
-                            <p className="text-xs text-muted-foreground mt-1">OpenAI</p>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm text-center">
-                        <p className="text-muted-foreground">先进的语言模型，擅长分析市场情绪和新闻事件</p>
-                      </CardContent>
-                    </Card>
-
-                    {/* Gemini */}
-                    <Card className="border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5 hover:border-blue-500/40 transition-colors">
-                      <CardHeader className="pb-3">
-                        <div className="flex flex-col items-center text-center gap-3">
-                          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center p-2">
-                            <img 
-                              src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg" 
-                              alt="Gemini Logo" 
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <CardTitle className="text-base">Gemini</CardTitle>
-                            <p className="text-xs text-muted-foreground mt-1">Google</p>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm text-center">
-                        <p className="text-muted-foreground">多模态AI模型，能够分析图表和技术指标</p>
-                      </CardContent>
-                    </Card>
-
-                    {/* DeepSeek */}
-                    <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-500/5 hover:border-purple-500/40 transition-colors">
-                      <CardHeader className="pb-3">
-                        <div className="flex flex-col items-center text-center gap-3">
-                          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-                            <span className="text-white font-bold text-2xl">DS</span>
-                          </div>
-                          <div>
-                            <CardTitle className="text-base">DeepSeek</CardTitle>
-                            <p className="text-xs text-muted-foreground mt-1">DeepSeek AI</p>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm text-center">
-                        <p className="text-muted-foreground">专注于深度学习的AI模型，擅长时间序列预测</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* 预测功能说明 */}
               <Card className="border-primary/20 bg-card/50 backdrop-blur">
                 <CardHeader>
@@ -433,6 +300,39 @@ export default function CryptoHistory() {
                   <p>• 预计将在未来几周内上线</p>
                 </CardContent>
               </Card>
+
+              {/* AI模型来源 - 底部简洁展示 */}
+              <div className="flex items-center justify-center gap-6 py-4 border-t border-border/30">
+                <span className="text-xs text-muted-foreground">AI模型：</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" 
+                        alt="ChatGPT" 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-xs font-medium">GPT-4</span>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="w-6 h-6 bg-white rounded flex items-center justify-center p-0.5">
+                      <img 
+                        src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg" 
+                        alt="Gemini" 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-xs font-medium">Gemini</span>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-blue-500 rounded flex items-center justify-center">
+                      <span className="text-white font-bold text-[10px]">DS</span>
+                    </div>
+                    <span className="text-xs font-medium">DeepSeek</span>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
