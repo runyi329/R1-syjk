@@ -2286,3 +2286,21 @@
 - [x] 修改GridTradingBacktest组件，调用API
 - [x] 实现回测结果展示界面
 - [ ] 测试回测功能（浏览器测试）
+
+
+## Bug修复 - 网格交易回测SQL查询错误
+- [x] 修复schema.ts中的表名（klineData → kline_data）
+- [x] 检查并修复字段名（确保与schema.ts一致）
+- [ ] 测试修复后的回测功能
+
+
+## 数据库Schema修复 - kline_data表列名不匹配问题
+- [x] 诊断问题：数据库使用snake_case，schema.ts使用camelCase导致SQL查询失败
+- [x] 修复 openTime 列名映射（"openTime" → "open_time"）
+- [x] 修复 closeTime 列名映射（"closeTime" → "close_time"）
+- [x] 修复 quoteVolume 列名映射（"quoteVolume" → "quote_volume"）
+- [x] 修复 createdAt 列名映射（"createdAt" → "created_at"）
+- [x] 删除数据库中不存在的列定义（takerBuyVolume, takerBuyQuoteVolume）
+- [x] 创建单元测试验证修复（klineData.test.ts，包含详细进度显示）
+- [x] 测试通过：成功查询526,981条记录（2024年全年数据），耗时12.22秒
+- [x] 验证所有字段类型和数据正确性

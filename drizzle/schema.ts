@@ -501,14 +501,14 @@ export type InsertStaffStockPermission = typeof staffStockPermissions.$inferInse
 /**
  * K线数据表 - 存储加密货币历史K线数据
  */
-export const klineData = mysqlTable("klineData", {
+export const klineData = mysqlTable("kline_data", {
   id: int("id").autoincrement().primaryKey(),
   /** 交易对符号，如 BTCUSDT */
   symbol: varchar("symbol", { length: 20 }).notNull(),
   /** K线时间间隔：1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M */
   interval: varchar("interval", { length: 5 }).notNull(),
   /** K线开盘时间（Unix时间戳，毫秒） */
-  openTime: timestamp("openTime").notNull(),
+  openTime: timestamp("open_time").notNull(),
   /** 开盘价 */
   open: decimal("open", { precision: 20, scale: 8 }).notNull(),
   /** 最高价 */
@@ -520,16 +520,12 @@ export const klineData = mysqlTable("klineData", {
   /** 成交量 */
   volume: decimal("volume", { precision: 20, scale: 8 }).notNull(),
   /** K线收盘时间（Unix时间戳，毫秒） */
-  closeTime: timestamp("closeTime").notNull(),
+  closeTime: timestamp("close_time").notNull(),
   /** 成交额 */
-  quoteVolume: decimal("quoteVolume", { precision: 20, scale: 8 }).notNull(),
+  quoteVolume: decimal("quote_volume", { precision: 20, scale: 8 }).notNull(),
   /** 成交笔数 */
   trades: int("trades").notNull(),
-  /** 主动买入成交量 */
-  takerBuyVolume: decimal("takerBuyVolume", { precision: 20, scale: 8 }).notNull(),
-  /** 主动买入成交额 */
-  takerBuyQuoteVolume: decimal("takerBuyQuoteVolume", { precision: 20, scale: 8 }).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   // 复合唯一索引：确保同一交易对、同一时间间隔、同一开盘时间的数据唯一
   symbolIntervalTimeIdx: unique("symbol_interval_time_idx").on(table.symbol, table.interval, table.openTime),

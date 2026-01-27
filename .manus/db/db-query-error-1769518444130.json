@@ -1,0 +1,8 @@
+{
+  "query": "SELECT openTime FROM kline_data WHERE symbol = 'BTCUSDT' AND `interval` = '1m' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT openTime FROM kline_data WHERE symbol = 'BTCUSDT' AND `interval` = '1m' LIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'opentime' in 'field list'"
+  ]
+}

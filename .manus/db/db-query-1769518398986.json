@@ -1,0 +1,76 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE();",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations"
+    },
+    {
+      "TABLE_NAME": "users"
+    },
+    {
+      "TABLE_NAME": "orders"
+    },
+    {
+      "TABLE_NAME": "pointTransactions"
+    },
+    {
+      "TABLE_NAME": "products"
+    },
+    {
+      "TABLE_NAME": "deposits"
+    },
+    {
+      "TABLE_NAME": "marketDataCache"
+    },
+    {
+      "TABLE_NAME": "kline_data"
+    },
+    {
+      "TABLE_NAME": "fetchTasks"
+    },
+    {
+      "TABLE_NAME": "walletAddresses"
+    },
+    {
+      "TABLE_NAME": "withdrawals"
+    },
+    {
+      "TABLE_NAME": "captchas"
+    },
+    {
+      "TABLE_NAME": "loginAttempts"
+    },
+    {
+      "TABLE_NAME": "passwordResets"
+    },
+    {
+      "TABLE_NAME": "cumulativeProfit"
+    },
+    {
+      "TABLE_NAME": "stockBalances"
+    },
+    {
+      "TABLE_NAME": "stockUsers"
+    },
+    {
+      "TABLE_NAME": "stockUserPermissions"
+    },
+    {
+      "TABLE_NAME": "adminPermissions"
+    },
+    {
+      "TABLE_NAME": "staffStockPermissions"
+    },
+    {
+      "TABLE_NAME": "siteConfigs"
+    },
+    {
+      "TABLE_NAME": "auditLogs"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\n__drizzle_migrations\nusers\norders\npointTransactions\nproducts\ndeposits\nmarketDataCache\nkline_data\nfetchTasks\nwalletAddresses\nwithdrawals\ncaptchas\nloginAttempts\npasswordResets\ncumulativeProfit\nstockBalances\nstockUsers\nstockUserPermissions\nadminPermissions\nstaffStockPermissions\nsiteConfigs\nauditLogs\n",
+  "stderr": "",
+  "execution_time_ms": 69
+}

@@ -1,0 +1,25 @@
+{
+  "query": "SELECT * FROM kline_data WHERE symbol = 'BTCUSDT' AND `interval` = '1m' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT * FROM kline_data WHERE symbol = 'BTCUSDT' AND `interval` = '1m' LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "symbol": "BTCUSDT",
+      "interval": "1m",
+      "open_time": "2017-08-17 00:00:00",
+      "open": "4261.48000000",
+      "high": "4261.48000000",
+      "low": "4261.48000000",
+      "close": "4261.48000000",
+      "volume": "1.77518300",
+      "close_time": "2017-08-17 00:01:00",
+      "quote_volume": "7564.90685084",
+      "trades": "3",
+      "created_at": "2026-01-27 07:25:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsymbol\tinterval\topen_time\topen\thigh\tlow\tclose\tvolume\tclose_time\tquote_volume\ttrades\tcreated_at\n1\tBTCUSDT\t1m\t2017-08-17 00:00:00\t4261.48000000\t4261.48000000\t4261.48000000\t4261.48000000\t1.77518300\t2017-08-17 00:01:00\t7564.90685084\t3\t2026-01-27 07:25:09\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}
