@@ -331,7 +331,7 @@ export default function CryptoHistory() {
                     <p>• 数据粒度：1分钟K线</p>
                     <p>• 数据来源：币安（Binance）交易所</p>
                     <p>• 数据库K线数据更新：{estimatedDataCount.toLocaleString()} 条</p>
-                    <p className="text-yellow-600 dark:text-yellow-500">⚠️ API端口抓取会遇到返回延迟</p>
+                    <p className="text-yellow-600 dark:text-yellow-500">⚠️ 高频数据抓取API响应约100-300ms，可能会存在网络延迟</p>
                   </div>
                 </CardContent>
               </Card>
