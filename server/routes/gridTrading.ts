@@ -20,7 +20,9 @@ export const gridTradingRouter = router({
         investment: z.number().positive(), // 投资金额
         type: z.enum(["spot", "contract"]), // 交易类型
         leverage: z.number().int().min(1).max(100).optional(), // 杠杆倍数
-        years: z.array(z.number().int()).min(1), // 年份数组
+        years: z.array(z.number().int()).optional(), // 年份数组（可选）
+        startDate: z.string().optional(), // 开始日期 YYYY-MM-DD
+        endDate: z.string().optional(), // 结束日期 YYYY-MM-DD
       })
     )
     .mutation(async ({ input }) => {
@@ -33,7 +35,14 @@ export const gridTradingRouter = router({
         type,
         leverage,
         years,
+        startDate,
+        endDate,
       } = input;
+
+      // 验证时间范围参数
+      if (!years && (!startDate || !endDate)) {
+        throw new Error("请提供年份数组或日期范围");
+      }
 
       // 验证价格区间
       if (minPrice >= maxPrice) {
@@ -50,7 +59,10 @@ export const gridTradingRouter = router({
 
       // 记录开始时间
       const startTime = Date.now();
-      console.log(`[回测开始] 交易对: ${binanceSymbol}, 年份: ${years.join(", ")}`);
+      const timeRangeDesc = years 
+        ? `年份: ${years.join(", ")}` 
+        : `日期范围: ${startDate} 至 ${endDate}`;
+      console.log(`[回测开始] 交易对: ${binanceSymbol}, ${timeRangeDesc}`);
 
       // 初始化回测状态
       let state: any = null;
@@ -58,10 +70,11 @@ export const gridTradingRouter = router({
       let processedDays = 0;
 
       // 按天流式处理K线数据
+      const timeRange = years ? years : { startDate: startDate!, endDate: endDate! };
       const { totalRecords, totalDays } = await streamKlineDataByDays(
         binanceSymbol,
         "1m",
-        years,
+        timeRange,
         async (batch, dayIndex, totalDaysCount, currentDate) => {
           if (batch.length === 0) {
             return;
@@ -97,7 +110,10 @@ export const gridTradingRouter = router({
 
       // 检查是否有数据
       if (totalRecords === 0 || state === null) {
-        throw new Error(`未找到${years.join(", ")}年的K线数据，请先获取历史数据`);
+        const errorMsg = years 
+          ? `未找到${years.join(", ")}年的K线数据，请先获取历史数据`
+          : `未找到${startDate}至${endDate}的K线数据，请先获取历史数据`;
+        throw new Error(errorMsg);
       }
 
       // 完成回测并计算最终结果

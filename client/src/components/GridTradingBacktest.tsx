@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { TrendingUp, ArrowRight, ArrowLeft, X, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { TrendingUp, ArrowRight, ArrowLeft, X, Loader2, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -21,27 +22,52 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   const [investment, setInvestment] = useState<string>("");
   const [tradeType, setTradeType] = useState<"spot" | "contract">("spot");
   const [leverage, setLeverage] = useState<number>(1);
-  const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [backtestResult, setBacktestResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
 
   // tRPC mutation
   const backtestMutation = trpc.gridTrading.backtest.useMutation();
 
-  // 生成年份列表（2017-2026）
-  const years = Array.from({ length: 10 }, (_, i) => 2017 + i);
+  // 快捷日期选择
+  const setQuickDateRange = (range: string) => {
+    const today = new Date();
+    const end = today.toISOString().split('T')[0];
+    let start = '';
+    
+    switch(range) {
+      case '1month':
+        start = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
+        break;
+      case '3months':
+        start = new Date(today.setMonth(today.getMonth() - 3)).toISOString().split('T')[0];
+        break;
+      case '6months':
+        start = new Date(today.setMonth(today.getMonth() - 6)).toISOString().split('T')[0];
+        break;
+      case '1year':
+        start = new Date(today.setFullYear(today.getFullYear() - 1)).toISOString().split('T')[0];
+        break;
+      case '2024':
+        start = '2024-01-01';
+        setEndDate('2024-12-31');
+        setStartDate(start);
+        return;
+    }
+    
+    setStartDate(start);
+    setEndDate(end);
+  };
 
-  // 切换年份选择
-  const toggleYear = (year: number) => {
-    setSelectedYears(prev => {
-      if (prev.includes(year)) {
-        // 取消选中
-        return prev.filter(y => y !== year);
-      } else {
-        // 选中，并按顺序排列
-        return [...prev, year].sort((a, b) => a - b);
-      }
-    });
+  // 计算选择的天数
+  const getDaysDiff = () => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
   };
 
   // 重置所有参数
@@ -52,8 +78,10 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     setInvestment("");
     setTradeType("spot");
     setLeverage(1);
-    setSelectedYears([]);
+    setStartDate("");
+    setEndDate("");
     setStep(0);
+    setProgress(0);
   };
 
   // 验证参数
@@ -61,8 +89,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     if (!priceMin || !priceMax || !gridCount || !investment) {
       return "请填写所有必填参数";
     }
-    if (selectedYears.length === 0) {
-      return "请至少选择一个年份";
+    if (!startDate || !endDate) {
+      return "请选择回测时间范围";
     }
     const min = parseFloat(priceMin);
     const max = parseFloat(priceMax);
@@ -81,8 +109,25 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     if (invest < 100) {
       return "投资金额至少为100 USDT";
     }
+    if (new Date(startDate) >= new Date(endDate)) {
+      return "开始日期必须早于结束日期";
+    }
     return null;
   };
+
+  // 模拟进度更新
+  useEffect(() => {
+    if (isLoading) {
+      setProgress(0);
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) return prev;
+          return prev + Math.random() * 5;
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
 
   // 如果未开始，显示启动按钮
   if (step === 0) {
@@ -113,6 +158,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   // 第1步：参数设置
   if (step === 1) {
     const error = validateParams();
+    const daysDiff = getDaysDiff();
+    
     return (
       <Card className="border-primary/20 bg-card/50 backdrop-blur">
         <CardHeader className="relative">
@@ -192,28 +239,82 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
             </RadioGroup>
           </div>
 
-          {/* 时间维度选择 */}
+          {/* 回测时间范围 */}
           <div className="space-y-3">
-            <Label className="text-base">回测时间范围</Label>
+            <Label className="text-base flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              回测时间范围
+            </Label>
+            
+            {/* 快捷选择按钮 */}
             <div className="flex flex-wrap gap-2">
-              {years.map((year) => (
-                <button
-                  key={year}
-                  type="button"
-                  onClick={() => toggleYear(year)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    selectedYears.includes(year)
-                      ? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary),0.3)]"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {year}
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => setQuickDateRange('1month')}
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
+              >
+                近1个月
+              </button>
+              <button
+                type="button"
+                onClick={() => setQuickDateRange('3months')}
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
+              >
+                近3个月
+              </button>
+              <button
+                type="button"
+                onClick={() => setQuickDateRange('6months')}
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
+              >
+                近6个月
+              </button>
+              <button
+                type="button"
+                onClick={() => setQuickDateRange('1year')}
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
+              >
+                近1年
+              </button>
+              <button
+                type="button"
+                onClick={() => setQuickDateRange('2024')}
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
+              >
+                2024全年
+              </button>
             </div>
-            {selectedYears.length > 0 && (
+
+            {/* 自定义日期输入 */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">开始日期</Label>
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  min="2017-01-01"
+                  max={endDate || "2026-12-31"}
+                  className="bg-background/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">结束日期</Label>
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  min={startDate || "2017-01-01"}
+                  max="2026-12-31"
+                  className="bg-background/50"
+                />
+              </div>
+            </div>
+
+            {/* 显示选择的天数 */}
+            {daysDiff > 0 && (
               <p className="text-sm text-muted-foreground">
-                已选择：{selectedYears.join("、")}年
+                已选择：{startDate} 至 {endDate}（共 {daysDiff} 天）
               </p>
             )}
           </div>
@@ -305,6 +406,20 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
             </div>
           </div>
 
+          {/* 进度条（回测中显示） */}
+          {isLoading && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">回测进度</span>
+                <span className="text-primary font-medium">{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-2" />
+              <p className="text-xs text-muted-foreground text-center">
+                正在分析历史数据，请稍候...
+              </p>
+            </div>
+          )}
+
           {/* 按钮组 */}
           <div className="grid grid-cols-2 gap-3">
             <Button
@@ -312,6 +427,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               variant="outline"
               className="border-primary/50"
               size="lg"
+              disabled={isLoading}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               上一步
@@ -319,6 +435,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
             <Button
               onClick={async () => {
                 setIsLoading(true);
+                setProgress(0);
                 try {
                   const result = await backtestMutation.mutateAsync({
                     symbol,
@@ -328,8 +445,10 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                     investment: parseFloat(investment),
                     type: tradeType,
                     leverage: tradeType === "contract" ? leverage : undefined,
-                    years: selectedYears,
+                    startDate,
+                    endDate,
                   });
+                  setProgress(100);
                   setBacktestResult(result.data);
                   setStep(3);
                   toast.success(result.message);
@@ -401,94 +520,68 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
           >
             <X className="w-4 h-4" />
           </Button>
-          <CardTitle>回测结果</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            回测结果
+          </CardTitle>
           <CardDescription>
-            {symbol}/USDT · {tradeType === "spot" ? "现货网格" : `合约网格 ${leverage}x`}
+            {startDate} 至 {endDate} 的回测数据
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* 收益统计 */}
+          {/* 核心指标 */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">总收益 (USDT)</p>
-              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                {totalProfit >= 0 ? '+' : ''}{totalProfit.toFixed(2)}
+              <p className="text-sm text-muted-foreground mb-1">总收益</p>
+              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {totalProfit >= 0 ? '+' : ''}{totalProfit.toFixed(2)} USDT
               </p>
             </div>
             <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">收益率</p>
-              <p className={`text-2xl font-bold ${profitRate >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+              <p className="text-sm text-muted-foreground mb-1">收益率</p>
+              <p className={`text-2xl font-bold ${profitRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {profitRate >= 0 ? '+' : ''}{profitRate.toFixed(2)}%
               </p>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">网格收益 (USDT)</p>
-              <p className="text-lg font-semibold">{gridProfit.toFixed(2)}</p>
+          </div>
+
+          {/* 详细数据 */}
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">网格利润</span>
+              <span className="font-medium">{gridProfit.toFixed(2)} USDT</span>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">未配对收益 (USDT)</p>
-              <p className="text-lg font-semibold">{unpairedProfit.toFixed(2)}</p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">浮动盈亏</span>
+              <span className="font-medium">{unpairedProfit.toFixed(2)} USDT</span>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">年化收益率</p>
-              <p className="text-lg font-semibold">{annualizedReturn.toFixed(2)}%</p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">年化收益率</span>
+              <span className="font-medium">{annualizedReturn.toFixed(2)}%</span>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">套利次数</p>
-              <p className="text-lg font-semibold">{arbitrageTimes}次</p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">套利次数</span>
+              <span className="font-medium">{arbitrageTimes} 次</span>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">日均套利次数</p>
-              <p className="text-lg font-semibold">{dailyArbitrageTimes.toFixed(2)}次</p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">日均套利</span>
+              <span className="font-medium">{dailyArbitrageTimes.toFixed(2)} 次/天</span>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">最大回撤</p>
-              <p className="text-lg font-semibold text-orange-500">{maxDrawdownRate.toFixed(2)}%</p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">最大回撤</span>
+              <span className="font-medium text-red-500">{maxDrawdown.toFixed(2)} USDT ({maxDrawdownRate.toFixed(2)}%)</span>
             </div>
           </div>
 
-          {/* 价格信息 */}
-          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">策略开启时价格</span>
-              <span className="font-semibold">{startPrice.toFixed(2)} USDT</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">当前价格</span>
-              <span className="font-semibold">{currentPrice.toFixed(2)} USDT</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">价格区间</span>
-              <span className="font-semibold">{priceMin} - {priceMax}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">最低资产</span>
-              <span className="font-semibold">{minAsset.toFixed(2)} USDT</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">最高资产</span>
-              <span className="font-semibold">{maxAsset.toFixed(2)} USDT</span>
-            </div>
-          </div>
-
-          {/* 按钮组 */}
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={() => setStep(1)}
-              variant="outline"
-              className="border-primary/50"
-              size="lg"
-            >
-              修改参数
-            </Button>
-            <Button
-              onClick={resetParams}
-              className="bg-[#c3ff00] hover:bg-[#b0e600] text-black font-semibold"
-              size="lg"
-            >
-              创建新策略
-            </Button>
-          </div>
+          {/* 重新回测按钮 */}
+          <Button
+            onClick={resetParams}
+            variant="outline"
+            className="w-full border-primary/50"
+            size="lg"
+          >
+            重新回测
+          </Button>
         </CardContent>
       </Card>
     );
