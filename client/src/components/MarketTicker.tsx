@@ -166,6 +166,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
   const [isScrolling, setIsScrolling] = useState(true);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [singleCycleWidth, setSingleCycleWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
@@ -215,13 +216,20 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
     setIsScrolling(true);
   };
 
-  // 计算滚动周期
+  // 计算单个周期的宽度（第一组卡片的实际宽度）
   useEffect(() => {
-    if (!trackRef.current || !isScrolling || isDragging) return;
-
+    if (!trackRef.current) return;
+    
     const track = trackRef.current;
-    // 计算单个周期的宽度（一半的总宽度）
-    const totalWidth = track.scrollWidth / 2;
+    // 总宽度 / 2 = 单个周期的宽度
+    const cycleWidth = track.scrollWidth / 2;
+    setSingleCycleWidth(cycleWidth);
+  }, [markets.length]);
+
+  // 滚动动画
+  useEffect(() => {
+    if (!trackRef.current || !isScrolling || isDragging || singleCycleWidth === 0) return;
+
     const scrollDuration = 40000; // 40 秒完成一个周期
 
     const animate = (currentTime: number) => {
@@ -230,15 +238,15 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
       }
 
       const elapsed = currentTime - lastTimeRef.current;
-      let newOffset = (elapsed / scrollDuration) * totalWidth;
+      let newOffset = (elapsed / scrollDuration) * singleCycleWidth;
 
       if (direction === 'right') {
         newOffset = -newOffset;
       }
 
-      // 当滚动距离达到一个周期时，重置为 0
-      if (Math.abs(newOffset) >= totalWidth) {
-        lastTimeRef.current = currentTime; // 重置时间基准，而不是设为 0
+      // 当滚动距离达到一个完整周期时，重置为 0
+      if (Math.abs(newOffset) >= singleCycleWidth) {
+        lastTimeRef.current = currentTime;
         newOffset = 0;
       }
 
@@ -253,7 +261,7 @@ function MarketTickerRow({ markets, direction = 'left', rowId, source = '' }: Ma
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isScrolling, isDragging, direction, markets.length]);
+  }, [isScrolling, isDragging, direction, singleCycleWidth]);
 
   const displayMarkets = [...markets, ...markets];
 
