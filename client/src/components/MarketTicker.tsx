@@ -71,19 +71,28 @@ function isMarketClosed(symbol: string): boolean {
 
 function MarketCard({ market, source = '' }: { market: MarketData; source?: string }) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [priceDirection, setPriceDirection] = useState<'up' | 'down' | null>(null);
   const prevPriceRef = useRef(market.price);
 
   useEffect(() => {
     if (prevPriceRef.current !== market.price) {
       setIsUpdating(true);
+      setPriceDirection(market.price > prevPriceRef.current ? 'up' : 'down');
       prevPriceRef.current = market.price;
-      const timer = setTimeout(() => setIsUpdating(false), 600);
+      const timer = setTimeout(() => {
+        setIsUpdating(false);
+        setPriceDirection(null);
+      }, 800);
       return () => clearTimeout(timer);
     }
   }, [market.price]);
 
   return (
-    <div className="flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-shadow flex-shrink-0">
+    <div className={cn(
+      "flex flex-col p-3 bg-card rounded-lg border border-border/50 shadow-sm min-w-[140px] hover:shadow-md transition-all flex-shrink-0",
+      isUpdating && priceDirection === 'up' && "bg-red-500/10 border-red-500/30",
+      isUpdating && priceDirection === 'down' && "bg-green-500/10 border-green-500/30"
+    )}>
       <div className="flex justify-between items-start mb-1">
         <span className="text-xs font-medium text-muted-foreground">{market.name}</span>
         <div className="flex items-center gap-1">
@@ -102,8 +111,10 @@ function MarketCard({ market, source = '' }: { market: MarketData; source?: stri
         </div>
       </div>
       <div className={cn(
-        'text-lg font-bold font-mono tracking-tight text-right transition-all',
-        isUpdating && 'animate-pulse'
+        'text-lg font-bold font-mono tracking-tight text-right transition-all duration-300',
+        isUpdating && 'scale-110',
+        isUpdating && priceDirection === 'up' && 'text-red-500',
+        isUpdating && priceDirection === 'down' && 'text-green-500'
       )}>
         {market.price.toFixed(2)}
       </div>
