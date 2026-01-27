@@ -56,8 +56,8 @@ export async function streamKlineDataByDays(
       andOp(
         eqOp(klineData.symbol, symbol),
         eqOp(klineData.interval, interval),
-        sql`${klineData.openTime} >= ${startDate.getTime()}`,
-        sql`${klineData.openTime} <= ${endDate.getTime()}`
+        gte(klineData.openTime, startDate),
+        lte(klineData.openTime, endDate)
       )
     )
     .orderBy(klineData.openTime);

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT \n  symbol,\n  `interval`,\n  MIN(open_time) as earliest_date,\n  MAX(open_time) as latest_date,\n  COUNT(*) as record_count\nFROM kline_data \nWHERE symbol = 'BTCUSDT' AND `interval` = '1m'\nGROUP BY symbol, `interval`;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT \n  symbol,\n  `interval`,\n  MIN(open_time) as earliest_date,\n  MAX(open_time) as latest_date,\n  COUNT(*) as record_count\nFROM kline_data \nWHERE symbol = 'BTCUSDT' AND `interval` = '1m'\nGROUP BY symbol, `interval`;",
+  "rows": [
+    {
+      "symbol": "BTCUSDT",
+      "interval": "1m",
+      "earliest_date": "2017-08-17 00:00:00",
+      "latest_date": "2026-01-26 21:18:00",
+      "record_count": "4433127"
+    }
+  ],
+  "messages": [],
+  "stdout": "symbol\tinterval\tearliest_date\tlatest_date\trecord_count\nBTCUSDT\t1m\t2017-08-17 00:00:00\t2026-01-26 21:18:00\t4433127\n",
+  "stderr": "",
+  "execution_time_ms": 4254
+}
