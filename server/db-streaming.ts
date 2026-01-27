@@ -32,6 +32,13 @@ export async function streamKlineDataByDays(
   let totalRecords = 0;
   let dayIndex = 0;
   
+  // 预先计算总天数（避免在循环中重复计算）
+  const totalDays = years.reduce((sum, y) => {
+    const start = new Date(`${y}-01-01T00:00:00Z`);
+    const end = new Date(`${y + 1}-01-01T00:00:00Z`);
+    return sum + Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  }, 0);
+  
   // 遍历每一年
   for (let year = minYear; year <= maxYear; year++) {
     const yearStart = new Date(`${year}-01-01T00:00:00Z`);
@@ -62,26 +69,15 @@ export async function streamKlineDataByDays(
       if (batch.length > 0) {
         totalRecords += batch.length;
         
-        // 计算总天数（所有年份的总天数）
-        const totalDays = years.reduce((sum, y) => {
-          const start = new Date(`${y}-01-01T00:00:00Z`);
-          const end = new Date(`${y + 1}-01-01T00:00:00Z`);
-          return sum + Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-        }, 0);
-        
         // 调用回调函数处理这批数据
         await onBatch(batch, dayIndex, totalDays, dayStart);
         dayIndex++;
+        
+        // 显式清空 batch 数据，帮助垃圾回收
+        batch.length = 0;
       }
     }
   }
-  
-  // 计算总天数
-  const totalDays = years.reduce((sum, y) => {
-    const start = new Date(`${y}-01-01T00:00:00Z`);
-    const end = new Date(`${y + 1}-01-01T00:00:00Z`);
-    return sum + Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  }, 0);
   
   return { totalRecords, totalDays };
 }

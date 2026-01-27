@@ -2313,3 +2313,28 @@
 - [x] 修改回测路由使用流式处理
 - [x] 测试单天数据回测（1.83秒，处理速度720,500条/秒）
 - [ ] 用户测试全年数据回测（预计约11分钟）
+
+
+## 新功能需求 - 加密货币历史数据分析
+### 数据库Schema修复 - kline_data表列名不匹配
+- [x] 诊断问题：数据库使用snake_case，schema.ts使用camelCase
+- [x] 修复 openTime 列名映射（"openTime" → "open_time"）
+- [x] 修复 closeTime 列名映射（"closeTime" → "close_time"）
+- [x] 修复 quoteVolume 列名映射（"quoteVolume" → "quote_volume"）
+- [x] 修复 createdAt 列名映射（"createdAt" → "created_at"）
+- [x] 删除数据库中不存在的列定义（takerBuyVolume, takerBuyQuoteVolume）
+- [x] 创建单元测试验证修复（klineData.test.ts，18个测试全部通过）
+- [x] 测试通过：成功查询526,981条记录，耗时12.22秒
+
+### 回测功能优化 - 按天分批处理
+- [x] 创建按天分批加载K线数据的函数（db-streaming.ts）
+- [x] 修改回测算法支持增量处理（gridTradingBacktestStreaming.ts）
+- [x] 实现后端进度日志输出
+- [x] 修改回测路由使用流式处理
+- [x] 测试单天数据回测（1.83秒，处理速度720,500条/秒）
+- [x] 限制交易记录数量（最多1000条）
+- [x] 限制盈亏曲线数据点（最多1000个点）
+- [x] 优化数据库查询（避免重复计算）
+- [x] 增加Node.js内存限制到4GB
+- [x] 显式清空批次数据，帮助垃圾回收
+- [ ] 用户测试全年数据回测（预计约11分钟）

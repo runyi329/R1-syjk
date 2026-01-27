@@ -182,15 +182,20 @@ export function processBatch(
       }
     }
     
-    // 每隔一小时记录一次盈亏曲线（避免数据点过多）
-    if (state.profitCurve.length === 0 || 
-        kline.openTime.getTime() - state.profitCurve[state.profitCurve.length - 1].time.getTime() > 3600000) {
-      const currentAsset = state.usdtBalance + state.btcBalance * state.currentPrice;
-      state.profitCurve.push({
-        time: kline.openTime,
-        profit: state.gridProfit,
-        asset: currentAsset,
-      });
+      // 每隔一小时记录一次盈亏曲线（避免数据点过多）
+      if (state.profitCurve.length === 0 || 
+          kline.openTime.getTime() - state.profitCurve[state.profitCurve.length - 1].time.getTime() > 3600000) {
+        const currentAsset = state.usdtBalance + state.btcBalance * state.currentPrice;
+        state.profitCurve.push({
+          time: kline.openTime,
+          profit: state.gridProfit,
+          asset: currentAsset,
+        });
+        
+        // 限制盈亏曲线数据点数量，只保留最近的 1000 个点
+        if (state.profitCurve.length > 1000) {
+          state.profitCurve.shift();
+        }
       
       // 更新最大/最小资产
       if (currentAsset > state.maxAsset) {
