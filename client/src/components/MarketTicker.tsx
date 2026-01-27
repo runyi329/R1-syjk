@@ -158,14 +158,14 @@ function MarketTickerRow({ markets, direction = 'left', rowId }: MarketTickerRow
           }
         }
         .market-ticker-scroll-left-${rowId} {
-          animation: ${isScrolling ? `scroll-left-${rowId}` : 'none'} 60s linear infinite;
+          animation: ${isScrolling ? `scroll-left-${rowId}` : 'none'} 40s linear infinite;
           display: flex;
           gap: 1rem;
           transition: ${isDragging ? 'none' : 'transform 0.1s ease-out'};
           ${!isScrolling ? `transform: translateX(${scrollOffset}px);` : ''}
         }
         .market-ticker-scroll-right-${rowId} {
-          animation: ${isScrolling ? `scroll-right-${rowId}` : 'none'} 60s linear infinite;
+          animation: ${isScrolling ? `scroll-right-${rowId}` : 'none'} 40s linear infinite;
           display: flex;
           gap: 1rem;
           transition: ${isDragging ? 'none' : 'transform 0.1s ease-out'};
