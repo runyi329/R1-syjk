@@ -135,12 +135,12 @@ export default function Home() {
             
 
             {authData ? (
-              <div className="flex gap-1 sm:gap-2 items-center">
+              <div className="flex gap-1 sm:gap-2 items-center min-w-0">
                 {/* 用户信息显示 - 在所有设备上都可见 */}
                 {userData && (
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs">
-                    <span className="font-semibold text-primary whitespace-nowrap leading-tight">{userData.name}</span>
-                    <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400/20 to-yellow-600/20 border border-amber-500/50 rounded-full px-2 py-0.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-[10px] sm:text-xs min-w-0">
+                    <span className="font-semibold text-primary truncate leading-tight">{userData.name}</span>
+                    <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400/20 to-yellow-600/20 border border-amber-500/50 rounded-full px-2 py-0.5 flex-shrink-0">
                       <img src="/vip-badge.png" alt="VIP" className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span className="text-[9px] sm:text-xs font-bold text-amber-400 whitespace-nowrap">
                         {vipInfo.label}
@@ -148,15 +148,16 @@ export default function Home() {
                     </div>
                   </div>
                 )}
-                <Link href="/user-center">
-                  <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2">
-                    {language === 'en' ? 'User Center' : '个人中心'}
+                <Link href="/user-center" className="flex-shrink-0">
+                  <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2 h-8">
+                    <span className="hidden sm:inline">{language === 'en' ? 'User Center' : '个人中心'}</span>
+                    <span className="sm:hidden">{language === 'en' ? 'Center' : '中心'}</span>
                   </Button>
                 </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-colors text-xs px-2 flex items-center gap-1"
+                  className="border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-colors text-xs px-2 flex items-center gap-1 flex-shrink-0 h-8"
                   onClick={handleLogout}
                 >
                   <LogOut className="w-3 h-3" />

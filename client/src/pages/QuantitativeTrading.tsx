@@ -1,11 +1,12 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
-import { Activity, BarChart3, Sparkles, TrendingUp, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Activity, BarChart3, Sparkles, TrendingUp, ArrowLeft, CheckCircle, Zap, Shield, AlertCircle, Code, Cpu, LineChart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -112,13 +113,13 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
   },
   [FactorType.RSI]: {
     type: FactorType.RSI,
-    name: 'RSI相对强弱指标',
-    description: '判断超买超卖状态',
+    name: 'RSI',
+    description: '相对强弱指标，判断超买超卖情况',
     category: '动量',
     parameters: [
       {
         key: 'period',
-        label: 'RSI周期',
+        label: '周期',
         type: 'number',
         defaultValue: 14,
         min: 2,
@@ -131,7 +132,7 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
         type: 'number',
         defaultValue: 70,
         min: 50,
-        max: 90,
+        max: 100,
         step: 1,
       },
       {
@@ -139,7 +140,7 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
         label: '超卖阈值',
         type: 'number',
         defaultValue: 30,
-        min: 10,
+        min: 0,
         max: 50,
         step: 1,
       },
@@ -148,7 +149,7 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
   [FactorType.BOLL]: {
     type: FactorType.BOLL,
     name: '布林带',
-    description: '通过价格与波动带的关系判断买卖时机',
+    description: '利用波动率判断价格极值和趋势',
     category: '波动',
     parameters: [
       {
@@ -166,20 +167,20 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
         type: 'number',
         defaultValue: 2,
         min: 1,
-        max: 3,
-        step: 0.1,
+        max: 5,
+        step: 0.5,
       },
     ],
   },
   [FactorType.KDJ]: {
     type: FactorType.KDJ,
-    name: 'KDJ随机指标',
-    description: '通过K、D、J三条线的交叉判断买卖时机',
+    name: 'KDJ',
+    description: '随机指标，结合动量和超买超卖',
     category: '动量',
     parameters: [
       {
         key: 'period',
-        label: 'K值周期',
+        label: '周期',
         type: 'number',
         defaultValue: 9,
         min: 2,
@@ -187,8 +188,8 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
         step: 1,
       },
       {
-        key: 'kPeriod',
-        label: 'K平滑周期',
+        key: 'smoothK',
+        label: 'K值平滑周期',
         type: 'number',
         defaultValue: 3,
         min: 1,
@@ -196,8 +197,8 @@ const FACTOR_REGISTRY: Record<FactorType, FactorMetadata> = {
         step: 1,
       },
       {
-        key: 'dPeriod',
-        label: 'D平滑周期',
+        key: 'smoothD',
+        label: 'D值平滑周期',
         type: 'number',
         defaultValue: 3,
         min: 1,
@@ -271,130 +272,113 @@ function FactorSelector({ selectedFactors, onChange }: { selectedFactors: Factor
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-semibold mb-1">因子库</h3>
-        <p className="text-xs text-muted-foreground mb-2">
+        <h3 className="text-lg font-semibold mb-2">因子库</h3>
+        <p className="text-sm text-muted-foreground mb-4">
           选择一个或多个因子构建您的量化策略
         </p>
       </div>
 
-      {availableFactors.map((metadata) => {
-        const config = getFactorConfig(metadata.type);
-        const isEnabled = config?.enabled ?? false;
-        const isExpanded = expandedFactors.has(metadata.type);
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {availableFactors.map((metadata) => {
+          const config = getFactorConfig(metadata.type);
+          const isEnabled = config?.enabled ?? false;
+          const isExpanded = expandedFactors.has(metadata.type);
 
-        return (
-          <Card key={metadata.type} className={isEnabled ? 'border-primary bg-primary/5' : 'border-border'}>
-            <CardHeader className="py-1.5 px-3">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <input
-                    type="checkbox"
-                    id={`factor-${metadata.type}`}
-                    checked={isEnabled}
-                    onChange={() => toggleFactor(metadata.type)}
-                    className="shrink-0"
-                  />
-                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                    <label htmlFor={`factor-${metadata.type}`} className="cursor-pointer font-medium text-xs truncate">
-                      {metadata.name}
-                    </label>
-                    <span className="inline-block px-1 py-0 text-[10px] leading-tight rounded bg-primary/10 text-primary shrink-0">
-                      {metadata.category}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate">
-                      {metadata.description}
-                    </span>
+          return (
+            <Card key={metadata.type} className={isEnabled ? 'border-primary bg-primary/5' : 'border-border'}>
+              <CardHeader className="py-3 px-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <input
+                      type="checkbox"
+                      id={`factor-${metadata.type}`}
+                      checked={isEnabled}
+                      onChange={() => toggleFactor(metadata.type)}
+                      className="shrink-0 mt-1"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label htmlFor={`factor-${metadata.type}`} className="cursor-pointer font-semibold text-sm block">
+                        {metadata.name}
+                      </label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metadata.description}
+                      </p>
+                      <Badge variant="outline" className="mt-2 text-xs">
+                        {metadata.category}
+                      </Badge>
+                    </div>
                   </div>
+                  {isEnabled && (
+                    <button
+                      onClick={() => toggleExpand(metadata.type)}
+                      className="text-primary text-xs font-medium shrink-0"
+                    >
+                      {isExpanded ? '隐藏' : '展开'}
+                    </button>
+                  )}
                 </div>
-                {isEnabled && (
-                  <button
-                    type="button"
-                    onClick={() => toggleExpand(metadata.type)}
-                    className="shrink-0 p-0.5 hover:bg-accent rounded transition-colors"
-                  >
-                    {isExpanded ? '▲' : '▼'}
-                  </button>
-                )}
-              </div>
-            </CardHeader>
+              </CardHeader>
 
-            {isEnabled && config && isExpanded && (
-              <CardContent className="py-2 px-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {metadata.parameters.map((param) => (
-                    <div key={param.key} className="space-y-2">
-                      <Label htmlFor={`${metadata.type}-${param.key}`}>
+              {isEnabled && isExpanded && (
+                <CardContent className="pt-0 px-4 pb-4 space-y-3 border-t border-border/50">
+                  {metadata.parameters.map(param => (
+                    <div key={param.key} className="space-y-1.5">
+                      <label htmlFor={`param-${metadata.type}-${param.key}`} className="text-xs font-medium block">
                         {param.label}
-                      </Label>
+                      </label>
                       {param.type === 'number' ? (
                         <Input
-                          id={`${metadata.type}-${param.key}`}
+                          id={`param-${metadata.type}-${param.key}`}
                           type="number"
                           min={param.min}
                           max={param.max}
                           step={param.step}
-                          value={config.parameters[param.key]}
-                          onChange={(e) =>
-                            updateParameter(
-                              metadata.type,
-                              param.key,
-                              parseFloat(e.target.value)
-                            )
-                          }
+                          value={config?.parameters[param.key] ?? param.defaultValue}
+                          onChange={(e) => updateParameter(metadata.type, param.key, Number(e.target.value))}
+                          className="text-sm h-8"
                         />
                       ) : (
-                        <select
-                          id={`${metadata.type}-${param.key}`}
-                          value={config.parameters[param.key]}
-                          onChange={(e) =>
-                            updateParameter(metadata.type, param.key, e.target.value)
-                          }
-                          className="w-full px-3 py-2 border rounded-md"
+                        <Select
+                          value={String(config?.parameters[param.key] ?? param.defaultValue)}
+                          onValueChange={(value) => updateParameter(metadata.type, param.key, value)}
                         >
-                          {param.options?.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger id={`param-${metadata.type}-${param.key}`} className="h-8 text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {param.options?.map(opt => (
+                              <SelectItem key={opt.value} value={String(opt.value)}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
                       {param.description && (
-                        <p className="text-xs text-muted-foreground">
-                          {param.description}
-                        </p>
+                        <p className="text-xs text-muted-foreground">{param.description}</p>
                       )}
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        );
-      })}
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 export default function QuantitativeTrading() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [tradingPair, setTradingPair] = useState("BTC-USDT");
   const [timeframe, setTimeframe] = useState("1H");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [initialCapital, setInitialCapital] = useState(10000);
-
-  const [selectedFactors, setSelectedFactors] = useState<FactorConfig[]>([
-    {
-      type: FactorType.MA,
-      enabled: true,
-      parameters: {
-        shortPeriod: 10,
-        longPeriod: 30,
-      },
-    },
-  ]);
+  const [selectedFactors, setSelectedFactors] = useState<FactorConfig[]>([]);
 
   useEffect(() => {
     const end = new Date();
@@ -422,14 +406,14 @@ export default function QuantitativeTrading() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
       {/* 导航栏 */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/crypto-analysis">
-            <Button variant="ghost" size="icon">
+          <Link href="/crypto">
+            <Button variant="ghost" size="icon" className="hover:bg-primary/10">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-center flex-1">量化交易计算机</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-center flex-1">量化交易</h1>
           <div className="w-10" />
         </div>
       </header>
@@ -437,94 +421,190 @@ export default function QuantitativeTrading() {
       {/* 主内容 */}
       <div className="relative overflow-hidden">
         {/* 装饰背景 */}
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-64 h-64 bg-primary rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary rounded-full blur-3xl"></div>
         </div>
 
-        <div className="container relative z-10 py-20">
-          {/* 页面标题 */}
-          <div className="text-center space-y-6 mb-16">
-            <h2 className="text-6xl font-bold text-foreground tracking-tight">
-              量化计算平台
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              专业的加密货币交易策略回测与模拟交易系统
-            </p>
-            <div className="flex justify-center gap-4 pt-4">
-              <div className="flex items-center gap-2 text-primary">
-                <Activity className="w-5 h-5" />
-                <span className="font-semibold">实时数据</span>
+        <div className="container relative z-10 py-8 md:py-16">
+          {/* 产品介绍部分 */}
+          <section className="mb-12 md:mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                    专业量化交易平台
+                  </h2>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    基于多因子模型的加密货币交易策略回测与模拟交易系统，帮助投资者验证交易策略、优化参数配置、降低投资风险。
+                  </p>
+                </div>
+
+                {/* 核心特点 */}
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-sm">历史回测</h3>
+                      <p className="text-xs text-muted-foreground">基于 5 年历史数据验证策略表现</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-sm">模拟交易</h3>
+                      <p className="text-xs text-muted-foreground">实时行情虚拟交易，零风险验证策略</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-sm">多因子库</h3>
+                      <p className="text-xs text-muted-foreground">MA、MACD、RSI、BOLL、KDJ 五大因子</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-sm">详细报告</h3>
+                      <p className="text-xs text-muted-foreground">收益率、最大回撤、胜率等关键指标</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-secondary">
-                <BarChart3 className="w-5 h-5" />
-                <span className="font-semibold">专业回测</span>
-              </div>
-              <div className="flex items-center gap-2 text-accent">
-                <Sparkles className="w-5 h-5" />
-                <span className="font-semibold">AI 辅助</span>
+
+              {/* 功能卡片 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 hover:border-primary/40 transition-colors">
+                  <CardHeader className="pb-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-2">
+                      <LineChart className="w-5 h-5 text-primary" />
+                    </div>
+                    <CardTitle className="text-sm">趋势分析</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground">
+                      MA、MACD 等趋势因子帮助识别市场方向
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-secondary/20 bg-gradient-to-br from-secondary/10 to-secondary/5 hover:border-secondary/40 transition-colors">
+                  <CardHeader className="pb-3">
+                    <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center mb-2">
+                      <Cpu className="w-5 h-5 text-secondary" />
+                    </div>
+                    <CardTitle className="text-sm">动量指标</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground">
+                      RSI、KDJ 等动量因子判断超买超卖
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-accent/20 bg-gradient-to-br from-accent/10 to-accent/5 hover:border-accent/40 transition-colors">
+                  <CardHeader className="pb-3">
+                    <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center mb-2">
+                      <Zap className="w-5 h-5 text-accent" />
+                    </div>
+                    <CardTitle className="text-sm">波动率</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground">
+                      BOLL 布林带捕捉价格极值机会
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 hover:border-yellow-500/40 transition-colors">
+                  <CardHeader className="pb-3">
+                    <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center mb-2">
+                      <Shield className="w-5 h-5 text-yellow-500" />
+                    </div>
+                    <CardTitle className="text-sm">风险控制</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground">
+                      多因子组合降低单一策略风险
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 回测配置 */}
-          <Card className="border-secondary/20 bg-card/50 backdrop-blur">
+          {/* 回测配置卡片 */}
+          <Card className="border-secondary/20 bg-card/50 backdrop-blur mb-12 md:mb-16">
             <CardHeader>
-              <CardTitle>配置回测策略</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                配置回测策略
+              </CardTitle>
               <CardDescription>选择交易对、时间周期和策略参数进行历史回测</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="tradingPair">交易对</Label>
-                  <Select value={tradingPair} onValueChange={setTradingPair}>
-                    <SelectTrigger id="tradingPair">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="BTC-USDT">BTC-USDT</SelectItem>
-                      <SelectItem value="ETH-USDT">ETH-USDT</SelectItem>
-                      <SelectItem value="SOL-USDT">SOL-USDT</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* 基础配置 */}
+              <div>
+                <h3 className="text-sm font-semibold mb-4">基础配置</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="tradingPair" className="text-xs font-medium">交易对</Label>
+                    <Select value={tradingPair} onValueChange={setTradingPair}>
+                      <SelectTrigger id="tradingPair" className="h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="BTC-USDT">BTC-USDT</SelectItem>
+                        <SelectItem value="ETH-USDT">ETH-USDT</SelectItem>
+                        <SelectItem value="SOL-USDT">SOL-USDT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="timeframe">时间周期</Label>
-                  <Select value={timeframe} onValueChange={setTimeframe}>
-                    <SelectTrigger id="timeframe">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1H">1 小时 (推荐)</SelectItem>
-                      <SelectItem value="4H" disabled>4 小时 (暂无数据)</SelectItem>
-                      <SelectItem value="1D" disabled>1 天 (暂无数据)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="timeframe" className="text-xs font-medium">时间周期</Label>
+                    <Select value={timeframe} onValueChange={setTimeframe}>
+                      <SelectTrigger id="timeframe" className="h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1H">1 小时 (推荐)</SelectItem>
+                        <SelectItem value="4H" disabled>4 小时 (暂无数据)</SelectItem>
+                        <SelectItem value="1D" disabled>1 天 (暂无数据)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">开始日期</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate" className="text-xs font-medium">开始日期</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="h-9 text-sm"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">结束日期</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate" className="text-xs font-medium">结束日期</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="h-9 text-sm"
+                    />
+                  </div>
                 </div>
+              </div>
 
+              {/* 资金配置 */}
+              <div>
+                <h3 className="text-sm font-semibold mb-4">资金配置</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="initialCapital">初始资金 (USDT)</Label>
+                  <Label htmlFor="initialCapital" className="text-xs font-medium">初始资金 (USDT)</Label>
                   <Input
                     id="initialCapital"
                     type="number"
@@ -533,10 +613,15 @@ export default function QuantitativeTrading() {
                     value={initialCapital}
                     onChange={(e) => setInitialCapital(Number(e.target.value))}
                     placeholder="10000"
+                    className="h-9 text-sm"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    建议初始资金 10,000 - 100,000 USDT，用于验证策略表现
+                  </p>
                 </div>
               </div>
 
+              {/* 因子库选择 */}
               <div className="border-t border-border pt-6">
                 <FactorSelector
                   selectedFactors={selectedFactors}
@@ -544,7 +629,8 @@ export default function QuantitativeTrading() {
                 />
               </div>
 
-              <div className="flex justify-end gap-4 pt-4">
+              {/* 操作按钮 */}
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-border">
                 {!isAuthenticated ? (
                   <Button
                     onClick={() => {
@@ -557,66 +643,183 @@ export default function QuantitativeTrading() {
                     }}
                     variant="default"
                     size="lg"
+                    className="w-full sm:w-auto"
                   >
                     登录后开始回测
                   </Button>
                 ) : (
-                  <Button
-                    onClick={handleRunBacktest}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    开始回测
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full sm:w-auto"
+                    >
+                      重置参数
+                    </Button>
+                    <Button
+                      onClick={handleRunBacktest}
+                      size="lg"
+                      className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      开始回测
+                    </Button>
+                  </>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* 功能卡片 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <Card className="border-primary/20 bg-card/30 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-primary" />
-                  专业回测
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  基于历史数据验证策略表现，计算收益率、最大回撤、胜率等关键指标
-                </p>
-              </CardContent>
-            </Card>
+          {/* 功能介绍 */}
+          <section className="mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">平台功能</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="border-primary/20 bg-card/30 backdrop-blur hover:border-primary/50 transition-colors">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">专业回测</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    基于 5 年历史数据验证策略表现，计算收益率、最大回撤、胜率、夏普比率等关键指标，帮助您全面评估策略质量。
+                  </p>
+                </CardContent>
+              </Card>
 
-            <Card className="border-secondary/20 bg-card/30 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-secondary" />
-                  模拟交易
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  基于实时价格进行虚拟交易，跟踪模拟账户盈亏，零风险验证策略
-                </p>
-              </CardContent>
-            </Card>
+              <Card className="border-secondary/20 bg-card/30 backdrop-blur hover:border-secondary/50 transition-colors">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4">
+                    <Activity className="w-6 h-6 text-secondary" />
+                  </div>
+                  <CardTitle className="text-lg">模拟交易</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    基于实时行情进行虚拟交易，跟踪模拟账户盈亏，零风险验证策略在实盘中的表现，支持随时停止和调整。
+                  </p>
+                </CardContent>
+              </Card>
 
-            <Card className="border-accent/20 bg-card/30 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-accent" />
-                  AI 辅助
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  用自然语言描述策略想法，AI 自动转换为可执行的策略参数
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+              <Card className="border-accent/20 bg-card/30 backdrop-blur hover:border-accent/50 transition-colors">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
+                    <Sparkles className="w-6 h-6 text-accent" />
+                  </div>
+                  <CardTitle className="text-lg">AI 辅助</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    用自然语言描述您的交易想法，AI 自动转换为可执行的策略参数，快速生成量化策略，降低技术门槛。
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* 因子说明 */}
+          <section className="mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">因子库说明</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <LineChart className="w-5 h-5 text-primary" />
+                    趋势因子
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">移动平均线 (MA)</h4>
+                    <p className="text-xs text-muted-foreground">
+                      通过短期和长期均线的交叉判断买卖时机，识别趋势方向变化。
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">MACD</h4>
+                    <p className="text-xs text-muted-foreground">
+                      通过快慢均线差值判断趋势和动量，识别趋势强度和反转信号。
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Cpu className="w-5 h-5 text-secondary" />
+                    动量因子
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">RSI</h4>
+                    <p className="text-xs text-muted-foreground">
+                      相对强弱指标，判断超买超卖情况，识别反转机会。
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">KDJ</h4>
+                    <p className="text-xs text-muted-foreground">
+                      随机指标，结合动量和超买超卖，提高信号准确度。
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-accent" />
+                    波动率因子
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">布林带 (BOLL)</h4>
+                    <p className="text-xs text-muted-foreground">
+                      利用波动率判断价格极值和趋势，识别支撑阻力位置。
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-yellow-500" />
+                    多因子组合
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">风险控制</h4>
+                    <p className="text-xs text-muted-foreground">
+                      组合多个因子降低单一策略风险，提高策略稳定性和收益率。
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* 使用建议 */}
+          <Card className="border-yellow-500/20 bg-yellow-500/5 mb-12">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <AlertCircle className="w-5 h-5 text-yellow-500" />
+                使用建议
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-muted-foreground">
+              <p>• 建议先从单个因子开始测试，逐步增加因子组合的复杂度</p>
+              <p>• 历史回测结果不代表未来表现，请谨慎参考</p>
+              <p>• 在模拟交易中验证策略至少 2-4 周后再考虑实盘交易</p>
+              <p>• 定期调整参数和因子组合，适应市场变化</p>
+              <p>• 设置合理的止损和止盈水平，控制单笔风险</p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
