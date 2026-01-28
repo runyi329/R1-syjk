@@ -67,23 +67,34 @@ export default function Home() {
 
 
 
-  const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/';
-    },
-    onError: (error) => {
-      toast.error(language === 'en' ? 'Logout failed' : '登出失败');
-      console.error('Logout failed:', error);
-    },
-  });
+  const utils = trpc.useUtils();
 
   const handleLogout = async () => {
     try {
-      await logoutMutation.mutateAsync();
+      // 调用后端登出API
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        // 清除本地存储
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 刷新认证状态
+        await utils.auth.me.invalidate();
+        
+        // 跳转到登录页
+        setLocation('/login');
+        
+        toast.success(language === 'en' ? 'Logout successful' : '登出成功');
+      } else {
+        toast.error(language === 'en' ? 'Logout failed' : '登出失败');
+      }
     } catch (error) {
       console.error('Logout error:', error);
+      toast.error(language === 'en' ? 'Logout failed' : '登出失败');
     }
   };
 
