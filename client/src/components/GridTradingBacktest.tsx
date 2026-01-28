@@ -36,11 +36,12 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
 
   // tRPC mutation and query
   const backtestMutation = trpc.gridTrading.backtest.useMutation();
+  const clearProgressMutation = trpc.gridTrading.clearProgress.useMutation();
   const progressQuery = trpc.gridTrading.getProgress.useQuery(
     { symbol },
     { 
       enabled: isLoading,
-      refetchInterval: isLoading ? 500 : false, // 每0.5秒轮询一次
+      refetchInterval: isLoading ? 1000 : false, // 每1秒轮询一次，避免过于频繁
     }
   );
 
@@ -60,9 +61,12 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
       }
       
       // 如果回测完成，开始动画显示
-      if (progressQuery.data.data.status === 'completed' && !isAnimating) {
+      if (progressQuery.data.data.status === 'completed' && !isAnimating && !showDosResult) {
         setIsLoading(false);
-        startDailyAnimation(progressQuery.data.data);
+        // 稍微延迟一下再开始动画，确保所有数据都已经准备好
+        setTimeout(() => {
+          startDailyAnimation(progressQuery.data.data);
+        }, 300);
       }
     }
   }, [progressQuery.data]);
@@ -173,7 +177,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     if (animationTimerRef.current) {
       clearInterval(animationTimerRef.current);
     }
-    setStep(0);
+    setStep(1); // 改为返回参数设置页面，而不是初始页面
   };
 
   // 验证参数
@@ -659,6 +663,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
             </Button>
             <Button
               onClick={async () => {
+                // 清理之前的状态
                 setIsLoading(true);
                 setShowDosResult(false);
                 setBacktestResult(null);
@@ -668,7 +673,15 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                 if (animationTimerRef.current) {
                   clearInterval(animationTimerRef.current);
                 }
+                
                 try {
+                  // 先清除之前的进度数据
+                  await clearProgressMutation.mutateAsync({ symbol });
+                  
+                  // 等待一下确保清除完成
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  
+                  // 然后开始新的回测
                   const result = await backtestMutation.mutateAsync({
                     symbol,
                     minPrice: parseFloat(priceMin),
