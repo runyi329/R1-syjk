@@ -22,8 +22,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   const [investment, setInvestment] = useState<string>("100000");
   const [tradeType, setTradeType] = useState<"spot" | "contract">("spot");
   const [leverage, setLeverage] = useState<number>(1);
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("2025-12-01");
+  const [endDate, setEndDate] = useState<string>("2025-12-15");
   const [backtestResult, setBacktestResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [progressData, setProgressData] = useState<any>(null);
@@ -96,14 +96,14 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
 
   // 重置所有参数
   const resetParams = () => {
-    setPriceMin("");
-    setPriceMax("");
-    setGridCount("");
-    setInvestment("");
+    setPriceMin("10000");
+    setPriceMax("100000");
+    setGridCount("200");
+    setInvestment("100000");
     setTradeType("spot");
     setLeverage(1);
-    setStartDate("");
-    setEndDate("");
+    setStartDate("2025-12-01");
+    setEndDate("2025-12-15");
     setStep(0);
     setProgressData(null);
     setBacktestResult(null);
