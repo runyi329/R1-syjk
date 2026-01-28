@@ -2398,3 +2398,15 @@
   - [x] 资产范围
 - [x] 优化文字排版，左右对齐，分隔线清晰
 - [x] 添加完成图标和标题
+
+## 认证系统改造 - 从 Manus OAuth 改为用户名密码登录 (2026-01-27)
+- [ ] 分析现有 Manus OAuth 认证流程
+- [ ] 修改数据库 schema，添加 username 和 password 字段
+- [ ] 实现密码加密（bcrypt）
+- [ ] 创建注册 API（POST /api/auth/register）
+- [ ] 创建登录 API（POST /api/auth/login）
+- [ ] 修改 JWT token 生成逻辑
+- [ ] 创建前端登录页面
+- [ ] 创建前端注册页面
+- [ ] 移除 Manus OAuth 相关代码
+- [ ] 测试完整的登录注册流程

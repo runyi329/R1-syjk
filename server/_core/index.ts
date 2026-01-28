@@ -6,6 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import testLoginRouter from "../routes/test-login.js";
+import authRouter from "../routes/auth";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -38,6 +39,8 @@ async function startServer() {
   registerOAuthRoutes(app);
   // Test login route
   app.use("/api", testLoginRouter);
+  // Username/password auth routes
+  app.use("/api/auth", authRouter);
   // tRPC API
   app.use(
     "/api/trpc",

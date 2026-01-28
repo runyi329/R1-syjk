@@ -178,78 +178,16 @@ export default function Home() {
                   {language === 'en' ? 'Register' : '注册'}
                 </Button>
 
-                {/* 用户名+密码登录对话框 */}
-                <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2 flex items-center gap-1"
-                    >
-                      <LogIn className="w-3 h-3" />
-                      <span className="hidden sm:inline">{language === 'en' ? 'Login' : '登录'}</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>{language === 'en' ? 'Login' : '登录'}</DialogTitle>
-                      <DialogDescription>
-                        {language === 'en' ? 'Enter your username and password' : '输入用户名和密码登录'}
-                      </DialogDescription>
-                    </DialogHeader>
-
-
-                      <form onSubmit={handlePasswordLogin} className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">
-                            {language === 'en' ? 'Username' : '用户名'}
-                          </label>
-                          <Input
-                            type="text"
-                            placeholder={language === 'en' ? 'Enter username' : '输入用户名'}
-                            value={loginUsername}
-                            onChange={(e) => setLoginUsername(e.target.value)}
-                            disabled={isLoggingIn}
-                            className="border-primary/20 focus:border-primary"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">
-                            {language === 'en' ? 'Password' : '密码'}
-                          </label>
-                          <Input
-                            type="password"
-                            placeholder={language === 'en' ? 'Enter password' : '输入密码'}
-                            value={loginPassword}
-                            onChange={(e) => setLoginPassword(e.target.value)}
-                            disabled={isLoggingIn}
-                            className="border-primary/20 focus:border-primary"
-                          />
-                        </div>
-
-                        <Button
-                          type="submit"
-                          disabled={isLoggingIn || !loginUsername || !loginPassword}
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                        >
-                          {isLoggingIn ? (language === 'en' ? 'Logging in...' : '登录中...') : (language === 'en' ? 'Login' : '登录')}
-                        </Button>
-
-                        <div className="text-center text-sm text-muted-foreground">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsLoginDialogOpen(false);
-                              window.location.href = '/forgot-password';
-                            }}
-                            className="text-primary hover:underline font-medium"
-                          >
-                            {language === 'en' ? 'Forgot password?' : '忘记密码?'}
-                          </button>
-                        </div>
-                      </form>
-                  </DialogContent>
-                </Dialog>
+                {/* 登录按钮 */}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs px-2 flex items-center gap-1"
+                  onClick={() => setLocation('/login')}
+                >
+                  <LogIn className="w-3 h-3" />
+                  <span className="hidden sm:inline">{language === 'en' ? 'Login' : '登录'}</span>
+                </Button>
               </div>
             )}
           </div>

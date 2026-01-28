@@ -19,6 +19,7 @@ import UserCenter from "./pages/UserCenter";
 import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
 import Register from "./pages/Register";
+import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import MobileBottomNav from "./components/MobileBottomNav";
 import AnalysisPlaceholder from "./pages/AnalysisPlaceholder";
@@ -43,6 +44,7 @@ function Router() {
     <>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/login" component={Login} />
         <Route path="/baccarat" component={BaccaratAnalysis} />
         <Route path="/football" component={FootballAnalysis} />
         <Route path="/crypto" component={CryptoAnalysis} />
