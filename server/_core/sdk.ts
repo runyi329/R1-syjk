@@ -257,8 +257,31 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
+    
+    // 先尝试从自定义 token cookie 中验证
+    const customToken = cookies.get("token");
+    if (customToken) {
+      try {
+        const secret = new TextEncoder().encode(ENV.JWT_SECRET);
+        const { payload } = await jwtVerify(customToken, secret, {
+          algorithms: ["HS256"],
+        });
+        
+        const userId = payload.userId as number;
+        if (userId) {
+          const user = await db.getUserById(userId);
+          if (user) {
+            return user;
+          }
+        }
+      } catch (error) {
+        console.warn("[Auth] Custom token verification failed:", error);
+        // 继续尝试 Manus OAuth
+      }
+    }
+    
+    // 如果没有自定义 token，尝试 Manus OAuth
     const sessionCookie = cookies.get(COOKIE_NAME);
     const session = await this.verifySession(sessionCookie);
 

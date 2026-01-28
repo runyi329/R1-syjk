@@ -2462,3 +2462,11 @@
 
 ## 参数优化 - 设置默认时间范围 (2026-01-28)
 - [x] 修改GridTradingBacktest组件，设置默认时间为2025-12-01至2025-12-15
+
+## 严重Bug - 登录后无法加载用户信息 (2026-01-28)
+- [x] 检查登录API是否正确设置cookie
+- [x] 检查JWT token是否正确生成
+- [x] 检查sdk.authenticateRequest是否能正确解析token
+- [x] 检查getUserById是否能从数据库读取用户
+- [x] 修复用户认证流程 - 修改sdk.authenticateRequest支持自定义token cookie
+- [ ] 测试登录后的用户状态
