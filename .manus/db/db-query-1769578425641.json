@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, username, passwordHash, registerMethod, accountStatus FROM users WHERE username = 'runyi';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute SELECT id, username, passwordHash, registerMethod, accountStatus FROM users WHERE username = 'runyi';",
+  "rows": [
+    {
+      "id": "330137",
+      "username": "runyi",
+      "passwordHash": "$2b$10$NLVEloZnkow1t6Vzh4mQH.gtJTjpM7KWI84nBeOJPxyP6Do4iQI8q",
+      "registerMethod": "password",
+      "accountStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tpasswordHash\tregisterMethod\taccountStatus\n330137\trunyi\t$2b$10$NLVEloZnkow1t6Vzh4mQH.gtJTjpM7KWI84nBeOJPxyP6Do4iQI8q\tpassword\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1540
+}
