@@ -458,8 +458,21 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
           >
             <X className="w-4 h-4" />
           </Button>
-          <CardTitle>运行策略</CardTitle>
-          <CardDescription>了解网格交易的运作原理</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>运行策略</CardTitle>
+              <CardDescription>了解网格交易的运作原理</CardDescription>
+            </div>
+            <Button
+              onClick={() => setLocation("/backtest-history")}
+              variant="outline"
+              size="sm"
+              className="border-primary/50"
+            >
+              <Database className="w-4 h-4 mr-2" />
+              历史记录
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* 策略图表 / 实时进度 / DOS结果显示区域 */}
