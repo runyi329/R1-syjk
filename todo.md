@@ -2470,3 +2470,10 @@
 - [x] 检查getUserById是否能从数据库读取用户
 - [x] 修复用户认证流程 - 修改sdk.authenticateRequest支持自定义token cookie
 - [ ] 测试登录后的用户状态
+
+## Bug - 登录后反复停留在登录页面 (2026-01-28)
+- [x] 检查登录页面的跳转逻辑
+- [x] 检查useAuth hook的认证状态检查
+- [x] 检查是否有路由保护导致循环跳转
+- [x] 修复跳转问题 - 移除window.location.reload()，改用trpc invalidate
+- [ ] 测试登录流程

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
   const [isLogin, setIsLogin] = useState(true); // true=登录，false=注册
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -55,9 +57,9 @@ export default function Login() {
         return;
       }
 
-      // 登录/注册成功，跳转到首页
+      // 登录/注册成功，刷新认证状态并跳转到首页
+      await utils.auth.me.invalidate();
       setLocation("/");
-      window.location.reload(); // 刷新页面以更新认证状态
     } catch (err) {
       console.error("请求错误:", err);
       setError("网络错误，请稍后重试");
