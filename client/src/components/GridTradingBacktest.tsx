@@ -570,35 +570,63 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               </div>
             ) : (
               // 回测中：显示实时进度
-              <div className="relative h-48 flex flex-col items-center justify-center space-y-4">
+              <div className="relative min-h-[380px] flex flex-col items-center justify-center space-y-5 py-6">
                 {progressData ? (
                   <>
-                    {/* 当前回测日期 */}
+                    {/* 进度标题 */}
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-2">正在回测</p>
-                      <p className="text-2xl font-bold text-primary">
-                        {progressData.currentDate || '准备中...'}
-                      </p>
+                      <Loader2 className="w-12 h-12 mx-auto mb-3 animate-spin text-primary" />
+                      <h3 className="text-xl font-bold mb-2">正在回测...</h3>
+                    </div>
+
+                    {/* 当前回测日期 */}
+                    <div className="text-center bg-primary/10 px-6 py-3 rounded-lg border border-primary/30 w-full">
+                      <p className="text-xs text-muted-foreground mb-1">回测进程</p>
+                      <div className="flex items-center gap-2 justify-center">
+                        <Calendar className="w-4 h-4 text-primary" />
+                        <p className="text-lg font-bold text-primary">
+                          {progressData.currentDate || '初始化中...'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 天数统计 */}
+                    <div className="w-full grid grid-cols-3 gap-3 text-center">
+                      <div className="bg-muted/30 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">已回测</p>
+                        <p className="text-xl font-bold text-primary">{progressData.processedDays}</p>
+                        <p className="text-xs text-muted-foreground">天</p>
+                      </div>
+                      <div className="bg-muted/30 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">总天数</p>
+                        <p className="text-xl font-bold">{progressData.totalDays}</p>
+                        <p className="text-xs text-muted-foreground">天</p>
+                      </div>
+                      <div className="bg-muted/30 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">剩余</p>
+                        <p className="text-xl font-bold text-orange-500">{progressData.totalDays - progressData.processedDays}</p>
+                        <p className="text-xs text-muted-foreground">天</p>
+                      </div>
                     </div>
 
                     {/* 进度条 */}
                     <div className="w-full space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
-                          {progressData.processedDays} / {progressData.totalDays} 天
+                          进度
                         </span>
                         <span className="text-primary font-medium">
                           {Math.round(progressData.progress)}%
                         </span>
                       </div>
-                      <Progress value={progressData.progress} className="h-2" />
+                      <Progress value={progressData.progress} className="h-3" />
                     </div>
 
                     {/* 当前盈亏 */}
                     {progressData.currentProfit !== undefined && (
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">当前盈亏</p>
-                        <p className={`text-lg font-bold ${progressData.currentProfit >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      <div className="text-center bg-muted/20 px-6 py-3 rounded-lg border border-border/50 w-full">
+                        <p className="text-xs text-muted-foreground mb-1">当前盈亏</p>
+                        <p className={`text-2xl font-bold ${progressData.currentProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                           {progressData.currentProfit >= 0 ? '+' : ''}{progressData.currentProfit.toFixed(2)} USDT
                         </p>
                       </div>
@@ -606,8 +634,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
 
                     {/* 错误信息 */}
                     {progressData.errorMessage && (
-                      <div className="text-center text-red-500">
-                        <p className="text-sm">{progressData.errorMessage}</p>
+                      <div className="text-center text-red-500 bg-red-500/10 px-4 py-3 rounded-lg border border-red-500/30 w-full">
+                        <p className="text-sm font-medium">{progressData.errorMessage}</p>
                       </div>
                     )}
                   </>
