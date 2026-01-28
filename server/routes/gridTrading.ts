@@ -117,7 +117,17 @@ export const gridTradingRouter = router({
             const progress = ((dayIndex + 1) / totalDaysCount * 100);
             const dateStr = currentDate.toISOString().split('T')[0];
             
-            // 更新进度
+            // 创建当天的累计数据快照
+            const dailySnapshot = {
+              date: dateStr,
+              balance: state.balance + state.floatingProfit,
+              totalProfit: state.totalProfit,
+              gridTriggers: state.gridTriggers,
+              floatingProfit: state.floatingProfit,
+              maxDrawdown: state.maxDrawdown,
+            };
+            
+            // 更新进度（包含每天的数据）
             updateBacktestProgress(userId, symbol, {
               currentDate: dateStr,
               processedDays: dayIndex + 1,
@@ -125,6 +135,7 @@ export const gridTradingRouter = router({
               progress,
               currentProfit: state.totalProfit || 0,
               status: 'running',
+              dailyData: dailySnapshot, // 添加当天数据
             });
             
             console.log(`[回测进度] ${progress.toFixed(1)}% | ${dateStr} | 已处理 ${totalKlines} 条K线 (${processedDays}/${totalDaysCount} 天)`);
@@ -162,10 +173,14 @@ export const gridTradingRouter = router({
         console.log(`[回测完成] 耗时: ${duration}秒, 处理了 ${totalKlines} 条K线, 分 ${processedDays} 天`);
         console.log(`[回测结果] 总收益: ¥${result.totalProfit.toFixed(2)}, 收益率: ${result.profitRate.toFixed(2)}%`);
 
-        // 标记完成
+        // 标记完成，保存最终结果
         updateBacktestProgress(userId, symbol, {
           status: 'completed',
           currentProfit: result.totalProfit,
+          finalResult: {
+            ...result,
+            dataCount: totalKlines,
+          },
         });
 
         return {

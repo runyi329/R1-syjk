@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, ArrowRight, ArrowLeft, X, Loader2, Calendar, CheckCircle2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { TypewriterLines } from "./TypewriterText";
 
@@ -28,6 +28,11 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [progressData, setProgressData] = useState<any>(null);
   const [showDosResult, setShowDosResult] = useState<boolean>(false);
+  
+  // 动态显示相关状态
+  const [displayedDayIndex, setDisplayedDayIndex] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // tRPC mutation and query
   const backtestMutation = trpc.gridTrading.backtest.useMutation();
@@ -35,7 +40,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     { symbol },
     { 
       enabled: isLoading,
-      refetchInterval: isLoading ? 1000 : false, // 每秒轮询一次
+      refetchInterval: isLoading ? 500 : false, // 每0.5秒轮询一次
     }
   );
 
@@ -44,16 +49,72 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     if (progressQuery.data?.data) {
       setProgressData(progressQuery.data.data);
       
-      // 如果回测失败，显示错误（但不使用toast）
+      // 如果回测失败，显示错误
       if (progressQuery.data.data.status === 'failed') {
         setIsLoading(false);
+        setIsAnimating(false);
         setProgressData({
           ...progressQuery.data.data,
           errorMessage: progressQuery.data.data.error || '回测失败'
         });
       }
+      
+      // 如果回测完成，开始动画显示
+      if (progressQuery.data.data.status === 'completed' && !isAnimating) {
+        setIsLoading(false);
+        startDailyAnimation(progressQuery.data.data);
+      }
     }
   }, [progressQuery.data]);
+
+  // 开始逐天动画显示
+  const startDailyAnimation = (progress: any) => {
+    if (!progress.dailyData || progress.dailyData.length === 0) {
+      // 没有每日数据，直接显示最终结果
+      setBacktestResult(progress.finalResult);
+      setShowDosResult(true);
+      return;
+    }
+
+    setIsAnimating(true);
+    setDisplayedDayIndex(0);
+    
+    // 每0.5秒显示一天的数据
+    let currentIndex = 0;
+    animationTimerRef.current = setInterval(() => {
+      currentIndex++;
+      setDisplayedDayIndex(currentIndex);
+      
+      // 显示完所有天数后，停止动画并显示最终结果
+      if (currentIndex >= progress.dailyData.length) {
+        if (animationTimerRef.current) {
+          clearInterval(animationTimerRef.current);
+        }
+        setIsAnimating(false);
+        setBacktestResult(progress.finalResult);
+        setShowDosResult(true);
+      }
+    }, 500); // 每0.5秒更新一次
+  };
+
+  // 清理动画定时器
+  useEffect(() => {
+    return () => {
+      if (animationTimerRef.current) {
+        clearInterval(animationTimerRef.current);
+      }
+    };
+  }, []);
+
+  // 获取当前显示的数据（动画过程中）
+  const getCurrentDisplayData = () => {
+    if (!progressData?.dailyData || displayedDayIndex === 0) {
+      return null;
+    }
+    
+    const currentDay = progressData.dailyData[Math.min(displayedDayIndex - 1, progressData.dailyData.length - 1)];
+    return currentDay;
+  };
 
   // 快捷日期选择
   const setQuickDateRange = (range: string) => {
@@ -96,106 +157,41 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
 
   // 重置所有参数
   const resetParams = () => {
-    setPriceMin("");
-    setPriceMax("");
-    setGridCount("");
-    setInvestment("");
+    setPriceMin("10000");
+    setPriceMax("100000");
+    setGridCount("200");
+    setInvestment("100000");
     setTradeType("spot");
     setLeverage(1);
     setStartDate("");
     setEndDate("");
-    setStep(0);
-    setProgressData(null);
     setBacktestResult(null);
+    setProgressData(null);
     setShowDosResult(false);
+    setDisplayedDayIndex(0);
+    setIsAnimating(false);
+    if (animationTimerRef.current) {
+      clearInterval(animationTimerRef.current);
+    }
+    setStep(0);
   };
 
   // 验证参数
   const validateParams = () => {
-    if (!priceMin || !priceMax || !gridCount || !investment) {
-      return "请填写所有必填参数";
-    }
-    if (!startDate || !endDate) {
-      return "请选择回测时间范围";
-    }
     const min = parseFloat(priceMin);
     const max = parseFloat(priceMax);
-    const count = parseInt(gridCount);
+    const grid = parseInt(gridCount);
     const invest = parseFloat(investment);
 
-    if (isNaN(min) || isNaN(max) || isNaN(count) || isNaN(invest)) {
-      return "请输入有效的数字";
-    }
-    if (min >= max) {
-      return "最低价必须小于最高价";
-    }
-    if (count < 2 || count > 200) {
-      return "网格数量必须在2-200之间";
-    }
-    if (invest < 100) {
-      return "投资金额至少为100 USDT";
-    }
-    if (new Date(startDate) >= new Date(endDate)) {
-      return "开始日期必须早于结束日期";
-    }
+    if (isNaN(min) || min <= 0) return "最低价必须大于0";
+    if (isNaN(max) || max <= 0) return "最高价必须大于0";
+    if (min >= max) return "最低价必须小于最高价";
+    if (isNaN(grid) || grid < 2 || grid > 200) return "网格数量必须在2-200之间";
+    if (isNaN(invest) || invest < 100) return "投资金额至少100 USDT";
+    if (!startDate || !endDate) return "请选择回测时间范围";
+    if (new Date(startDate) >= new Date(endDate)) return "开始日期必须早于结束日期";
+
     return null;
-  };
-
-  // 生成DOS命令行风格的结果文本
-  const generateDosResultLines = () => {
-    if (!backtestResult) return [];
-    
-    const {
-      totalProfit,
-      gridProfit,
-      unpairedProfit,
-      profitRate,
-      annualizedReturn,
-      arbitrageTimes,
-      dailyArbitrageTimes,
-      maxDrawdown,
-      maxDrawdownRate,
-      minAsset,
-      maxAsset,
-      dataCount,
-    } = backtestResult;
-
-    const lines = [
-      "========================================",
-      "  网格交易回测系统 v1.0",
-      "========================================",
-      "",
-      `> 回测日期范围: ${startDate} 至 ${endDate}`,
-      `> 回测数据量: ${dataCount || 0} 条K线数据`,
-      `> 初始投资: ${investment} USDT`,
-      `> 价格区间: ${priceMin} - ${priceMax} USDT`,
-      `> 网格数量: ${gridCount} 个`,
-      "",
-      "----------------------------------------",
-      "  回测结果统计",
-      "----------------------------------------",
-      "",
-      `最终余额: ${(parseFloat(investment) + totalProfit).toFixed(2)} USDT`,
-      `总收益: ${totalProfit >= 0 ? '+' : ''}${totalProfit.toFixed(2)} USDT`,
-      `收益率: ${profitRate >= 0 ? '+' : ''}${profitRate.toFixed(2)}%`,
-      `年化收益率: ${annualizedReturn.toFixed(2)}%`,
-      "",
-      `网格利润: ${gridProfit.toFixed(2)} USDT`,
-      `浮动盈亏: ${unpairedProfit.toFixed(2)} USDT`,
-      "",
-      `套利次数: ${arbitrageTimes} 次`,
-      `日均套利: ${dailyArbitrageTimes.toFixed(2)} 次/天`,
-      "",
-      `最大回撤: ${maxDrawdown.toFixed(2)} USDT (${maxDrawdownRate.toFixed(2)}%)`,
-      `资产最低值: ${minAsset.toFixed(2)} USDT`,
-      `资产最高值: ${maxAsset.toFixed(2)} USDT`,
-      "",
-      "========================================",
-      `  回测完成 - ${new Date().toLocaleString()}`,
-      "========================================",
-    ];
-
-    return lines;
   };
 
   // 如果未开始，显示启动按钮
@@ -360,86 +356,65 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                 2024全年
               </Button>
             </div>
-
-            {/* 自定义日期输入 */}
+            
+            {/* 日期选择器 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">开始日期</Label>
+                <Label className="text-sm">开始日期</Label>
                 <Input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  min="2017-01-01"
-                  max={endDate || "2026-12-31"}
                   className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">结束日期</Label>
+                <Label className="text-sm">结束日期</Label>
                 <Input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  min={startDate || "2017-01-01"}
-                  max="2026-12-31"
                   className="bg-background/50"
                 />
               </div>
             </div>
-
+            
             {/* 显示选择的天数 */}
             {daysDiff > 0 && (
-              <p className="text-sm text-muted-foreground">
-                已选择：{startDate} 至 {endDate}（共 {daysDiff} 天）
-              </p>
-            )}
-          </div>
-
-          {/* 杠杆倍数（仅合约网格） */}
-          {tradeType === "contract" && (
-            <div className="space-y-3">
-              <Label className="text-base">杠杆倍数：{leverage}x</Label>
-              <Slider
-                value={[leverage]}
-                onValueChange={(v) => setLeverage(v[0])}
-                min={1}
-                max={100}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>1x</span>
-                <span>50x</span>
-                <span>100x</span>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span>已选择 {daysDiff} 天</span>
               </div>
-            </div>
-          )}
-
-          {/* 说明文字 */}
-          <div className="text-sm text-muted-foreground space-y-2 bg-muted/50 p-4 rounded-lg">
-            <p className="font-semibold">仅需设置 2 个参数，即可快速创建策略。</p>
-            <div className="space-y-1">
-              <p>• <span className="font-semibold">价格区间：</span>区间内自动帮您低买高卖，超出区间则策略暂停。</p>
-              <p>• <span className="font-semibold">网格数量：</span>策略的挂单数量。数量越多，策略的买卖次数越多。</p>
-            </div>
+            )}
           </div>
 
           {/* 错误提示 */}
           {error && (
-            <div className="text-sm text-red-500 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
               {error}
             </div>
           )}
 
-          {/* 下一步按钮 */}
-          <Button
-            onClick={() => setStep(2)}
-            disabled={!!error}
-            className="w-full bg-[#c3ff00] hover:bg-[#b0e600] text-black font-semibold"
-            size="lg"
-          >
-            下一步
-          </Button>
+          {/* 操作按钮 */}
+          <div className="flex gap-3">
+            <Button
+              onClick={resetParams}
+              variant="outline"
+              className="flex-1"
+              size="lg"
+            >
+              重置
+            </Button>
+            <Button
+              onClick={() => setStep(2)}
+              disabled={!!error}
+              className="flex-1 bg-primary hover:bg-primary/90"
+              size="lg"
+            >
+              下一步
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -447,57 +422,42 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
 
   // 第2步：策略说明和回测执行
   if (step === 2) {
+    const currentDisplayData = getCurrentDisplayData();
+    
     return (
       <Card className="border-primary/20 bg-card/50 backdrop-blur">
-        <CardHeader className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-4 top-4"
-            onClick={resetParams}
-          >
-            <X className="w-4 h-4" />
-          </Button>
-          <CardTitle>运行策略</CardTitle>
-          <CardDescription>了解网格交易的运作原理</CardDescription>
+        <CardHeader>
+          <CardTitle>网格交易回测</CardTitle>
+          <CardDescription>
+            {symbol} 现货网格 · {startDate} 至 {endDate}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* 策略图表 / 实时进度 / DOS结果显示区域 */}
-          <div className="bg-black/90 p-6 rounded-lg border border-primary/30">
-            {!isLoading && !showDosResult ? (
-              // 未开始回测：显示策略图表
-              <div className="relative h-48 flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <TrendingUp className="w-16 h-16 mx-auto mb-2 opacity-50" />
-                  <p>策略图表展示</p>
-                  <p className="text-xs mt-1">低买高卖，循环套利，赚取网格利润</p>
-                </div>
-              </div>
-            ) : showDosResult ? (
-              // 回测完成：显示回测结果报告
-              <div className="relative min-h-[300px] text-foreground space-y-4 py-4">
-                <div className="text-center mb-6">
-                  <CheckCircle2 className="w-12 h-12 mx-auto mb-2 text-green-500" />
-                  <h3 className="text-xl font-bold">回测完成</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {startDate} 至 {endDate}
-                  </p>
-                </div>
+          {/* 回测结果或进度 */}
+          <div className="space-y-4">
+            {showDosResult && backtestResult ? (
+              // 显示最终结果
+              <div className="space-y-4">
+                <TypewriterLines
+                  lines={[
+                    `回测完成！共分析 ${backtestResult.dataCount || 0} 条K线数据`,
+                    `回测时长：${getDaysDiff()} 天`,
+                  ]}
+                  delay={50}
+                />
 
                 {backtestResult && (
-                  <div className="space-y-3 text-sm">
-                    {/* 回测数据量 */}
+                  <div className="space-y-2 bg-background/30 rounded-lg p-4 border border-border/50">
+                    {/* 初始资金 */}
                     <div className="flex justify-between items-center py-2 border-b border-border/50">
-                      <span className="text-muted-foreground">回测数据量</span>
-                      <span className="font-medium">{backtestResult.dataCount || 0} 条K线</span>
+                      <span className="text-muted-foreground">初始资金</span>
+                      <span className="font-medium">{parseFloat(investment).toFixed(2)} USDT</span>
                     </div>
 
                     {/* 最终余额 */}
                     <div className="flex justify-between items-center py-2 border-b border-border/50">
                       <span className="text-muted-foreground">最终余额</span>
-                      <span className="font-medium text-lg">
-                        {(parseFloat(investment) + backtestResult.totalProfit).toFixed(2)} USDT
-                      </span>
+                      <span className="font-medium">{backtestResult.finalBalance.toFixed(2)} USDT</span>
                     </div>
 
                     {/* 总收益 */}
@@ -568,14 +528,67 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                   </div>
                 )}
               </div>
-            ) : (
+            ) : isAnimating && currentDisplayData ? (
+              // 动画显示中：逐天显示累计数据
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-2">正在回测</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {currentDisplayData.date}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    第 {displayedDayIndex} / {progressData.dailyData.length} 天
+                  </p>
+                </div>
+
+                <div className="space-y-2 bg-background/30 rounded-lg p-4 border border-border/50">
+                  {/* 当前余额 */}
+                  <div className="flex justify-between items-center py-2 border-b border-border/50">
+                    <span className="text-muted-foreground">当前余额</span>
+                    <span className="font-bold text-lg">{currentDisplayData.balance.toFixed(2)} USDT</span>
+                  </div>
+
+                  {/* 累计收益 */}
+                  <div className="flex justify-between items-center py-2 border-b border-border/50">
+                    <span className="text-muted-foreground">累计收益</span>
+                    <span className={`font-bold text-lg ${
+                      currentDisplayData.totalProfit >= 0 ? 'text-red-500' : 'text-green-500'
+                    }`}>
+                      {currentDisplayData.totalProfit >= 0 ? '+' : ''}{currentDisplayData.totalProfit.toFixed(2)} USDT
+                    </span>
+                  </div>
+
+                  {/* 套利次数 */}
+                  <div className="flex justify-between items-center py-2 border-b border-border/50">
+                    <span className="text-muted-foreground">套利次数</span>
+                    <span className="font-medium">{currentDisplayData.gridTriggers} 次</span>
+                  </div>
+
+                  {/* 浮动盈亏 */}
+                  <div className="flex justify-between items-center py-2 border-b border-border/50">
+                    <span className="text-muted-foreground">浮动盈亏</span>
+                    <span className="font-medium">{currentDisplayData.floatingProfit.toFixed(2)} USDT</span>
+                  </div>
+
+                  {/* 最大回撤 */}
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-muted-foreground">最大回撤</span>
+                    <span className="font-medium text-red-500">
+                      {currentDisplayData.maxDrawdown.toFixed(2)} USDT
+                    </span>
+                  </div>
+                </div>
+
+                <Progress value={(displayedDayIndex / progressData.dailyData.length) * 100} className="h-2" />
+              </div>
+            ) : (isLoading || progressData?.status === 'running') ? (
               // 回测中：显示实时进度
               <div className="relative h-48 flex flex-col items-center justify-center space-y-4">
                 {progressData ? (
                   <>
                     {/* 当前回测日期 */}
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-2">正在回测</p>
+                      <p className="text-sm text-muted-foreground mb-2">正在计算回测数据</p>
                       <p className="text-2xl font-bold text-primary">
                         {progressData.currentDate || '准备中...'}
                       </p>
@@ -619,7 +632,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* 策略说明 */}
@@ -639,7 +652,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               variant="outline"
               className="flex-1 border-primary/50"
               size="lg"
-              disabled={isLoading}
+              disabled={isLoading || isAnimating}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               返回修改
@@ -650,6 +663,11 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                 setShowDosResult(false);
                 setBacktestResult(null);
                 setProgressData(null);
+                setDisplayedDayIndex(0);
+                setIsAnimating(false);
+                if (animationTimerRef.current) {
+                  clearInterval(animationTimerRef.current);
+                }
                 try {
                   const result = await backtestMutation.mutateAsync({
                     symbol,
@@ -662,9 +680,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                     startDate,
                     endDate,
                   });
-                  setBacktestResult(result.data);
-                  setIsLoading(false);
-                  setShowDosResult(true);
+                  // 不在这里设置结果，等待动画完成后再设置
                 } catch (error: any) {
                   setIsLoading(false);
                   setProgressData({
@@ -673,14 +689,14 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                   });
                 }
               }}
-              disabled={isLoading || showDosResult}
+              disabled={isLoading || isAnimating || showDosResult}
               className="flex-1 bg-[#c3ff00] hover:bg-[#b0e600] text-black font-semibold"
               size="lg"
             >
-              {isLoading ? (
+              {isLoading || isAnimating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  回测中...
+                  {isAnimating ? '动画显示中...' : '回测中...'}
                 </>
               ) : showDosResult ? (
                 <>
@@ -699,7 +715,16 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
           {/* 重新回测按钮（仅在显示DOS结果时显示） */}
           {showDosResult && (
             <Button
-              onClick={resetParams}
+              onClick={() => {
+                setShowDosResult(false);
+                setBacktestResult(null);
+                setProgressData(null);
+                setDisplayedDayIndex(0);
+                setIsAnimating(false);
+                if (animationTimerRef.current) {
+                  clearInterval(animationTimerRef.current);
+                }
+              }}
               variant="outline"
               className="w-full border-primary/50"
               size="lg"
