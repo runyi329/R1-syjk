@@ -8,8 +8,10 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { GridTradingBacktest } from "@/components/GridTradingBacktest";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function CryptoHistory() {
+  const { user } = useAuth();
   const [selectedCrypto, setSelectedCrypto] = useState<string>("BTC");
   const [fetchingTaskId, setFetchingTaskId] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState<string>(new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
@@ -115,6 +117,14 @@ export default function CryptoHistory() {
   });
 
   const handleStartFetch = () => {
+    // 检查用户权限
+    if (user?.role !== "admin") {
+      toast.error("权限不足", {
+        description: "您的权限不够，请联系管理员",
+      });
+      return;
+    }
+
     // BTC/USDT 开始时间：2017年8月17日 12:00 (UTC+8)
     const startTime = new Date("2017-08-17T12:00:00+08:00").getTime();
     const endTime = Date.now();
