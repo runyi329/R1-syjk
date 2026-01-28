@@ -673,33 +673,38 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               返回修改
             </Button>
             <Button
-              onClick={async () => {
+              onClick={() => {
+                // 启动回测，不等待结果，让进度轮询工作
                 setIsLoading(true);
                 setShowDosResult(false);
                 setBacktestResult(null);
                 setProgressData(null);
-                try {
-                  const result = await backtestMutation.mutateAsync({
-                    symbol,
-                    minPrice: parseFloat(priceMin),
-                    maxPrice: parseFloat(priceMax),
-                    gridCount: parseInt(gridCount),
-                    investment: parseFloat(investment),
-                    type: tradeType,
-                    leverage,
-                    startDate,
-                    endDate,
-                  });
-                  setBacktestResult(result.data);
-                  setIsLoading(false);
-                  setShowDosResult(true);
-                } catch (error: any) {
-                  setIsLoading(false);
-                  setProgressData({
-                    status: 'failed',
-                    errorMessage: error.message || "回测失败，请重试"
-                  });
-                }
+                
+                // 在后台执行回测，不阻塞界面
+                backtestMutation.mutate({
+                  symbol,
+                  minPrice: parseFloat(priceMin),
+                  maxPrice: parseFloat(priceMax),
+                  gridCount: parseInt(gridCount),
+                  investment: parseFloat(investment),
+                  type: tradeType,
+                  leverage,
+                  startDate,
+                  endDate,
+                }, {
+                  onSuccess: (result) => {
+                    setBacktestResult(result.data);
+                    setIsLoading(false);
+                    setShowDosResult(true);
+                  },
+                  onError: (error: any) => {
+                    setIsLoading(false);
+                    setProgressData({
+                      status: 'failed',
+                      errorMessage: error.message || "回测失败，请重试"
+                    });
+                  }
+                });
               }}
               disabled={isLoading || showDosResult}
               className="flex-1 bg-[#c3ff00] hover:bg-[#b0e600] text-black font-semibold"
