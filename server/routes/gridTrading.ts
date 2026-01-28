@@ -128,6 +128,9 @@ export const gridTradingRouter = router({
             });
             
             console.log(`[回测进度] ${progress.toFixed(1)}% | ${dateStr} | 已处理 ${totalKlines} 条K线 (${processedDays}/${totalDaysCount} 天)`);
+            
+            // 添加延迟，让前端有时间轮询和显示进度（0.5秒/天）
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
         );
 

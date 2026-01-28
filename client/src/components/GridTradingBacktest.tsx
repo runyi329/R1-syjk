@@ -35,7 +35,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     { symbol },
     { 
       enabled: isLoading,
-      refetchInterval: isLoading ? 1000 : false, // 每秒轮询一次
+      refetchInterval: isLoading ? 500 : false, // 每0.5秒轮询一次，更及时地显示进度
     }
   );
 
@@ -640,10 +640,22 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                     )}
                   </>
                 ) : (
-                  // 等待进度数据
-                  <div className="text-center">
-                    <Loader2 className="w-12 h-12 mx-auto mb-2 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">正在初始化回测...</p>
+                  // 等待进度数据 - 初始化阶段
+                  <div className="text-center space-y-4 py-6">
+                    <Loader2 className="w-12 h-12 mx-auto mb-3 animate-spin text-primary" />
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-bold">系统正在从币安调取数据</h3>
+                      <p className="text-sm text-muted-foreground">
+                        数据范围：{startDate} 至 {endDate}
+                      </p>
+                    </div>
+                    <div className="bg-muted/30 px-6 py-4 rounded-lg border border-border/50 max-w-md mx-auto">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        本次回测部署设计涉及 <span className="font-semibold text-foreground">大量 K 线数据</span>，系统正在从币安服务器调取历史行情数据。
+                        由于数据量较大，我们将在数据调取完成后通知您。
+                      </p>
+                    </div>
+                    <p className="text-xs text-primary/70">请稍候...</p>
                   </div>
                 )}
               </div>
