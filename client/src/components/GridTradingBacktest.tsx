@@ -16,10 +16,10 @@ interface GridTradingBacktestProps {
 
 export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
   const [step, setStep] = useState<number>(0); // 0: 未开始, 1: 参数设置, 2: 策略说明, 3: 回测结果
-  const [priceMin, setPriceMin] = useState<string>("");
-  const [priceMax, setPriceMax] = useState<string>("");
-  const [gridCount, setGridCount] = useState<string>("");
-  const [investment, setInvestment] = useState<string>("");
+  const [priceMin, setPriceMin] = useState<string>("10000");
+  const [priceMax, setPriceMax] = useState<string>("100000");
+  const [gridCount, setGridCount] = useState<string>("200");
+  const [investment, setInvestment] = useState<string>("100000");
   const [tradeType, setTradeType] = useState<"spot" | "contract">("spot");
   const [leverage, setLeverage] = useState<number>(1);
   const [startDate, setStartDate] = useState<string>("");
