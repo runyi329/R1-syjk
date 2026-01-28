@@ -2432,3 +2432,16 @@
 - [x] 修复状态重置问题，确保一次点击完成整个流程
 - [x] 确保所有状态变化都在黑色屏幕中连续显示
 - [ ] 测试回测流程，验证只需点击一次
+
+## Bug修复 - 回测结果显示0条K线 (2026-01-28)
+- [ ] 检查后端返回的dataCount字段
+- [ ] 查看gridTradingBacktestStreaming.ts中的finalizeBacktest函数
+- [ ] 确保dataCount正确计算并返回
+- [ ] 测试回测功能，验证K线数量显示正确
+
+## Bug修复完成 - 回测结果显示0条K线 (2026-01-28)
+- [x] 检查后端返回的dataCount字段
+- [x] 查看gridTradingBacktestStreaming.ts中的finalizeBacktest函数
+- [x] 在gridTrading路由中添加dataCount字段到返回结果
+- [x] 确保dataCount正确计算并返回
+- [ ] 测试回测功能，验证K线数量显示正确

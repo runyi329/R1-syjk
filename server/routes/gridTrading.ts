@@ -170,7 +170,10 @@ export const gridTradingRouter = router({
 
         return {
           success: true,
-          data: result,
+          data: {
+            ...result,
+            dataCount: totalKlines, // 添加K线数据量
+          },
           message: `回测完成，共分析${totalKlines}条K线数据（${processedDays}天），耗时${duration}秒`,
         };
       } catch (error: any) {
