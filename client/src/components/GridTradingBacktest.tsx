@@ -44,12 +44,6 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
     if (progressQuery.data?.data) {
       setProgressData(progressQuery.data.data);
       
-      // 如果回测完成，显示DOS命令行风格的结果
-      if (progressQuery.data.data.status === 'completed' && backtestResult) {
-        setIsLoading(false);
-        setShowDosResult(true);
-      }
-      
       // 如果回测失败，显示错误（但不使用toast）
       if (progressQuery.data.data.status === 'failed') {
         setIsLoading(false);
@@ -59,7 +53,7 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
         });
       }
     }
-  }, [progressQuery.data, backtestResult]);
+  }, [progressQuery.data]);
 
   // 快捷日期选择
   const setQuickDateRange = (range: string) => {
@@ -654,6 +648,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
               onClick={async () => {
                 setIsLoading(true);
                 setShowDosResult(false);
+                setBacktestResult(null);
+                setProgressData(null);
                 try {
                   const result = await backtestMutation.mutateAsync({
                     symbol,
@@ -667,7 +663,8 @@ export function GridTradingBacktest({ symbol }: GridTradingBacktestProps) {
                     endDate,
                   });
                   setBacktestResult(result.data);
-                  // 注意：不要立即跳转，等待进度查询检测到完成状态后自动显示DOS结果
+                  setIsLoading(false);
+                  setShowDosResult(true);
                 } catch (error: any) {
                   setIsLoading(false);
                   setProgressData({
