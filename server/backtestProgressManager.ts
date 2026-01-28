@@ -3,15 +3,6 @@
  * 用于在内存中存储和查询回测进度
  */
 
-interface DailyBacktestData {
-  date: string;
-  balance: number;
-  totalProfit: number;
-  gridTriggers: number;
-  floatingProfit: number;
-  maxDrawdown: number;
-}
-
 interface BacktestProgress {
   userId: string;
   symbol: string;
@@ -23,8 +14,6 @@ interface BacktestProgress {
   status: 'running' | 'completed' | 'failed';
   startTime: number;
   error?: string;
-  dailyData?: DailyBacktestData[]; // 每天的累计数据
-  finalResult?: any; // 最终结果
 }
 
 // 使用 Map 存储每个用户的回测进度
@@ -43,16 +32,10 @@ function getProgressKey(userId: string, symbol: string): string {
 export function updateBacktestProgress(
   userId: string,
   symbol: string,
-  data: Partial<BacktestProgress> & { dailyData?: DailyBacktestData }
+  data: Partial<BacktestProgress>
 ): void {
   const key = getProgressKey(userId, symbol);
   const existing = progressMap.get(key);
-  
-  // 处理 dailyData 的累积
-  let dailyDataArray = existing?.dailyData || [];
-  if (data.dailyData) {
-    dailyDataArray = [...dailyDataArray, data.dailyData];
-  }
   
   const progress: BacktestProgress = {
     userId,
@@ -65,8 +48,6 @@ export function updateBacktestProgress(
     status: data.status || existing?.status || 'running',
     startTime: data.startTime || existing?.startTime || Date.now(),
     error: data.error,
-    dailyData: dailyDataArray,
-    finalResult: data.finalResult || existing?.finalResult,
   };
   
   progressMap.set(key, progress);
