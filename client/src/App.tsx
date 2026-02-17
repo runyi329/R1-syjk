@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import BaccaratAnalysis from "./pages/BaccaratAnalysis";
 import CryptoAnalysis from "./pages/CryptoAnalysis";
 import WeeklyWinAnalysis from "./pages/WeeklyWinAnalysis";
+import WeeklyWinWhitepaper from "./pages/WeeklyWinWhitepaper";
 import FootballAnalysis from "./pages/FootballAnalysis";
 import PokerAnalysis from "./pages/PokerAnalysis";
 import Lottery from "./pages/Lottery";
@@ -52,6 +53,7 @@ function Router() {
         <Route path="/crypto-history" component={CryptoHistory} />
         <Route path="/crypto-analysis" component={CryptoAnalysis} />
         <Route path="/weekly-win" component={WeeklyWinAnalysis} />
+        <Route path="/weekly-win-whitepaper" component={WeeklyWinWhitepaper} />
         <Route path="/lottery" component={Lottery} />
         {/* 股票分析 */}
         <Route path="/stocks-a" component={StocksAAnalysis} />

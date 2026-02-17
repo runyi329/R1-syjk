@@ -191,9 +191,17 @@ export default function WeeklyWinAnalysis() {
 
         {/* 产品特点 */}
         <section id="features" className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2">产品特点</h2>
-            <p className="text-muted-foreground mb-6">周周赢的核心优势和创新设计</p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight mb-2">产品特点</h2>
+              <p className="text-muted-foreground">周周赢的核心优势和创新设计</p>
+            </div>
+            <Link href="/weekly-win-whitepaper">
+              <Button variant="outline" className="border-red-500/50 text-red-600 hover:bg-red-500/10 gap-2">
+                <Badge className="bg-red-500 text-white px-2 py-0.5 text-xs">必看</Badge>
+                产品白皮书
+              </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
