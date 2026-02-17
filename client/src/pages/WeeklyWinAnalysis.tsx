@@ -148,7 +148,7 @@ export default function WeeklyWinAnalysis() {
         <section className="space-y-6">
           <div className="text-center space-y-4">
             <h2 className="text-4xl font-bold tracking-tight">周周赢</h2>
-            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 每周可提现1%本金</p>
+            <p className="text-xl text-muted-foreground">数字货币托管交易产品 | 每周平均1%收益</p>
             <div className="flex justify-center gap-4 flex-wrap">
               <Badge className="bg-green-500/20 text-green-600 border-green-500/30">安全可靠</Badge>
               <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">全权委托</Badge>
