@@ -96,6 +96,9 @@ function getContractType(question: string): string {
 async function fetchPolymarketEvents(coin: string): Promise<PredictionGroup[]> {
   const keyword = coin === 'BTC' ? 'bitcoin' : 'ethereum';
   const excludeKeywords = ['megaeth', 'wbtc', 'wrapped', 'lbtc', 'stbtc', 'cbbtc', 'tbtc', 'ebtc'];
+  // 排除 "Up or Down" 短线题（5分钟/15分钟涨跌，无具体价格目标）
+  const excludeUpOrDown = /up or down|up-or-down/i;
+
   const excludeNonPrice = [
     'gas', 'gwei', 'etf flow', 'bitmine', 'flipped', 'flip bitcoin', 'volatility index',
     'eth/btc', 'eth-btc', 'dominance', 'market cap', 'market share', 'reserve', 'treasury',
@@ -117,6 +120,8 @@ async function fetchPolymarketEvents(coin: string): Promise<PredictionGroup[]> {
     const q = (event.title || event.question || '').toLowerCase();
     if (excludeKeywords.some((k) => q.includes(k))) continue;
     if (excludeNonPrice.some((k) => q.includes(k))) continue;
+    // 排除 Up or Down 短线题
+    if (excludeUpOrDown.test(event.title || event.question || '')) continue;
     if (!event.markets?.length) continue;
 
     for (const market of event.markets) {
