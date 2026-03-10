@@ -569,3 +569,23 @@ export const fetchTasks = mysqlTable("fetchTasks", {
 
 export type FetchTask = typeof fetchTasks.$inferSelect;
 export type InsertFetchTask = typeof fetchTasks.$inferInsert;
+
+/**
+ * Polymarket 预测竞猜 - 题目勾选状态表
+ * 存储管理员勾选的题目组，控制哪些题目在正式页面显示
+ */
+export const polymarketEnabled = mysqlTable("polymarketEnabled", {
+  id: int("id").autoincrement().primaryKey(),
+  /** 币种：BTC 或 ETH */
+  coin: mysqlEnum("coin", ["BTC", "ETH"]).notNull(),
+  /** 题目组的原始标题（作为唯一标识键） */
+  groupKey: varchar("groupKey", { length: 512 }).notNull(),
+  /** 是否启用显示 */
+  enabled: boolean("enabled").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  coinGroupKeyIdx: unique("coin_group_key_idx").on(table.coin, table.groupKey),
+}));
+export type PolymarketEnabled = typeof polymarketEnabled.$inferSelect;
+export type InsertPolymarketEnabled = typeof polymarketEnabled.$inferInsert;

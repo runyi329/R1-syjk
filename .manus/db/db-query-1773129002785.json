@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `polymarketEnabled` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `coin` enum('BTC','ETH') NOT NULL,\n  `groupKey` varchar(512) NOT NULL,\n  `enabled` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `polymarketEnabled_id` PRIMARY KEY(`id`),\n  CONSTRAINT `coin_group_key_idx` UNIQUE(`coin`, `groupKey`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user XTqR3P9v8tSgKnm.root --database jHCPjtWAoWrQh3F8kPBEFC --execute CREATE TABLE IF NOT EXISTS `polymarketEnabled` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `coin` enum('BTC','ETH') NOT NULL,\n  `groupKey` varchar(512) NOT NULL,\n  `enabled` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `polymarketEnabled_id` PRIMARY KEY(`id`),\n  CONSTRAINT `coin_group_key_idx` UNIQUE(`coin`, `groupKey`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 681
+}

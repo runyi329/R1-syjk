@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, BarChart3, TrendingUp } from "lucide-react";
+import { ArrowLeft, BarChart3, TrendingUp, Dices } from "lucide-react";
 import { Link } from "wouter";
 
 export default function CryptoAnalysis() {
@@ -104,6 +104,43 @@ export default function CryptoAnalysis() {
                 <Link href="/quantitative-trading">
                   <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                     了解详情
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            {/* 加密货币竞猜卡片 */}
+            <Card className="group hover:shadow-lg transition-all duration-300 border-border/60 hover:border-primary/50 overflow-hidden bg-card/80 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
+                    <Dices className="w-5 h-5" />
+                  </div>
+                  <CardTitle className="text-lg">加密货币竞猜</CardTitle>
+                </div>
+                <CardDescription>Polymarket 预测市场实时数据</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">数据来源</span>
+                    <span className="font-semibold text-primary">Polymarket</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">支持币种</span>
+                    <span className="font-semibold">BTC / ETH</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">展示内容</span>
+                    <span className="font-semibold">翻倍数 / 年化收益率</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">风险等级</span>
+                    <span className="font-semibold text-red-500">R5</span>
+                  </div>
+                </div>
+                <Link href="/prediction">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    查看竞猜数据
                   </Button>
                 </Link>
               </CardContent>

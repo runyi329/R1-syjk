@@ -39,6 +39,7 @@ import StockClientView from "./pages/StockClientView";
 import QuantitativeTrading from "./pages/QuantitativeTrading";
 import CryptoHistory from "./pages/CryptoHistory";
 import AStockPresentation from "./pages/AStockPresentation";
+import Prediction from "./pages/Prediction";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -53,6 +54,7 @@ function Router() {
         <Route path="/quantitative-trading" component={QuantitativeTrading} />
         <Route path="/crypto-history" component={CryptoHistory} />
         <Route path="/a-stock-presentation" component={AStockPresentation} />
+        <Route path="/prediction" component={Prediction} />
         <Route path="/crypto-analysis" component={CryptoAnalysis} />
         <Route path="/weekly-win" component={WeeklyWinAnalysis} />
         <Route path="/weekly-win-whitepaper" component={WeeklyWinWhitepaper} />
