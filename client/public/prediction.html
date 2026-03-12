@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>加密货币竞猜</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f13; color: #e0e0e0; min-height: 100vh; }
+header { background: #1a1a24; border-bottom: 1px solid #2a2a3a; padding: 12px 16px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
+header h1 { font-size: 16px; font-weight: 700; color: #fff; }
+.tabs { display: flex; gap: 6px; padding: 10px 16px; background: #0f0f13; border-bottom: 1px solid #1e1e2e; overflow-x: auto; }
+.tab { padding: 6px 14px; border-radius: 20px; border: 1px solid #333; background: transparent; color: #aaa; font-size: 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.tab.active { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
+/* 利润率切换栏 */
+.margin-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: #13131a; border-bottom: 1px solid #1e1e2e; overflow-x: auto; }
+.margin-label { font-size: 11px; color: #666; white-space: nowrap; flex-shrink: 0; }
+.margin-btn { padding: 4px 10px; border-radius: 14px; border: 1px solid #2a2a3a; background: transparent; color: #888; font-size: 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.margin-btn.active { background: #7c3aed; border-color: #7c3aed; color: #fff; font-weight: 600; }
+.disclaimer { margin: 10px 16px; padding: 8px 12px; background: #1e1e10; border: 1px solid #3a3a10; border-radius: 8px; font-size: 11px; color: #888; }
+.content { padding: 8px 16px 80px; }
+.hidden { display: none; }
+.card { margin-bottom: 10px; border-radius: 10px; overflow: hidden; }
+.bull-card { border: 1px solid #7f1d1d; background: #1a0a0a; }
+.bear-card { border: 1px solid #1e3a5f; background: #0a0f1a; }
+.card-header { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
+.bull-card .card-header { background: #2d0f0f; }
+.bear-card .card-header { background: #0d1a2d; }
+.card-title { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.4; }
+.bull-card .card-title { color: #fca5a5; }
+.bear-card .card-title { color: #93c5fd; }
+.time-label { font-size: 11px; color: #555; white-space: nowrap; }
+.rows { padding: 4px 0; }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.row:last-child { border-bottom: none; }
+.price { font-size: 13px; color: #ccc; }
+.val { font-size: 13px; font-weight: 700; }
+.bull-val { color: #f87171; }
+.bear-val { color: #60a5fa; }
+.db-group { margin-bottom: 10px; border: 1px solid #2a2a3a; border-radius: 10px; overflow: hidden; }
+.db-group.enabled { border-color: #3a5a3a; }
+.db-header { padding: 10px 12px; background: #1a1a24; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.checkbox-wrap { display: flex; align-items: flex-start; gap: 8px; flex: 1; cursor: pointer; }
+.checkbox-wrap input[type=checkbox] { width: 18px; height: 18px; margin-top: 1px; flex-shrink: 0; accent-color: #2563eb; cursor: pointer; }
+.db-title { font-size: 13px; font-weight: 600; color: #ccc; line-height: 1.4; }
+.db-body { display: grid; grid-template-columns: 1fr 1fr; }
+.db-col { padding: 4px 0; }
+.db-col:first-child { border-right: 1px solid #1e1e2e; }
+.db-col-label { font-size: 11px; font-weight: 700; padding: 4px 12px; }
+.bull-label { color: #f87171; background: #1a0a0a; }
+.bear-label { color: #60a5fa; background: #0a0f1a; }
+.loading { text-align: center; padding: 60px 20px; color: #555; font-size: 20px; letter-spacing: 4px; }
+.empty-msg { text-align: center; padding: 40px 20px; color: #555; font-size: 14px; line-height: 2; }
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; white-space: nowrap; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>加密货币竞猜</h1>
+  <span style="font-size:11px;color:#555;">Polymarket</span>
+</header>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('eth',this)">ETH</button>
+  <button class="tab" onclick="showTab('btc',this)">BTC</button>
+  <button class="tab" onclick="showTab('eth-db',this)">ETH库</button>
+  <button class="tab" onclick="showTab('btc-db',this)">BTC库</button>
+</div>
+<!-- 利润率切换栏，只在ETH/BTC展示页显示 -->
+<div class="margin-bar" id="margin-bar">
+  <span class="margin-label">公司利润：</span>
+  <button class="margin-btn active" onclick="setMargin(0,this)">原始</button>
+  <button class="margin-btn" onclick="setMargin(10,this)">10%</button>
+  <button class="margin-btn" onclick="setMargin(15,this)">15%</button>
+  <button class="margin-btn" onclick="setMargin(20,this)">20%</button>
+  <button class="margin-btn" onclick="setMargin(25,this)">25%</button>
+  <button class="margin-btn" onclick="setMargin(30,this)">30%</button>
+</div>
+<div class="disclaimer">红色=涨区翻倍数，蓝色=跌区年化收益率。数据来自 Polymarket，仅供参考。</div>
+<div class="content">
+  <div id="tab-eth"><div class="loading">...</div></div>
+  <div id="tab-btc" class="hidden"><div class="loading">...</div></div>
+  <div id="tab-eth-db" class="hidden"><div class="loading">...</div></div>
+  <div id="tab-btc-db" class="hidden"><div class="loading">...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API = '/api/trpc';
+const loaded = {};
+let currentTab = 'eth';
+let marginPct = 0;
+let cachedGroups = {};
+function setMargin(pct, btn) {
+  marginPct = pct;
+  document.querySelectorAll('.margin-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 重新渲染当前展示页
+  if (currentTab === 'eth' || currentTab === 'btc') {
+    const el = document.getElementById('tab-'+currentTab);
+    const groups = cachedGroups[currentTab];
+    if (groups !== undefined) {
+      el.innerHTML = renderDisplay(groups);
+    }
+  }
+}
+
+function showTab(name, btn) {
+  ['eth','btc','eth-db','btc-db'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentTab = name;
+  // 利润率栏只在展示页显示
+  const mb = document.getElementById('margin-bar');
+  mb.style.display = (name === 'eth' || name === 'btc') ? 'flex' : 'none';
+  if (!loaded[name]) { loaded[name] = true; loadTab(name); }
+}
+
+function timeLabel(d) {
+  if (!d) return '';
+  const days = Math.floor((new Date(d) - new Date()) / 86400000);
+  if (days < 0) return '已截止';
+  if (days === 0) return '今天截止';
+  if (days < 30) return days + '天后截止';
+  if (days < 365) return Math.floor(days/30) + '个月后截止';
+  return (days/365).toFixed(1) + '年后截止';
+}
+function daysLeft(d) { return d ? Math.max(1, Math.floor((new Date(d)-new Date())/86400000)) : 365; }
+
+// 原始翻倍数，再乘以 (1 - margin%)
+function fmtM(p) {
+  if(p<=0||p>=1) return '—';
+  const m = (1/p) * (1 - marginPct/100);
+  if(m < 1.01) return '—';
+  return '翻'+(m>=10?Math.round(m):m.toFixed(1))+'倍';
+}
+// 原始年化收益率，再乘以 (1 - margin%)
+function fmtA(p, dl) {
+  if(p<=0||p>=1) return '—';
+  const a = (1-p)/p*365/dl*100 * (1 - marginPct/100);
+  if(a < 0.1) return '—';
+  if(a>=10000) return '年化'+Math.round(a/100)*100+'%';
+  if(a>=1000) return '年化'+Math.round(a/10)*10+'%';
+  if(a>=100) return '年化'+Math.round(a)+'%';
+  return '年化'+a.toFixed(1)+'%';
+}
+
+function renderDisplay(groups) {
+  if (!groups || !groups.length) return '<div class="empty-msg">暂无勾选数据<br>请前往 ETH库 或 BTC库 勾选要展示的题目</div>';
+  let h = '';
+  for (const g of groups) {
+    const bull = g.bullTitleZh || g.rawTitle || '';
+    const bear = g.bearTitleZh || bull;
+    const items = g.items || [];
+    const ed = items.map(i=>i.endDate).filter(Boolean)[0];
+    const tl = timeLabel(ed); const dl = daysLeft(ed);
+    const th = tl ? '<span class="time-label">'+tl+'</span>' : '';
+    let br='', ar='';
+    for (const it of items) {
+      const pl = it.priceLabel||''; if(pl==='?') continue;
+      br += '<div class="row"><span class="price">'+pl+'</span><span class="val bull-val">'+fmtM(it.yesProb)+'</span></div>';
+      ar += '<div class="row"><span class="price">'+pl+'</span><span class="val bear-val">'+fmtA(it.noProb,dl)+'</span></div>';
+    }
+    if(br) h += '<div class="card bull-card"><div class="card-header"><span class="card-title">'+bull+'</span>'+th+'</div><div class="rows">'+br+'</div></div>';
+    if(ar) h += '<div class="card bear-card"><div class="card-header"><span class="card-title">'+bear+'</span>'+th+'</div><div class="rows">'+ar+'</div></div>';
+  }
+  return h || '<div class="empty-msg">暂无勾选数据<br>请前往 ETH库 或 BTC库 勾选要展示的题目</div>';
+}
+
+function renderDb(groups, coin) {
+  let h = '';
+  groups.forEach(function(g, i) {
+    const bull = g.bullTitleZh || g.rawTitle || '';
+    const items = g.items || [];
+    const ed = items.map(function(it){return it.endDate;}).filter(Boolean)[0];
+    const tl = timeLabel(ed); const dl = daysLeft(ed);
+    const th = tl ? '<span class="time-label">'+tl+'</span>' : '';
+    const en = g.enabled || false;
+    const rk = (g.rawTitle||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const gid = coin+'_'+i;
+    // 库里用原始赔率（不加利润）
+    function fmtMraw(p) { if(p<=0||p>=1) return '—'; const m=1/p; return '翻'+(m>=10?Math.round(m):m.toFixed(1))+'倍'; }
+    function fmtAraw(p,dl2) { if(p<=0||p>=1) return '—'; const a=(1-p)/p*365/dl2*100; if(a>=10000) return '年化'+Math.round(a/100)*100+'%'; if(a>=1000) return '年化'+Math.round(a/10)*10+'%'; if(a>=100) return '年化'+Math.round(a)+'%'; return '年化'+a.toFixed(1)+'%'; }
+    let br='', ar='';
+    for (const it of items) {
+      const pl = it.priceLabel||''; if(pl==='?') continue;
+      br += '<div class="row"><span class="price">'+pl+'</span><span class="val bull-val">'+fmtMraw(it.yesProb)+'</span></div>';
+      ar += '<div class="row"><span class="price">'+pl+'</span><span class="val bear-val">'+fmtAraw(it.noProb,dl)+'</span></div>';
+    }
+    h += '<div class="db-group'+(en?' enabled':'')+'" id="grp-'+gid+'">';
+    h += '<div class="db-header"><label class="checkbox-wrap"><input type="checkbox" '+(en?'checked':'')+' onchange="toggle(\''+coin+'\',\''+rk+'\',this.checked,\''+gid+'\')"><span class="db-title">'+bull+'</span></label>'+th+'</div>';
+    h += '<div class="db-body"><div class="db-col"><div class="db-col-label bull-label">涨区</div>'+(br||'<div class="row"><span class="price" style="color:#444">无数据</span></div>')+'</div>';
+    h += '<div class="db-col"><div class="db-col-label bear-label">跌区</div>'+(ar||'<div class="row"><span class="price" style="color:#444">无数据</span></div>')+'</div></div></div>';
+  });
+  return h;
+}
+
+async function loadTab(name) {
+  const el = document.getElementById('tab-'+name);
+  try {
+    if (name==='eth' || name==='btc') {
+      const coin = name.toUpperCase();
+      const url = API+'/prediction.getEvents?input='+encodeURIComponent(JSON.stringify({json:{coin}}));
+      const r = await fetch(url); const d = await r.json();
+      const groups = (d && d.result && d.result.data && d.result.data.json && d.result.data.json.groups) || null;
+      cachedGroups[name] = groups; // 缓存数据
+      el.innerHTML = renderDisplay(groups);
+    } else {
+      const coin = name.replace('-db','').toUpperCase();
+      const url = API+'/prediction.getAllEvents?input='+encodeURIComponent(JSON.stringify({json:{coin}}));
+      const r = await fetch(url); const d = await r.json();
+      el.innerHTML = renderDb((d && d.result && d.result.data && d.result.data.json && d.result.data.json.groups)||[], coin);
+    }
+  } catch(e) { el.innerHTML = '<div class="empty-msg">加载失败，请稍后重试</div>'; console.error(e); }
+}
+
+async function toggle(coin, key, checked, gid) {
+  try {
+    const r = await fetch(API+'/prediction.toggle', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({json:{coin:coin,key:key,checked:checked}})
+    });
+    const d = await r.json();
+    if (d && d.result && d.result.data && d.result.data.json && d.result.data.json.ok) {
+      const grp = document.getElementById('grp-'+gid);
+      if (grp) grp.classList.toggle('enabled', checked);
+      showToast(checked ? '已勾选' : '已取消');
+      delete loaded[coin.toLowerCase()];
+      delete cachedGroups[coin.toLowerCase()];
+    } else { showToast('操作失败'); }
+  } catch(e) { showToast('操作失败，请重试'); console.error(e); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');}, 2000);
+}
+
+loaded['eth'] = true;
+loadTab('eth');
+</script>
+</body>
+</html>
