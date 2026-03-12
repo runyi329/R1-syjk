@@ -11,6 +11,7 @@ const ATH: Record<string, number> = { BTC: 125835, ETH: 4953.73 };
 // 内存缓存（5分钟）
 const translateCache = new Map<string, { bull: string; bear: string }>();
 const groupCache = new Map<string, { data: PredictionGroup[]; ts: number }>();
+const priceCache = new Map<string, { data: { prices: { ts: number; price: number }[] }; ts: number }>();
 
 interface PredictionItem {
   price: number | null;
@@ -31,9 +32,20 @@ interface PredictionGroup {
   items: PredictionItem[];
 }
 
-async function translateGroupTitle(title: string): Promise<{ bull: string; bear: string }> {
-  if (translateCache.has(title)) return translateCache.get(title)!;
+async function translateGroupTitle(title: string, endDate?: string | null): Promise<{ bull: string; bear: string }> {
+  const cacheKey = title + (endDate || '');
+  if (translateCache.has(cacheKey)) return translateCache.get(cacheKey)!;
   try {
+    // 计算截止日期描述（固定日期，不用相对时间）
+    let timeDesc = '';
+    if (endDate) {
+      const d = new Date(endDate);
+      const y = d.getFullYear();
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      timeDesc = `${y}年${m}月${day}日`;
+    }
+    const timeHint = timeDesc ? `\n截止时间提示：该竞猜在${timeDesc}截止，请将截止日期自然融入标题，如"在${timeDesc}前"。` : '';
     const prompt = [
       '将以下加密货币预测市场的系列标题翻译成简体中文。需要输出两个标题：',
       '第一行：正向标题（涨区）——描述"价格会上涨到这个价位"的问题',
@@ -46,6 +58,7 @@ async function translateGroupTitle(title: string): Promise<{ bull: string; bear:
       '4) 反向标题用词：不会触及、不会守住（跌破）、不会跌至、不会创历史新高',
       '5) 标题要自然流畅，如同金融资讯标题，不要生硬拼凑',
       '6) 只输出两行，不加任何标签、解释或引号',
+      timeHint,
       '',
       '原文：',
       title,
@@ -60,7 +73,7 @@ async function translateGroupTitle(title: string): Promise<{ bull: string; bear:
     const bullTitle = (lines[0] || title).replace(/\$PRICE/g, '以下价格');
     const bearTitle = (lines[1] || bullTitle).replace(/\$PRICE/g, '以下价格');
     const out = { bull: bullTitle, bear: bearTitle };
-    translateCache.set(title, out);
+    translateCache.set(cacheKey, out);
     return out;
   } catch {
     const fallback = { bull: title, bear: title };
@@ -186,7 +199,8 @@ async function fetchPolymarketEvents(coin: string): Promise<PredictionGroup[]> {
   const groupArr = Array.from(groups.values());
   await Promise.all(
     groupArr.map(async (g) => {
-      const zh = await translateGroupTitle(g.rawTitle);
+      const endDate = g.items[0]?.endDate || null;
+      const zh = await translateGroupTitle(g.rawTitle, endDate);
       g.bullTitleZh = zh.bull;
       g.bearTitleZh = zh.bear;
       g.titleZh = zh.bull;
@@ -221,8 +235,8 @@ export const predictionRouter = router({
       );
       const enabledKeys = new Set(enabledRows.map((r) => r.groupKey));
 
-      // 无勾选时显示全部，有勾选时只显示勾选的
-      const data = enabledKeys.size > 0 ? groups.filter((g) => enabledKeys.has(g.rawTitle)) : groups;
+      // 只显示勾选的，无勾选时返回空
+      const data = groups.filter((g) => enabledKeys.has(g.rawTitle));
       return { groups: data };
     }),
 
@@ -285,5 +299,20 @@ export const predictionRouter = router({
     .mutation(async ({ input }) => {
       groupCache.delete(input.coin);
       return { ok: true };
+    }),
+  // 价格历史（代理CoinGecko）
+  priceHistory: publicProcedure
+    .input(z.object({ coin: z.enum(['BTC', 'ETH']), days: z.number().default(2) }))
+    .query(async ({ input }) => {
+      const { coin, days } = input;
+      const coinId = coin === 'ETH' ? 'ethereum' : 'bitcoin';
+      const cacheKey = 'price_'+coin+'_'+days;
+      const cached = priceCache.get(cacheKey);
+      if (cached && Date.now() - cached.ts < 5 * 60 * 1000) return cached.data;
+      const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
+      const json = await res.json() as { prices?: [number, number][] };
+      const prices = (json.prices || []).map(([ts, price]: [number, number]) => ({ ts, price }));
+      priceCache.set(cacheKey, { data: { prices }, ts: Date.now() });
+      return { prices };
     }),
 });
